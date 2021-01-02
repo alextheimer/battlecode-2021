@@ -11,15 +11,15 @@ public class Util {
 	 */
 	public static class IntCoord {
 		public final int x, y;
-		public IntCoord(int x, int y) {
+		public IntCoord(final int x, final int y) {
 			this.x = x;
 			this.y = y;
 		}
-		public boolean sameValue(IntCoord other) {
+		public boolean sameValue(final IntCoord other) {
 			return (this.x == other.x) && (this.y == other.y);
 		}
 		@Override
-		public boolean equals(Object other) {
+		public boolean equals(final Object other) {
 			return (other instanceof IntCoord) && (this.sameValue((IntCoord)other));
 		}
 		@Override

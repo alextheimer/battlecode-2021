@@ -1,13 +1,16 @@
 package test;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-import java.util.function.Predicate;
-import main.Util.IntCoord;
-import java.util.function.Function;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
+
+import main.Util.IntCoord;
 
 class SearchTest {
 
@@ -25,41 +28,41 @@ class SearchTest {
 	 *         -result is length 1 (start == end), result > length 1
 	 *     TODO(theimer): endgame is one node; endgame encompasses multiple nodes
 	 */
-	
+
 	/*==== Common Functions ====================================================================*/
-	
+
 	// Utils ---------------------------------------------------------
-	
-	boolean intCoordInBounds(IntCoord coord, int xMin, int xMax, int yMin, int yMax) {
+
+	boolean intCoordInBounds(final IntCoord coord, final int xMin, final int xMax, final int yMin, final int yMax) {
 		return ((coord.x >= xMin) && (coord.x < xMax) &&
 			    (coord.y >= yMin) && (coord.y < yMax));
 	}
-	
+
 	// isEndgameCheck ------------------------------------------------
-	
-	Predicate<IntCoord> makeEndgamePred(IntCoord goal) {
+
+	Predicate<IntCoord> makeEndgamePred(final IntCoord goal) {
 		return coord -> goal.equals(coord);
 	}
-	
+
 	// cost ----------------------------------------------------------
-	
-	double cost(IntCoord coordA, IntCoord coordB) {
+
+	double cost(final IntCoord coordA, final IntCoord coordB) {
 		return Math.sqrt(Math.pow(coordA.x - coordB.x, 2) + (Math.pow(coordA.y - coordB.y, 2)));
 	}
-	
+
 	// heuristic -----------------------------------------------------
-	
-	Function<IntCoord, Double> makeHeuristicFunc(IntCoord goal) {
+
+	Function<IntCoord, Double> makeHeuristicFunc(final IntCoord goal) {
 		return coord -> cost(coord, goal);
 	}
-	
+
 	// expand --------------------------------------------------------
-	
-	Function<IntCoord, Set<IntCoord>> makeExpandFuncCardinal(IntCoord baseCoord, int xMin,
-			                                                 int xMax, int yMin, int yMax) {
+
+	Function<IntCoord, Set<IntCoord>> makeExpandFuncCardinal(final IntCoord baseCoord, final int xMin,
+			                                                 final int xMax, final int yMin, final int yMax) {
 		return new Function<IntCoord, Set<IntCoord>>() {
 			@Override
-			public Set<IntCoord> apply(IntCoord coord) {
+			public Set<IntCoord> apply(final IntCoord coord) {
 				assert intCoordInBounds(baseCoord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
 				// TODO(theimer): make this faster if speed matters.
 				return Stream.of(
@@ -72,9 +75,9 @@ class SearchTest {
 			}
 		};
 	}
-	
+
 	/*==== Unit Tests ==========================================================================*/
-	
+
 	/**
 	 * Covers:
      *     cost- returns 0 at least once during search
@@ -85,7 +88,7 @@ class SearchTest {
 	void aStarCostReturnsZeroAndBidirectionalWithSelfLoops() {
 		fail("Not yet implemented");
 	}
-	
+
 	/**
 	 * Covers:
      *     cost- never returns 0 during search
@@ -95,7 +98,7 @@ class SearchTest {
 	void aStarBidirectionalAndOneWay() {
 		fail("Not yet implemented");
 	}
-	
+
 	/**
 	 * Covers:
      *     return- no valid path
@@ -104,7 +107,7 @@ class SearchTest {
 	void aStarNoPath() {
 		fail("Not yet implemented");
 	}
-	
+
 	/**
 	 * Covers:
      *     return- length == 1
@@ -113,7 +116,7 @@ class SearchTest {
 	void aStarStartInEndgame() {
 		fail("Not yet implemented");
 	}
-	
+
 	/**
 	 * Covers:
      *     expand- returns empty set during search
