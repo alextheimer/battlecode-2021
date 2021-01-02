@@ -9,9 +9,10 @@ import java.util.function.Predicate;
 /**
  * Implements various search algorithms.
  */
-public class Search<T> {
+public class Search {
 	/**
 	 * Returns a shortest path between two T.
+	 * @param <T> TODO(theimer)
 	 * @param startObj begin the search here. Must lie within valid search space.
 	 * @param isEndgameCheck returns true if and only if its argument lies in the endgame.
 	 * @param expand returns the set of all T adjacent to its argument.
@@ -26,7 +27,7 @@ public class Search<T> {
 	 *     Returns a List of length 1 [startObj] if startObj lies within the endgame.
 	 *     Returns an empty List if there is no path from startObj to the endgame.
 	 */
-	public List<T> aStar(final T startObj, final Predicate<T> isEndgameCheck, final Function<T, Set<T>> expand,
+	public static <T> List<T> aStar(final T startObj, final Predicate<T> isEndgameCheck, final Function<T, Set<T>> expand,
 			final BiFunction<T, T, Double> cost, final Function<T, Double> heuristic) {
 		assert false : "Needs implementation!";
 		return List.of();
