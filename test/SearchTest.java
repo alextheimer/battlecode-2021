@@ -2,9 +2,12 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import javafx.util.Pair;
-
-class IntPair extends Pair<Integer, Integer> {public IntPair(int i1, int i2) {super(i1, i2);}}
+import java.util.function.Predicate;
+import main.Util.IntCoord;
+import java.util.function.Function;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class SearchTest {
 
@@ -20,7 +23,57 @@ class SearchTest {
 	 *     result
 	 *         -no valid path, valid path
 	 *         -result is length 1 (start == end), result > length 1
+	 *     TODO(theimer): endgame is one node; endgame encompasses multiple nodes
 	 */
+	
+	/*==== Common Functions ====================================================================*/
+	
+	// Utils ---------------------------------------------------------
+	
+	boolean intCoordInBounds(IntCoord coord, int xMin, int xMax, int yMin, int yMax) {
+		return ((coord.x >= xMin) && (coord.x < xMax) &&
+			    (coord.y >= yMin) && (coord.y < yMax));
+	}
+	
+	// isEndgameCheck ------------------------------------------------
+	
+	Predicate<IntCoord> makeEndgamePred(IntCoord goal) {
+		return coord -> goal.equals(coord);
+	}
+	
+	// cost ----------------------------------------------------------
+	
+	double cost(IntCoord coordA, IntCoord coordB) {
+		return Math.sqrt(Math.pow(coordA.x - coordB.x, 2) + (Math.pow(coordA.y - coordB.y, 2)));
+	}
+	
+	// heuristic -----------------------------------------------------
+	
+	Function<IntCoord, Double> makeHeuristicFunc(IntCoord goal) {
+		return coord -> cost(coord, goal);
+	}
+	
+	// expand --------------------------------------------------------
+	
+	Function<IntCoord, Set<IntCoord>> makeExpandFuncCardinal(IntCoord baseCoord, int xMin,
+			                                                 int xMax, int yMin, int yMax) {
+		return new Function<IntCoord, Set<IntCoord>>() {
+			@Override
+			public Set<IntCoord> apply(IntCoord coord) {
+				assert intCoordInBounds(baseCoord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
+				// TODO(theimer): make this faster if speed matters.
+				return Stream.of(
+					new IntCoord(baseCoord.x + 1, baseCoord.y),
+					new IntCoord(baseCoord.x - 1, baseCoord.y),
+					new IntCoord(baseCoord.x, baseCoord.y + 1),
+					new IntCoord(baseCoord.x, baseCoord.y - 1)
+				).filter(expandedCoord -> intCoordInBounds(expandedCoord, xMin, xMax, yMin, yMax))
+			     .collect(Collectors.toSet());
+			}
+		};
+	}
+	
+	/*==== Unit Tests ==========================================================================*/
 	
 	/**
 	 * Covers:
