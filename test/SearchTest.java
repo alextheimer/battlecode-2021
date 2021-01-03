@@ -1,8 +1,11 @@
 package test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -10,6 +13,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
+import main.Search;
 import main.Util.IntCoord;
 
 class SearchTest {
@@ -37,7 +41,7 @@ class SearchTest {
 	 * Returns true if coord lies within the space defined by:
 	 *     {coord.x on [xMin, xMax) && coord.y on [yMin, yMax)}
 	 */
-	boolean intCoordInBounds(final IntCoord coord, final int xMin, final int xMax,
+	static boolean intCoordInBounds(final IntCoord coord, final int xMin, final int xMax,
 			                 final int yMin, final int yMax) {
 		return ((coord.x >= xMin) && (coord.x < xMax) &&
 			    (coord.y >= yMin) && (coord.y < yMax));
@@ -48,7 +52,7 @@ class SearchTest {
 	/**
 	 * Returns a Predicate that returns true if and only if its argument equals() goal.
 	 */
-	Predicate<IntCoord> makeEndgamePred(final IntCoord goal) {
+	static Predicate<IntCoord> makeEndgamePred(final IntCoord goal) {
 		return coord -> goal.equals(coord);
 	}
 
@@ -57,7 +61,7 @@ class SearchTest {
 	/**
 	 * Returns the Euclidian distance between the argument IntCoords.
 	 */
-	double cost(final IntCoord coordA, final IntCoord coordB) {
+	static double cost(final IntCoord coordA, final IntCoord coordB) {
 		return Math.sqrt(Math.pow(coordA.x - coordB.x, 2) + (Math.pow(coordA.y - coordB.y, 2)));
 	}
 
@@ -66,7 +70,7 @@ class SearchTest {
 	/**
 	 * Returns a Function that returns the Euclidian distance of an IntCoord from goal.
 	 */
-	Function<IntCoord, Double> makeHeuristicFunc(final IntCoord goal) {
+	static Function<IntCoord, Double> makeHeuristicFunc(final IntCoord goal) {
 		return coord -> cost(coord, goal);
 	}
 
@@ -75,7 +79,7 @@ class SearchTest {
 	/**
 	 * Returns a Function that expands an IntCoord into its cardinal neighbors. TODO(theimer): explain.
 	 */
-	Function<IntCoord, Set<IntCoord>> makeExpandFuncCardinal(final int xMin, final int xMax,
+	static Function<IntCoord, Set<IntCoord>> makeExpandFuncCardinal(final int xMin, final int xMax,
 			                                                 final int yMin, final int yMax) {
 		return new Function<IntCoord, Set<IntCoord>>() {
 			@Override
@@ -131,7 +135,20 @@ class SearchTest {
 	 */
 	@Test
 	void aStarStartInEndgame() {
-		fail("Not yet implemented");
+		final int xMin = 0;
+		final int xMax = 10;
+		final int yMin = 0;
+		final int yMax = 10;
+		final IntCoord startCoord = new IntCoord(0, 0);
+		final IntCoord goalCoord = new IntCoord(0, 0);
+		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
+		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFuncCardinal(xMin, xMax, yMin, yMax);
+		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
+		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		assertEquals(startCoord, goalCoord);  // sanity check
+		assertEquals(result.size(), 1);  // TODO(theimer): messages
+		assertEquals(result.get(0), startCoord);
 	}
 
 	/**
