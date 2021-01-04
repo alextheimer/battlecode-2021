@@ -1,6 +1,7 @@
 package test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
@@ -109,7 +110,7 @@ class SearchTest {
      *     result- length > 1, valid path
 	 */
 	@Test
-	void aStarCostReturnsZeroAndBidirectional() {
+	void aStarLongAndOnlyBidirectional() {
 		final int xMin = 0;
 		final int xMax = 20;
 		final int yMin = 0;
@@ -117,13 +118,17 @@ class SearchTest {
 		final IntCoord startCoord = new IntCoord(xMin, yMin);
 		final IntCoord goalCoord = new IntCoord(xMax/2, yMax/2);
 		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
-		final BiPredicate<IntCoord, IntCoord> noDiagFilter =
-				(coord, expandedCoord) -> (expandedCoord.x != expandedCoord.y);
-		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, noDiagFilter);
+		final BiPredicate<IntCoord, IntCoord> allFilter = (coord, expandedCoord) -> true;
+		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, allFilter);
 		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
-		assertEquals(result.size(), 0);  // TODO(theimer): messages
+		assertTrue(result.size() > 1);
+		assertEquals(startCoord, result.get(0), String.format(
+				"startCoord: (%d, %d), result.get(0): (%d, %d)",
+				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y));
+		assertEquals(goalCoord, result.get(result.size()-1));
+		// TODO(theimer): assert connected by edges
 	}
 
 	/**
