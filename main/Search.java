@@ -1,15 +1,67 @@
 package main;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+class Node<T> {
+	public final T element;
+	public double costTo;
+	public double costSum;
+	public Node<T> parent;
+
+	public Node(final T element, final double costTo, final double costSum, final Node<T> parent) {
+		this.element = element;
+		this.costTo = costTo;
+		this.costSum = costSum;
+		this.parent = parent;
+	}
+
+//	public boolean sameValue(final Node<?> other) {
+//		return (this.element.equals(other.element) &&
+//			    (this.costFrom == other.costFrom) &&
+//			    (this.costTo == other.costTo));
+//	}
+//
+//	@Override
+//	public int hashCode() {
+//		return Objects.hash(this.element, this.costFrom, this.costTo);
+//	}
+//
+//	@Override
+//	public boolean equals(final Object other) {
+//		return ((other instanceof Node<?>) && this.sameValue((Node<?>)other));
+//	}
+
+}
 
 /**
  * Implements various search algorithms.
  */
 public class Search {
+
+	private static <T> List<T> makeElementPath(final Node<T> tail) {
+		final Stack<T> path = new Stack<>();
+		Node<T> ptr = tail;
+		while (ptr != null) {
+			path.push(ptr.element);
+			ptr = ptr.parent;
+		}
+		return Collections.unmodifiableList(path);
+	}
+
+	private static <T> List<T> makeNullPath() {
+		return List.of();
+	}
+
 	/**
 	 * Returns a shortest path between two T.
 	 * @param <T> TODO(theimer)
@@ -29,7 +81,59 @@ public class Search {
 	 */
 	public static <T> List<T> aStar(final T startObj, final Predicate<T> isEndgameCheck, final Function<T, Set<T>> expand,
 			final BiFunction<T, T, Double> cost, final Function<T, Double> heuristic) {
-		assert false : "Needs implementation!";
-		return List.of();
+		// build the start node
+		final Node<T> startNode;
+		{
+			// these variables only exist as clarification
+			final double startCost = 0;
+			final double startHeuristic = heuristic.apply(startObj);
+			final Node<T> startParent = null;
+			startNode = new Node<>(startObj, startCost, startHeuristic, startParent);
+		}
+
+		// initialize the data structures
+		final PriorityQueue<Node<T>> pQueue = new PriorityQueue<>(List.of(startNode));
+		final Map<T, Node<T>> nodeMap = new HashMap<>(Map.of(startObj, startNode));  // contains only nodes in pQueue
+		final Set<T> closed = new HashSet<>();  // been popped from pQueue.
+
+		// begin A* algorithm
+		while (pQueue.size() > 0) {
+			final Node<T> popped = pQueue.poll();
+			nodeMap.remove(popped.element);
+			closed.add(popped.element);
+			assert popped != null : "null Node popped from the queue!";
+			if (isEndgameCheck.test(popped.element)) {
+				// found an element in the endgame; ready to return a path.
+				// TODO(theimer): make immutable
+				return Search.makeElementPath(popped);
+			}
+			final Set<T> expanded = expand.apply(popped.element);
+			for (final T expandedObj : expanded) {
+				if (nodeMap.containsKey(expandedObj)) {  // pQueue contains expandedObj's Node
+					final double expandedCost = popped.costTo + cost.apply(popped.element, expandedObj);
+					final double expandedHeuristic = heuristic.apply(expandedObj);
+					final double expandedSum = expandedCost + expandedHeuristic;
+					final Node<T> containedNode = nodeMap.get(expandedObj);
+					if (containedNode.costSum > expandedSum) {
+						pQueue.remove(containedNode);
+						containedNode.costTo = expandedCost;
+						containedNode.costSum = expandedSum;
+						containedNode.parent = popped;
+						pQueue.add(containedNode);
+					}
+
+				}
+				else if (!closed.contains(expandedObj)) {  // neither open nor closed contains expandedObj
+					final double expandedCost = popped.costTo + cost.apply(popped.element, expandedObj);
+					final double expandedHeuristic = heuristic.apply(expandedObj);
+					final double expandedSum = expandedCost + expandedHeuristic;
+					final Node<T> expandedNode = new Node<>(expandedObj, expandedCost, expandedSum, popped);
+					pQueue.add(expandedNode);
+					nodeMap.put(expandedObj, expandedNode);
+				}
+			}
+		}
+		// reach here only if no path was found; return the "null" path.
+		return Search.makeNullPath();
 	}
 }
