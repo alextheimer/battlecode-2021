@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 
 // TODO(theimer): make this exclusive to A*
 //     (also probably make this file AStar.java if no other searches are needed)
-class Node<T> {
+class Node<T> implements Comparable<Node<T>> {
 	private final T element;
 	private double costTo;  // the best-known cost to this Node from some initial Node.
 	private double costSum;  // the best-known sum of costTo and some heuristic
@@ -53,6 +53,11 @@ class Node<T> {
 		// Don't necessarily need this method, but it's here for the sake of
 		// uniformity with the other getters.
 		return this.element;
+	}
+
+	@Override
+	public int compareTo(final Node<T> other) {
+		return (int)Math.signum(this.costSum - other.costSum);
 	}
 }
 
