@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -77,21 +78,27 @@ class SearchTest {
 	// expand --------------------------------------------------------
 
 	/**
-	 * Returns a Function that expands an IntCoord into its cardinal neighbors. TODO(theimer): explain.
+	 * Returns a Function that expands an IntCoord into its neighbors. TODO(theimer): explain.
 	 */
-	static Function<IntCoord, Set<IntCoord>> makeExpandFuncCardinal(final int xMin, final int xMax,
-			                                                 final int yMin, final int yMax) {
+	static Function<IntCoord, Set<IntCoord>> makeExpandFunc(final int xMin, final int xMax,
+			                                                final int yMin, final int yMax,
+			                                                final BiPredicate<IntCoord, IntCoord> intCoordFilter) {
 		return new Function<IntCoord, Set<IntCoord>>() {
 			@Override
 			public Set<IntCoord> apply(final IntCoord coord) {
 				assert intCoordInBounds(coord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
 				// TODO(theimer): make this faster if speed matters.
 				return Stream.of(
-					new IntCoord(coord.x + 1, coord.y),
-					new IntCoord(coord.x - 1, coord.y),
 					new IntCoord(coord.x, coord.y + 1),
-					new IntCoord(coord.x, coord.y - 1)
-				).filter(expandedCoord -> intCoordInBounds(expandedCoord, xMin, xMax, yMin, yMax))
+					new IntCoord(coord.x, coord.y - 1),
+					new IntCoord(coord.x + 1, coord.y),
+					new IntCoord(coord.x + 1, coord.y + 1),
+					new IntCoord(coord.x + 1, coord.y - 1),
+					new IntCoord(coord.x - 1, coord.y),
+					new IntCoord(coord.x - 1, coord.y + 1),
+					new IntCoord(coord.x - 1, coord.y - 1)
+				).filter(expandedCoord -> (intCoordInBounds(expandedCoord, xMin, xMax, yMin, yMax) &&
+						                   intCoordFilter.test(coord, expandedCoord)))
 			     .collect(Collectors.toSet());
 			}
 		};
@@ -142,7 +149,9 @@ class SearchTest {
 		final IntCoord startCoord = new IntCoord(0, 0);
 		final IntCoord goalCoord = new IntCoord(0, 0);
 		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
-		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFuncCardinal(xMin, xMax, yMin, yMax);
+		final BiPredicate<IntCoord, IntCoord> cardinalFilter =
+				(coord, expandedCoord) -> (coord.x == expandedCoord.x) || (coord.y == expandedCoord.y);
+		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, cardinalFilter);
 		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
