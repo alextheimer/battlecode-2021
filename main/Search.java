@@ -13,10 +13,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 class Node<T> {
-	public final T element;
-	public double costTo;
-	public double costSum;
-	public Node<T> parent;
+	private final T element;
+	private double costTo;
+	private double costSum;
+	private Node<T> parent;
 
 	public Node(final T element, final double costTo, final double costSum, final Node<T> parent) {
 		this.element = element;
@@ -25,22 +25,27 @@ class Node<T> {
 		this.parent = parent;
 	}
 
-//	public boolean sameValue(final Node<?> other) {
-//		return (this.element.equals(other.element) &&
-//			    (this.costFrom == other.costFrom) &&
-//			    (this.costTo == other.costTo));
-//	}
-//
-//	@Override
-//	public int hashCode() {
-//		return Objects.hash(this.element, this.costFrom, this.costTo);
-//	}
-//
-//	@Override
-//	public boolean equals(final Object other) {
-//		return ((other instanceof Node<?>) && this.sameValue((Node<?>)other));
-//	}
+	public void updateParent(final Node<T> parent, final double costTo, final double costSum) {
+		this.parent = parent;
+		this.costTo = costTo;
+		this.costSum = costSum;
+	}
 
+	public double getCostTo() {
+		return this.costTo;
+	}
+
+	public double getCostSum() {
+		return this.costSum;
+	}
+
+	public Node<T> getParent() {
+		return this.parent;
+	}
+
+	public T getElement() {
+		return this.element;
+	}
 }
 
 /**
@@ -52,8 +57,8 @@ public class Search {
 		final Stack<T> path = new Stack<>();
 		Node<T> ptr = tail;
 		while (ptr != null) {
-			path.push(ptr.element);
-			ptr = ptr.parent;
+			path.push(ptr.getElement());
+			ptr = ptr.getParent();
 		}
 		return Collections.unmodifiableList(path);
 	}
@@ -62,6 +67,7 @@ public class Search {
 		return List.of();
 	}
 
+	// TODO(theimer): mention immutability of return type
 	/**
 	 * Returns a shortest path between two T.
 	 * @param <T> TODO(theimer)
@@ -99,34 +105,36 @@ public class Search {
 		// begin A* algorithm
 		while (pQueue.size() > 0) {
 			final Node<T> popped = pQueue.poll();
-			nodeMap.remove(popped.element);
-			closed.add(popped.element);
+			nodeMap.remove(popped.getElement());
+			closed.add(popped.getElement());
 			assert popped != null : "null Node popped from the queue!";
-			if (isEndgameCheck.test(popped.element)) {
+			if (isEndgameCheck.test(popped.getElement())) {
 				// found an element in the endgame; ready to return a path.
-				// TODO(theimer): make immutable
 				return Search.makeElementPath(popped);
 			}
-			final Set<T> expanded = expand.apply(popped.element);
+			final Set<T> expanded = expand.apply(popped.getElement());
 			for (final T expandedObj : expanded) {
-				if (nodeMap.containsKey(expandedObj)) {  // pQueue contains expandedObj's Node
-					final double expandedCost = popped.costTo + cost.apply(popped.element, expandedObj);
-					final double expandedHeuristic = heuristic.apply(expandedObj);
-					final double expandedSum = expandedCost + expandedHeuristic;
+				if (closed.contains(expandedObj)) {
+					// don't want to add it to pQueue or update its costs
+					continue;
+				}
+				final double expandedCost = popped.getCostTo() + cost.apply(popped.getElement(), expandedObj);
+				final double expandedHeuristic = heuristic.apply(expandedObj);
+				final double expandedSum = expandedCost + expandedHeuristic;
+				if (nodeMap.containsKey(expandedObj)) {
+					// pQueue contains expandedObj's Node; check if we need to update its costs
+					// (i.e. we've arrived from a parent along a more-optimal path)
 					final Node<T> containedNode = nodeMap.get(expandedObj);
-					if (containedNode.costSum > expandedSum) {
+					if (containedNode.getCostSum() > expandedSum) {
+						// found a better path; update.
+						// TODO(theimer): make this faster if times out!
 						pQueue.remove(containedNode);
-						containedNode.costTo = expandedCost;
-						containedNode.costSum = expandedSum;
-						containedNode.parent = popped;
+						containedNode.updateParent(popped, expandedCost, expandedSum);
 						pQueue.add(containedNode);
 					}
-
 				}
-				else if (!closed.contains(expandedObj)) {  // neither open nor closed contains expandedObj
-					final double expandedCost = popped.costTo + cost.apply(popped.element, expandedObj);
-					final double expandedHeuristic = heuristic.apply(expandedObj);
-					final double expandedSum = expandedCost + expandedHeuristic;
+				else {  // neither open nor closed contains expandedObj
+					// we haven't seen this expandedObj yet; add it to pQueue/nodeMap
 					final Node<T> expandedNode = new Node<>(expandedObj, expandedCost, expandedSum, popped);
 					pQueue.add(expandedNode);
 					nodeMap.put(expandedObj, expandedNode);
