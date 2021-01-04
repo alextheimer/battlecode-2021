@@ -133,7 +133,20 @@ class SearchTest {
 	 */
 	@Test
 	void aStarNoPath() {
-		fail("Not yet implemented");
+		final int xMin = 0;
+		final int xMax = 10;
+		final int yMin = 0;
+		final int yMax = 10;
+		final IntCoord startCoord = new IntCoord(xMin, yMin);
+		final IntCoord goalCoord = new IntCoord(xMax, yMax);
+		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
+		final BiPredicate<IntCoord, IntCoord> noDiagFilter =
+				(coord, expandedCoord) -> (expandedCoord.x != expandedCoord.y);
+		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, noDiagFilter);
+		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
+		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		assertEquals(result.size(), 0);  // TODO(theimer): messages
 	}
 
 	/**
@@ -146,8 +159,8 @@ class SearchTest {
 		final int xMax = 10;
 		final int yMin = 0;
 		final int yMax = 10;
-		final IntCoord startCoord = new IntCoord(0, 0);
-		final IntCoord goalCoord = new IntCoord(0, 0);
+		final IntCoord startCoord = new IntCoord(xMin, yMin);
+		final IntCoord goalCoord = new IntCoord(xMin, yMin);
 		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
 		final BiPredicate<IntCoord, IntCoord> cardinalFilter =
 				(coord, expandedCoord) -> (coord.x == expandedCoord.x) || (coord.y == expandedCoord.y);
