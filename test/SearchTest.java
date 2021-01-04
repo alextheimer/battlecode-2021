@@ -2,7 +2,6 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Set;
@@ -24,7 +23,7 @@ class SearchTest {
 	 * ~~~ Test Partitions ~~~
 	 * aStar:
 	 *     expand
-	 *         -only bidirectional, both bidirectional and one-way
+	 *         -sometimes bidirectional, never bidirectional
 	 *         -returns empty set during search; returns only nonempty sets
 	 *     result
 	 *         -no valid path, valid path
@@ -44,6 +43,16 @@ class SearchTest {
 			                 final int yMin, final int yMax) {
 		return ((coord.x >= xMin) && (coord.x < xMax) &&
 			    (coord.y >= yMin) && (coord.y < yMax));
+	}
+
+	static boolean pathIsConnected(final List<IntCoord> path, final Function<IntCoord, Set<IntCoord>> expandFunc) {
+		for (int i = 0; i < (path.size() - 1); ++i) {
+			final Set<IntCoord> adjacentSet = expandFunc.apply(path.get(i));
+			if (!adjacentSet.contains(path.get(i+1))) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// isEndgameCheck ------------------------------------------------
@@ -106,15 +115,15 @@ class SearchTest {
 
 	/**
 	 * Covers:
-     *     expand- only bidirectional, returns only nonempty sets
+     *     expand- sometimes bidirectional, returns only nonempty sets
      *     result- length > 1, valid path
 	 */
 	@Test
-	void aStarLongAndOnlyBidirectional() {
+	void aStarLongBidirectional() {
 		final int xMin = 0;
-		final int xMax = 20;
+		final int xMax = 10;
 		final int yMin = 0;
-		final int yMax = 20;
+		final int yMax = 10;
 		final IntCoord startCoord = new IntCoord(xMin, yMin);
 		final IntCoord goalCoord = new IntCoord(xMax/2, yMax/2);
 		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
@@ -128,16 +137,34 @@ class SearchTest {
 				"startCoord: (%d, %d), result.get(0): (%d, %d)",
 				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y));
 		assertEquals(goalCoord, result.get(result.size()-1));
-		// TODO(theimer): assert connected by edges
+		assertTrue(pathIsConnected(result, expand));
 	}
 
 	/**
 	 * Covers:
-     *     expand- bidirectional and one-way
+     *     expand- never bidirectional
 	 */
 	@Test
-	void aStarBidirectionalAndOneWay() {
-		fail("Not yet implemented");
+	void aStarOneWay() {
+		final int xMin = 0;
+		final int xMax = 10;
+		final int yMin = 0;
+		final int yMax = 10;
+		final IntCoord startCoord = new IntCoord(xMin, yMin);
+		final IntCoord goalCoord = new IntCoord(xMax/2, yMax/2);
+		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
+		final BiPredicate<IntCoord, IntCoord> upRightFilter =
+				(coord, expandedCoord) -> (expandedCoord.x >= coord.x) && (expandedCoord.y >= coord.y);
+		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, upRightFilter);
+		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
+		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		assertTrue(result.size() > 1);
+		assertEquals(startCoord, result.get(0), String.format(
+				"startCoord: (%d, %d), result.get(0): (%d, %d)",
+				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y));
+		assertEquals(goalCoord, result.get(result.size()-1));
+		assertTrue(pathIsConnected(result, expand));
 	}
 
 	/**
@@ -153,13 +180,13 @@ class SearchTest {
 		final IntCoord startCoord = new IntCoord(xMin, yMin);
 		final IntCoord goalCoord = new IntCoord(xMax, yMax);
 		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
-		final BiPredicate<IntCoord, IntCoord> noDiagFilter =
-				(coord, expandedCoord) -> (expandedCoord.x != expandedCoord.y);
-		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, noDiagFilter);
+		final BiPredicate<IntCoord, IntCoord> lineObstacleFilter =
+				(coord, expandedCoord) -> (expandedCoord.x != (xMax / 2));
+		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, lineObstacleFilter);
 		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
-		assertEquals(result.size(), 0);  // TODO(theimer): messages
+		assertEquals(result, List.of());  // TODO(theimer): messages
 	}
 
 	/**
@@ -175,15 +202,13 @@ class SearchTest {
 		final IntCoord startCoord = new IntCoord(xMin, yMin);
 		final IntCoord goalCoord = new IntCoord(xMin, yMin);
 		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
-		final BiPredicate<IntCoord, IntCoord> cardinalFilter =
-				(coord, expandedCoord) -> (coord.x == expandedCoord.x) || (coord.y == expandedCoord.y);
-		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, cardinalFilter);
+		final BiPredicate<IntCoord, IntCoord> allFilter = (coord, expandedCoord) -> true;
+		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, allFilter);
 		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertEquals(startCoord, goalCoord);  // sanity check
-		assertEquals(result.size(), 1);  // TODO(theimer): messages
-		assertEquals(result.get(0), startCoord);
+		assertEquals(result, List.of(startCoord));
 	}
 
 	/**
@@ -192,7 +217,25 @@ class SearchTest {
 	 */
 	@Test
 	void aStarExpandReturnsEmptySet() {
-		fail("Not yet implemented");
+		final int xMin = 0;
+		final int xMax = 5;
+		final int yMin = 0;
+		final int yMax = 5;
+		final IntCoord startCoord = new IntCoord(xMin, yMin);
+		final IntCoord goalCoord = new IntCoord(xMax - 1, yMax - 1);
+		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
+		final BiPredicate<IntCoord, IntCoord> edgeFilter =
+				(coord, expandedCoord) -> (coord.y == yMin) || (coord.x == (xMax - 1));
+		final Function<IntCoord, Set<IntCoord>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, edgeFilter);
+		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
+		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		assertTrue(result.size() > 1);
+		assertEquals(startCoord, result.get(0), String.format(
+				"startCoord: (%d, %d), result.get(0): (%d, %d)",
+				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y));
+		assertEquals(goalCoord, result.get(result.size()-1));
+		assertTrue(pathIsConnected(result, expand));
 	}
 
 }
