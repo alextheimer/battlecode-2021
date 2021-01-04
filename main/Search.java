@@ -3,11 +3,11 @@ package main;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -70,10 +70,11 @@ public class Search {
 	 * Returns the path of Node elements to the tail element.
 	 */
 	private static <T> List<T> makeElementPath(final Node<T> tail) {
-		final Stack<T> path = new Stack<>();
+		// TODO(theimer): just return a Deque if this is too slow
+		final LinkedList<T> path = new LinkedList<>();
 		Node<T> ptr = tail;
 		while (ptr != null) {
-			path.push(ptr.getElement());
+			path.addFirst((ptr.getElement()));
 			ptr = ptr.getParent();
 		}
 		return Collections.unmodifiableList(path);
