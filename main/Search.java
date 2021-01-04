@@ -90,7 +90,7 @@ public class Search {
 	 * @param <T> TODO(theimer)
 	 * @param startObj begin the search here. Must lie within valid search space.
 	 * @param isEndgameCheck returns true if and only if its argument lies in the endgame.
-	 * @param expand returns the set of all T adjacent to its argument.
+	 * @param expand returns the set of all T adjacent to its argument such that each T is valid.
 	 * @param cost returns the cost between its two T arguments. Must return a value >= 0.
 	 * @param heuristic returns an estimated cost to the endgame from the argument T. Must be
 	 *     both admissible and consistent.
