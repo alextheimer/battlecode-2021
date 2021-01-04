@@ -22,8 +22,6 @@ class SearchTest {
 	/**
 	 * ~~~ Test Partitions ~~~
 	 * aStar:
-	 *     cost
-	 *         -returns 0 at least once during search, never returns 0 during search
 	 *     expand
 	 *         -only bidirectional, both bidirectional and one-way
 	 *         -returns empty set during search; returns only nonempty sets
@@ -107,18 +105,17 @@ class SearchTest {
 
 	/**
 	 * Covers:
-     *     cost- returns 0 at least once during search
      *     expand- only bidirectional, returns only nonempty sets
      *     result- length > 1, valid path
 	 */
 	@Test
 	void aStarCostReturnsZeroAndBidirectional() {
 		final int xMin = 0;
-		final int xMax = 10;
+		final int xMax = 20;
 		final int yMin = 0;
-		final int yMax = 10;
+		final int yMax = 20;
 		final IntCoord startCoord = new IntCoord(xMin, yMin);
-		final IntCoord goalCoord = new IntCoord(xMax, yMax);
+		final IntCoord goalCoord = new IntCoord(xMax/2, yMax/2);
 		final Predicate<IntCoord> isEndgameCheck = makeEndgamePred(goalCoord);
 		final BiPredicate<IntCoord, IntCoord> noDiagFilter =
 				(coord, expandedCoord) -> (expandedCoord.x != expandedCoord.y);
@@ -131,7 +128,6 @@ class SearchTest {
 
 	/**
 	 * Covers:
-     *     cost- never returns 0 during search
      *     expand- bidirectional and one-way
 	 */
 	@Test
