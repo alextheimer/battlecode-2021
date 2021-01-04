@@ -12,11 +12,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+// TODO(theimer): make this exclusive to A*
+//     (also probably make this file AStar.java if no other searches are needed)
 class Node<T> {
 	private final T element;
-	private double costTo;
-	private double costSum;
-	private Node<T> parent;
+	private double costTo;  // the best-known cost to this Node from some initial Node.
+	private double costSum;  // the best-known sum of costTo and some heuristic
+	private Node<T> parent;  // the parent that gives costTo and costSum
 
 	public Node(final T element, final double costTo, final double costSum, final Node<T> parent) {
 		this.element = element;
@@ -25,7 +27,11 @@ class Node<T> {
 		this.parent = parent;
 	}
 
+	/**
+	 * Updates the Node's best-known parent (and all other relevant info).
+	 */
 	public void updateParent(final Node<T> parent, final double costTo, final double costSum) {
+		// Note: this method prevents mistakes where <3 of these attributes are updated.
 		this.parent = parent;
 		this.costTo = costTo;
 		this.costSum = costSum;
@@ -44,6 +50,8 @@ class Node<T> {
 	}
 
 	public T getElement() {
+		// Don't necessarily need this method, but it's here for the sake of
+		// uniformity with the other getters.
 		return this.element;
 	}
 }
@@ -53,6 +61,9 @@ class Node<T> {
  */
 public class Search {
 
+	/**
+	 * Returns the path of Node elements to the tail element.
+	 */
 	private static <T> List<T> makeElementPath(final Node<T> tail) {
 		final Stack<T> path = new Stack<>();
 		Node<T> ptr = tail;
