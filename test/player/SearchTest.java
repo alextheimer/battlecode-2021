@@ -1,7 +1,6 @@
-package test;
+package player;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,12 +13,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import main.Search;
-import main.Util.IntCoord;
+import player.Search;
+import player.Util.IntCoord;
 
-class SearchTest {
+public class SearchTest {
 
 	/**
 	 * ~~~ Test Partitions ~~~
@@ -121,7 +120,7 @@ class SearchTest {
      *     result- length > 1, valid path
 	 */
 	@Test
-	void aStarLongBidirectional() {
+	public void aStarLongBidirectional() {
 		final int xMin = 0;
 		final int xMax = 10;
 		final int yMin = 0;
@@ -135,9 +134,11 @@ class SearchTest {
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
-		assertEquals(startCoord, result.get(0), String.format(
+		assertEquals(
+		    String.format(
 				"startCoord: (%d, %d), result.get(0): (%d, %d)",
-				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y));
+				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y),
+			startCoord, result.get(0));
 		assertEquals(goalCoord, result.get(result.size()-1));
 		assertTrue(pathIsConnected(result, expand));
 	}
@@ -147,7 +148,7 @@ class SearchTest {
      *     expand- never bidirectional
 	 */
 	@Test
-	void aStarOneWay() {
+	public void aStarOneWay() {
 		final int xMin = 0;
 		final int xMax = 10;
 		final int yMin = 0;
@@ -162,9 +163,11 @@ class SearchTest {
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
-		assertEquals(startCoord, result.get(0), String.format(
+		assertEquals(
+		    String.format(
 				"startCoord: (%d, %d), result.get(0): (%d, %d)",
-				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y));
+				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y),
+			startCoord, result.get(0));
 		assertEquals(goalCoord, result.get(result.size()-1));
 		assertTrue(pathIsConnected(result, expand));
 	}
@@ -174,7 +177,7 @@ class SearchTest {
      *     return- no valid path
 	 */
 	@Test
-	void aStarNoPath() {
+	public void aStarNoPath() {
 		final int xMin = 0;
 		final int xMax = 10;
 		final int yMin = 0;
@@ -196,7 +199,7 @@ class SearchTest {
      *     return- length == 1
 	 */
 	@Test
-	void aStarStartInEndgame() {
+	public void aStarStartInEndgame() {
 		final int xMin = 0;
 		final int xMax = 10;
 		final int yMin = 0;
@@ -218,7 +221,7 @@ class SearchTest {
      *     expand- returns empty set during search
 	 */
 	@Test
-	void aStarExpandReturnsEmptySet() {
+	public void aStarExpandReturnsEmptySet() {
 		final int xMin = 0;
 		final int xMax = 5;
 		final int yMin = 0;
@@ -233,9 +236,11 @@ class SearchTest {
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
-		assertEquals(startCoord, result.get(0), String.format(
+		assertEquals(
+		    String.format(
 				"startCoord: (%d, %d), result.get(0): (%d, %d)",
-				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y));
+				startCoord.x, startCoord.y, result.get(0).x, result.get(0).y),
+			startCoord, result.get(0));
 		assertEquals(goalCoord, result.get(result.size()-1));
 		assertTrue(pathIsConnected(result, expand));
 	}

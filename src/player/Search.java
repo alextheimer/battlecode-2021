@@ -1,4 +1,4 @@
-package main;
+package player;
 
 import java.util.Arrays;
 import java.util.Collections;
