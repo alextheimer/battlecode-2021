@@ -3,6 +3,8 @@ package test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -186,7 +188,7 @@ class SearchTest {
 		final BiFunction<IntCoord, IntCoord, Double> cost = SearchTest::cost;
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
-		assertEquals(result, List.of());  // TODO(theimer): messages
+		assertEquals(result, Collections.emptyList());  // TODO(theimer): messages
 	}
 
 	/**
@@ -208,7 +210,7 @@ class SearchTest {
 		final Function<IntCoord, Double> heuristic = makeHeuristicFunc(goalCoord);
 		final List<IntCoord> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertEquals(startCoord, goalCoord);  // sanity check
-		assertEquals(result, List.of(startCoord));
+		assertEquals(result, Arrays.asList(startCoord));
 	}
 
 	/**

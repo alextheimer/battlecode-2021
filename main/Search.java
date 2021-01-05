@@ -1,5 +1,6 @@
 package main;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,7 +82,7 @@ public class Search {
 	}
 
 	private static <T> List<T> makeNullPath() {
-		return List.of();
+		return Collections.emptyList();
 	}
 
 	// TODO(theimer): mention immutability of return type
@@ -115,8 +116,9 @@ public class Search {
 		}
 
 		// initialize the data structures
-		final PriorityQueue<Node<T>> pQueue = new PriorityQueue<>(List.of(startNode));
-		final Map<T, Node<T>> nodeMap = new HashMap<>(Map.of(startObj, startNode));  // contains only nodes in pQueue
+		final PriorityQueue<Node<T>> pQueue = new PriorityQueue<>(Arrays.asList(startNode));
+		final Map<T, Node<T>> nodeMap = new HashMap<>();  // contains only nodes in pQueue
+		nodeMap.put(startObj, startNode);
 		final Set<T> closed = new HashSet<>();  // been popped from pQueue.
 
 		// begin A* algorithm
