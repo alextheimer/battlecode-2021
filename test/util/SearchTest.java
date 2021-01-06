@@ -1,4 +1,4 @@
-package player;
+package util;
 
 import static org.junit.Assert.*;
 
@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 
-import player.Search;
-import player.Util.IntCoord;
+import util.Search;
+import util.Util.IntCoord;
 
 public class SearchTest {
 
