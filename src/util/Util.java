@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Contains utility functions/classes.
  */
-public class Util {
+public class Util {	
 	/**
 	 * Immutable struct-like class for storage of 2D (x, y) coordinate.
 	 */
