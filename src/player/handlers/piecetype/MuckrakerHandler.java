@@ -4,7 +4,7 @@ import battlecode.common.*;
 import player.handlers.HandlerCommon;
 
 public class MuckrakerHandler {
-	public static void handle(RobotController rc) throws GameActionException {
+	public static void handle(RobotController rc, HandlerCommon.RobotState state) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
         for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {

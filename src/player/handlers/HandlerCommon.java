@@ -10,7 +10,7 @@ public class HandlerCommon {
             RobotType.MUCKRAKER,
     };
     
-   public static final Direction[] directions = {
+    public static final Direction[] directions = {
             Direction.NORTH,
             Direction.NORTHEAST,
             Direction.EAST,
@@ -20,6 +20,18 @@ public class HandlerCommon {
             Direction.WEST,
             Direction.NORTHWEST,
     };
+    
+    // TODO(theimer) default state fields
+    public static class RoleState {};
+    public static class TypeState {};
+    public static class RobotState {
+    	public RoleState roleState;
+    	public TypeState typeState;
+    	public RobotState() {
+    		roleState = null;
+    		typeState = null;
+    	}
+    }
     
     /**
      * Returns a random Direction.

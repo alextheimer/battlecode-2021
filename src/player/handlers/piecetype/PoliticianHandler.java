@@ -4,7 +4,7 @@ import battlecode.common.*;
 import player.handlers.HandlerCommon;
 
 public class PoliticianHandler {
-	public static void handle(RobotController rc) throws GameActionException {
+	public static void handle(RobotController rc, HandlerCommon.RobotState state) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
         RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
