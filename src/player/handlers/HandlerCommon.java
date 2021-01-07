@@ -1,6 +1,7 @@
 package player.handlers;
 
 import battlecode.common.*;
+import util.Util.IntCoord;
 
 
 public class HandlerCommon {
@@ -21,16 +22,27 @@ public class HandlerCommon {
             Direction.NORTHWEST,
     };
     
+    public static enum SquadType {PATROL, OCCUPY, UNASSIGNED, NONE};
+    
     // TODO(theimer) default state fields
-    public static class RoleState {};
-    public static class TypeState {};
+    public static class Squad {
+    	public SquadType squadType;
+    	public int leaderID;
+    	public IntCoord originCoord;
+//    	public DoubleVec outboundVec;
+    };
+    
     public static class RobotState {
-    	public RoleState roleState;
-    	public TypeState typeState;
-    	public RobotState() {
-    		roleState = null;
-    		typeState = null;
-    	}
+    	Squad squad;
+    };
+    
+    public interface IRobotHandlerFactory {
+    	public IRobotHandler instantiate();
+    	public IRobotHandler instantiateFromState(RobotState state);
+    }
+    
+    public interface IRobotHandler {
+    	public void handle(RobotController rc) throws GameActionException;
     }
     
     /**
