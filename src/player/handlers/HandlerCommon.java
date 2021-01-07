@@ -22,6 +22,7 @@ public class HandlerCommon {
             Direction.NORTHWEST,
     };
     
+    public static enum RobotRole {UNASSIGNED, LEADER, FOLLOWER, NONE};
     public static enum SquadType {PATROL, OCCUPY, UNASSIGNED, NONE};
     
     // TODO(theimer) default state fields
@@ -32,9 +33,7 @@ public class HandlerCommon {
 //    	public DoubleVec outboundVec;
     };
     
-    public static class RobotState {
-    	Squad squad;
-    };
+    public static class RobotState {};
     
     public interface IRobotHandlerFactory {
     	public IRobotHandler instantiate();
