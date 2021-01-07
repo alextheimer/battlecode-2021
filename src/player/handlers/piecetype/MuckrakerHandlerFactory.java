@@ -7,19 +7,14 @@ import player.handlers.HandlerCommon.RobotState;
 
 import static player.handlers.HandlerCommon.*;
 
-class MuckrakerState extends RobotState {
-	// TODO(theimer)
-}
-
 class MuckrakerHandler implements IRobotHandler {
-	private MuckrakerState state;
 	
 	public MuckrakerHandler() {
-		this.state = new MuckrakerState();
+		//blank
 	}
 	
 	@Override
-	public void handle(RobotController rc) throws GameActionException {
+	public void handle(RobotController rc, RobotState state) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
         for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
@@ -41,13 +36,7 @@ class MuckrakerHandler implements IRobotHandler {
 
 public class MuckrakerHandlerFactory implements IRobotHandlerFactory {
 	@Override
-	public IRobotHandler instantiate() {
+	public IRobotHandler instantiate(RobotController rc, RobotState state) {
 		return new MuckrakerHandler();
 	}
-
-	@Override
-	public IRobotHandler instantiateFromState(RobotState state) {
-		return new MuckrakerHandler();
-	}
-
 }

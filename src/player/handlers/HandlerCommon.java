@@ -33,15 +33,19 @@ public class HandlerCommon {
 //    	public DoubleVec outboundVec;
     };
     
-    public static class RobotState {};
+    public static class RobotState {
+    	public RobotRole role;
+    	public RobotState(RobotRole role) {
+    		this.role = role;
+    	}
+    };
     
     public interface IRobotHandlerFactory {
-    	public IRobotHandler instantiate();
-    	public IRobotHandler instantiateFromState(RobotState state);
+    	public IRobotHandler instantiate(RobotController rc, RobotState state);
     }
     
     public interface IRobotHandler {
-    	public void handle(RobotController rc) throws GameActionException;
+    	public void handle(RobotController rc, RobotState state) throws GameActionException;
     }
     
     /**

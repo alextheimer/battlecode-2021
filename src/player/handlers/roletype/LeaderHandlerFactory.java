@@ -8,8 +8,12 @@ import static player.handlers.HandlerCommon.*;
 
 class LeaderHandler implements IRobotHandler {
 
+	public LeaderHandler() {
+		// blank
+	}
+	
 	@Override
-	public void handle(RobotController rc) throws GameActionException {
+	public void handle(RobotController rc, RobotState state) throws GameActionException {
 		return;
 	}
 
@@ -18,12 +22,7 @@ class LeaderHandler implements IRobotHandler {
 public class LeaderHandlerFactory implements IRobotHandlerFactory {
 
 	@Override
-	public IRobotHandler instantiate() {
-		return new LeaderHandler();
-	}
-
-	@Override
-	public IRobotHandler instantiateFromState(RobotState state) {
+	public IRobotHandler instantiate(RobotController rc, RobotState state) {
 		return new LeaderHandler();
 	}
 

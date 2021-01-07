@@ -8,8 +8,12 @@ import static player.handlers.HandlerCommon.*;
 
 class UnassignedHandler implements IRobotHandler {
 
+	public UnassignedHandler() {
+		// blank
+	}
+	
 	@Override
-	public void handle(RobotController rc) throws GameActionException {
+	public void handle(RobotController rc, RobotState state) throws GameActionException {
 		return;
 	}
 
@@ -18,12 +22,7 @@ class UnassignedHandler implements IRobotHandler {
 public class UnassignedHandlerFactory implements IRobotHandlerFactory {
 
 	@Override
-	public IRobotHandler instantiate() {
-		return new UnassignedHandler();
-	}
-
-	@Override
-	public IRobotHandler instantiateFromState(RobotState state) {
+	public IRobotHandler instantiate(RobotController rc, RobotState state) {
 		return new UnassignedHandler();
 	}
 

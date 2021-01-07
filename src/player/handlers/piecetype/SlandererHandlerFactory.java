@@ -7,32 +7,23 @@ import player.handlers.HandlerCommon.RobotState;
 
 import static player.handlers.HandlerCommon.*;
 
-class SlandererState extends RobotState {
-	// TODO(theimer)
-}
-
 class SlandererHandler implements IRobotHandler {
-	private SlandererState state;
 	
 	public SlandererHandler() {
-		this.state = new SlandererState();
+		// blank
 	}
 	
 	@Override
-	public void handle(RobotController rc) throws GameActionException {
+	public void handle(RobotController rc, RobotState state) throws GameActionException {
         if (tryMove(rc, randomDirection()))
             System.out.println("I moved!");
 	}
 }
 
 public class SlandererHandlerFactory implements IRobotHandlerFactory {
-	@Override
-	public IRobotHandler instantiate() {
-		return new SlandererHandler();
-	}
 
 	@Override
-	public IRobotHandler instantiateFromState(RobotState state) {
+	public IRobotHandler instantiate(RobotController rc, RobotState state) {
 		return new SlandererHandler();
 	}
 

@@ -5,22 +5,21 @@ import static player.handlers.HandlerCommon.*;
 
 class FollowerHandler implements IRobotHandler {
 
+	public FollowerHandler() {
+		// blank
+	}
+	
 	@Override
-	public void handle(RobotController rc) throws GameActionException {
+	public void handle(RobotController rc, RobotState state) throws GameActionException {
 		return;
 	}
 	
 }
 
 public class FollowerHandlerFactory implements IRobotHandlerFactory {
-
+	
 	@Override
-	public IRobotHandler instantiate() {
-		return new FollowerHandler();
-	}
-
-	@Override
-	public IRobotHandler instantiateFromState(RobotState state) {
+	public IRobotHandler instantiate(RobotController rc, RobotState state) {
 		return new FollowerHandler();
 	}
 

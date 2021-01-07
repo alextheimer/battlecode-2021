@@ -11,12 +11,7 @@ import java.util.List;
 import java.util.Map;
 import static player.handlers.HandlerCommon.*;
 
-class EnlightenmentCenterState extends RobotState {
-	// TODO(theimer)
-}
-
 class EnlightenmentCenterHandler implements IRobotHandler {
-	private EnlightenmentCenterState state;
 	
 	private static Map<SquadType, List<RobotType>> squadSpecMap = new HashMap<>();
 	static {
@@ -32,16 +27,16 @@ class EnlightenmentCenterHandler implements IRobotHandler {
         return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
     }
     
-    private static SquadType chooseSquadType(RobotController rc) {
-    	return SquadType.PATROL;
-    }
+//    private static SquadType chooseSquadType(RobotController rc) {
+//    	return SquadType.PATROL;
+//    }
 	
 	public EnlightenmentCenterHandler() {
-		this.state = new EnlightenmentCenterState();
+		// blank
 	}
 	
 	@Override
-	public void handle(RobotController rc) throws GameActionException {
+	public void handle(RobotController rc, RobotState state) throws GameActionException {
     	RobotType toBuild = randomSpawnableRobotType();
         int influence = 50;
         for (Direction dir : directions) {
@@ -57,14 +52,9 @@ class EnlightenmentCenterHandler implements IRobotHandler {
 }
 
 public class EnlightenmentCenterHandlerFactory implements IRobotHandlerFactory {
-    
-	@Override
-	public IRobotHandler instantiate() {
-		return new EnlightenmentCenterHandler();
-	}
 
 	@Override
-	public IRobotHandler instantiateFromState(RobotState state) {
+	public IRobotHandler instantiate(RobotController rc, RobotState state) {
 		return new EnlightenmentCenterHandler();
 	}
 

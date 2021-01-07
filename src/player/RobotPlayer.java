@@ -30,27 +30,37 @@ public strictfp class RobotPlayer {
      * If this method returns, the robot dies!
      **/
     public static void run(RobotController rc) {
-    	IRobotHandlerFactory roleHandlerFactory = roleHandlerFactoryMap.get(
-    			rc.getType() == RobotType.ENLIGHTENMENT_CENTER ? RobotRole.NONE : RobotRole.UNASSIGNED);
-    	IRobotHandlerFactory typeHandlerFactory = typeHandlerFactoryMap.get(rc.getType());
-    	IRobotHandler roleHandler = roleHandlerFactory.instantiate();
-    	IRobotHandler typeHandler = typeHandlerFactory.instantiate();
-
+    	RobotType currentType = rc.getType();
+    	RobotRole currentRole = currentType == RobotType.ENLIGHTENMENT_CENTER ? RobotRole.NONE : RobotRole.UNASSIGNED;
+    	RobotState state = new RobotState(currentRole);
+    	
+    	IRobotHandler roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
+    	IRobotHandler typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);
+    	
         System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
+        	System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
                 // You may rewrite this into your own control structure if you wish.
-                System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
-                roleHandler.handle(rc);
-                typeHandler.handle(rc);
+                roleHandler.handle(rc, state);
+                typeHandler.handle(rc, state);
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
 
             } catch (GameActionException e) {
                 System.out.println(rc.getType() + " GameActionException");
                 e.printStackTrace();
+            }
+            
+            if (currentType != rc.getType()) {
+            	currentType = rc.getType();
+            	typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);
+            }
+            if (currentRole != state.role) {
+            	currentRole = state.role;
+            	roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
             }
         }
     }
