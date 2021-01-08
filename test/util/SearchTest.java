@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 import util.Search;
-import util.Util.IntVec;
+import util.Util.IntVec2D;
 
 public class SearchTest {
 
@@ -40,15 +40,15 @@ public class SearchTest {
 	 * Returns true if coord lies within the space defined by:
 	 *     {coord.x on [xMin, xMax) && coord.y on [yMin, yMax)}
 	 */
-	static boolean intCoordInBounds(final IntVec coord, final int xMin, final int xMax,
+	static boolean intCoordInBounds(final IntVec2D coord, final int xMin, final int xMax,
 			                 final int yMin, final int yMax) {
 		return ((coord.x >= xMin) && (coord.x < xMax) &&
 			    (coord.y >= yMin) && (coord.y < yMax));
 	}
 
-	static boolean pathIsConnected(final List<IntVec> path, final Function<IntVec, Set<IntVec>> expandFunc) {
+	static boolean pathIsConnected(final List<IntVec2D> path, final Function<IntVec2D, Set<IntVec2D>> expandFunc) {
 		for (int i = 0; i < (path.size() - 1); ++i) {
-			final Set<IntVec> adjacentSet = expandFunc.apply(path.get(i));
+			final Set<IntVec2D> adjacentSet = expandFunc.apply(path.get(i));
 			if (!adjacentSet.contains(path.get(i+1))) {
 				return false;
 			}
@@ -61,7 +61,7 @@ public class SearchTest {
 	/**
 	 * Returns a Predicate that returns true if and only if its argument equals() goal.
 	 */
-	static Predicate<IntVec> makeEndgamePred(final IntVec goal) {
+	static Predicate<IntVec2D> makeEndgamePred(final IntVec2D goal) {
 		return coord -> goal.equals(coord);
 	}
 
@@ -70,7 +70,7 @@ public class SearchTest {
 	/**
 	 * Returns the Euclidian distance between the argument IntCoords.
 	 */
-	static double cost(final IntVec coordA, final IntVec coordB) {
+	static double cost(final IntVec2D coordA, final IntVec2D coordB) {
 		return Math.sqrt(Math.pow(coordA.x - coordB.x, 2) + (Math.pow(coordA.y - coordB.y, 2)));
 	}
 
@@ -79,7 +79,7 @@ public class SearchTest {
 	/**
 	 * Returns a Function that returns the Euclidian distance of an IntCoord from goal.
 	 */
-	static Function<IntVec, Double> makeHeuristicFunc(final IntVec goal) {
+	static Function<IntVec2D, Double> makeHeuristicFunc(final IntVec2D goal) {
 		return coord -> cost(coord, goal);
 	}
 
@@ -88,23 +88,23 @@ public class SearchTest {
 	/**
 	 * Returns a Function that expands an IntCoord into its neighbors. TODO(theimer): explain.
 	 */
-	static Function<IntVec, Set<IntVec>> makeExpandFunc(final int xMin, final int xMax,
+	static Function<IntVec2D, Set<IntVec2D>> makeExpandFunc(final int xMin, final int xMax,
 			                                                final int yMin, final int yMax,
-			                                                final BiPredicate<IntVec, IntVec> intCoordFilter) {
-		return new Function<IntVec, Set<IntVec>>() {
+			                                                final BiPredicate<IntVec2D, IntVec2D> intCoordFilter) {
+		return new Function<IntVec2D, Set<IntVec2D>>() {
 			@Override
-			public Set<IntVec> apply(final IntVec coord) {
+			public Set<IntVec2D> apply(final IntVec2D coord) {
 				assert intCoordInBounds(coord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
 				// TODO(theimer): make this faster if speed matters.
 				return Stream.of(
-					new IntVec(coord.x, coord.y + 1),
-					new IntVec(coord.x, coord.y - 1),
-					new IntVec(coord.x + 1, coord.y),
-					new IntVec(coord.x + 1, coord.y + 1),
-					new IntVec(coord.x + 1, coord.y - 1),
-					new IntVec(coord.x - 1, coord.y),
-					new IntVec(coord.x - 1, coord.y + 1),
-					new IntVec(coord.x - 1, coord.y - 1)
+					new IntVec2D(coord.x, coord.y + 1),
+					new IntVec2D(coord.x, coord.y - 1),
+					new IntVec2D(coord.x + 1, coord.y),
+					new IntVec2D(coord.x + 1, coord.y + 1),
+					new IntVec2D(coord.x + 1, coord.y - 1),
+					new IntVec2D(coord.x - 1, coord.y),
+					new IntVec2D(coord.x - 1, coord.y + 1),
+					new IntVec2D(coord.x - 1, coord.y - 1)
 				).filter(expandedCoord -> (intCoordInBounds(expandedCoord, xMin, xMax, yMin, yMax) &&
 						                   intCoordFilter.test(coord, expandedCoord)))
 			     .collect(Collectors.toSet());
@@ -125,14 +125,14 @@ public class SearchTest {
 		final int xMax = 10;
 		final int yMin = 0;
 		final int yMax = 10;
-		final IntVec startCoord = new IntVec(xMin, yMin);
-		final IntVec goalCoord = new IntVec(xMax/2, yMax/2);
-		final Predicate<IntVec> isEndgameCheck = makeEndgamePred(goalCoord);
-		final BiPredicate<IntVec, IntVec> allFilter = (coord, expandedCoord) -> true;
-		final Function<IntVec, Set<IntVec>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, allFilter);
-		final BiFunction<IntVec, IntVec, Double> cost = SearchTest::cost;
-		final Function<IntVec, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final IntVec2D startCoord = new IntVec2D(xMin, yMin);
+		final IntVec2D goalCoord = new IntVec2D(xMax/2, yMax/2);
+		final Predicate<IntVec2D> isEndgameCheck = makeEndgamePred(goalCoord);
+		final BiPredicate<IntVec2D, IntVec2D> allFilter = (coord, expandedCoord) -> true;
+		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, allFilter);
+		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
+		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntVec2D> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
 		assertEquals(
 		    String.format(
@@ -153,15 +153,15 @@ public class SearchTest {
 		final int xMax = 10;
 		final int yMin = 0;
 		final int yMax = 10;
-		final IntVec startCoord = new IntVec(xMin, yMin);
-		final IntVec goalCoord = new IntVec(xMax/2, yMax/2);
-		final Predicate<IntVec> isEndgameCheck = makeEndgamePred(goalCoord);
-		final BiPredicate<IntVec, IntVec> upRightFilter =
+		final IntVec2D startCoord = new IntVec2D(xMin, yMin);
+		final IntVec2D goalCoord = new IntVec2D(xMax/2, yMax/2);
+		final Predicate<IntVec2D> isEndgameCheck = makeEndgamePred(goalCoord);
+		final BiPredicate<IntVec2D, IntVec2D> upRightFilter =
 				(coord, expandedCoord) -> (expandedCoord.x >= coord.x) && (expandedCoord.y >= coord.y);
-		final Function<IntVec, Set<IntVec>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, upRightFilter);
-		final BiFunction<IntVec, IntVec, Double> cost = SearchTest::cost;
-		final Function<IntVec, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, upRightFilter);
+		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
+		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntVec2D> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
 		assertEquals(
 		    String.format(
@@ -182,15 +182,15 @@ public class SearchTest {
 		final int xMax = 10;
 		final int yMin = 0;
 		final int yMax = 10;
-		final IntVec startCoord = new IntVec(xMin, yMin);
-		final IntVec goalCoord = new IntVec(xMax, yMax);
-		final Predicate<IntVec> isEndgameCheck = makeEndgamePred(goalCoord);
-		final BiPredicate<IntVec, IntVec> lineObstacleFilter =
+		final IntVec2D startCoord = new IntVec2D(xMin, yMin);
+		final IntVec2D goalCoord = new IntVec2D(xMax, yMax);
+		final Predicate<IntVec2D> isEndgameCheck = makeEndgamePred(goalCoord);
+		final BiPredicate<IntVec2D, IntVec2D> lineObstacleFilter =
 				(coord, expandedCoord) -> (expandedCoord.x != (xMax / 2));
-		final Function<IntVec, Set<IntVec>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, lineObstacleFilter);
-		final BiFunction<IntVec, IntVec, Double> cost = SearchTest::cost;
-		final Function<IntVec, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, lineObstacleFilter);
+		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
+		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntVec2D> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertEquals(result, Collections.emptyList());  // TODO(theimer): messages
 	}
 
@@ -204,14 +204,14 @@ public class SearchTest {
 		final int xMax = 10;
 		final int yMin = 0;
 		final int yMax = 10;
-		final IntVec startCoord = new IntVec(xMin, yMin);
-		final IntVec goalCoord = new IntVec(xMin, yMin);
-		final Predicate<IntVec> isEndgameCheck = makeEndgamePred(goalCoord);
-		final BiPredicate<IntVec, IntVec> allFilter = (coord, expandedCoord) -> true;
-		final Function<IntVec, Set<IntVec>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, allFilter);
-		final BiFunction<IntVec, IntVec, Double> cost = SearchTest::cost;
-		final Function<IntVec, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final IntVec2D startCoord = new IntVec2D(xMin, yMin);
+		final IntVec2D goalCoord = new IntVec2D(xMin, yMin);
+		final Predicate<IntVec2D> isEndgameCheck = makeEndgamePred(goalCoord);
+		final BiPredicate<IntVec2D, IntVec2D> allFilter = (coord, expandedCoord) -> true;
+		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, allFilter);
+		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
+		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntVec2D> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertEquals(startCoord, goalCoord);  // sanity check
 		assertEquals(result, Arrays.asList(startCoord));
 	}
@@ -226,15 +226,15 @@ public class SearchTest {
 		final int xMax = 5;
 		final int yMin = 0;
 		final int yMax = 5;
-		final IntVec startCoord = new IntVec(xMin, yMin);
-		final IntVec goalCoord = new IntVec(xMax - 1, yMax - 1);
-		final Predicate<IntVec> isEndgameCheck = makeEndgamePred(goalCoord);
-		final BiPredicate<IntVec, IntVec> edgeFilter =
+		final IntVec2D startCoord = new IntVec2D(xMin, yMin);
+		final IntVec2D goalCoord = new IntVec2D(xMax - 1, yMax - 1);
+		final Predicate<IntVec2D> isEndgameCheck = makeEndgamePred(goalCoord);
+		final BiPredicate<IntVec2D, IntVec2D> edgeFilter =
 				(coord, expandedCoord) -> (coord.y == yMin) || (coord.x == (xMax - 1));
-		final Function<IntVec, Set<IntVec>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, edgeFilter);
-		final BiFunction<IntVec, IntVec, Double> cost = SearchTest::cost;
-		final Function<IntVec, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, edgeFilter);
+		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
+		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
+		final List<IntVec2D> result = Search.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
 		assertEquals(
 		    String.format(

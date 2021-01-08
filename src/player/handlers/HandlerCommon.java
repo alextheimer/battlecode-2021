@@ -1,7 +1,7 @@
 package player.handlers;
 
 import battlecode.common.*;
-import util.Util.IntVec;
+import util.Util.IntVec2D;
 
 
 public class HandlerCommon {
@@ -29,7 +29,7 @@ public class HandlerCommon {
     public static class Squad {
     	public SquadType squadType;
     	public int leaderID;
-    	public IntVec originCoord;
+    	public IntVec2D originCoord;
 //    	public DoubleVec outboundVec;
     };
     
