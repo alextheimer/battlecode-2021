@@ -9,6 +9,7 @@ import static util.Util.IntVec2D;
 import util.Util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,8 +18,14 @@ import static player.handlers.HandlerCommon.*;
 
 class LeaderHandler implements IRobotHandler {
 	
+	private enum PathDirection {INBOUND, OUTBOUND, NONE};
+	
+	private List<IntVec2D> plannedPath;
+	private PathDirection pathDirection;
+	
 	public LeaderHandler() {
-		// intentionally blank
+		plannedPath = null;
+		pathDirection = PathDirection.NONE;
 	}
 	
 	private static Set<IntVec2D> expandCoord(IntVec2D coord, RobotController rc) {
@@ -43,9 +50,29 @@ class LeaderHandler implements IRobotHandler {
 		return passabilityMap;
 	}
 	
+	private void handlePatrol(RobotController rc, RobotState state) {
+		
+	}
+	
+	private void handleOccupy(RobotController rc, RobotState state) {
+		
+	}
+	
 	@Override
 	public void handle(RobotController rc, RobotState state) throws GameActionException {
-		return;
+		switch(state.orders.squadType) {
+		case PATROL:
+//			handlePatrol(RobotController rc, RobotState state);
+			rc.move(Direction.NORTH);
+			break;
+		case OCCUPY:
+//			handleOccupy(RobotController rc, RobotState state);
+			break;
+		case NONE:
+		case UNASSIGNED:
+			assert false : "leaders shouldn't have these SquadTypes!";
+			break;
+		}
 	}
 
 }
