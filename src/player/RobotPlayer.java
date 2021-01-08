@@ -32,7 +32,7 @@ public strictfp class RobotPlayer {
     public static void run(RobotController rc) {
     	RobotType currentType = rc.getType();
     	RobotRole currentRole = currentType == RobotType.ENLIGHTENMENT_CENTER ? RobotRole.NONE : RobotRole.UNASSIGNED;
-    	RobotState state = new RobotState(currentRole);
+    	RobotState state = new RobotState(currentRole, new SquadOrders());
     	
     	IRobotHandler roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
     	IRobotHandler typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);

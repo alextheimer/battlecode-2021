@@ -7,9 +7,9 @@ import player.handlers.HandlerCommon.RobotState;
 import static player.handlers.HandlerCommon.*;
 
 class LeaderHandler implements IRobotHandler {
-
+	
 	public LeaderHandler() {
-		// blank
+		// intentionally blank
 	}
 	
 	@Override

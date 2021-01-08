@@ -1,4 +1,4 @@
-package util;
+package util.search;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,7 +65,7 @@ class Node<T> implements Comparable<Node<T>> {
 /**
  * Implements various search algorithms.
  */
-public class Search {
+public class AStar {
 
 	/**
 	 * Returns the path of Node elements to the tail element.
@@ -129,7 +129,7 @@ public class Search {
 			assert popped != null : "null Node popped from the queue!";
 			if (isEndgameCheck.test(popped.getElement())) {
 				// found an element in the endgame; ready to return a path.
-				return Search.makeElementPath(popped);
+				return AStar.makeElementPath(popped);
 			}
 			final Set<T> expanded = expand.apply(popped.getElement());
 			for (final T expandedObj : expanded) {
@@ -161,6 +161,6 @@ public class Search {
 			}
 		}
 		// reach here only if no path was found; return the "null" path.
-		return Search.makeNullPath();
+		return AStar.makeNullPath();
 	}
 }

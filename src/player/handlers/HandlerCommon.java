@@ -1,6 +1,7 @@
 package player.handlers;
 
 import battlecode.common.*;
+import util.Util.DoubleVec2D;
 import util.Util.IntVec2D;
 
 
@@ -26,17 +27,23 @@ public class HandlerCommon {
     public static enum SquadType {PATROL, OCCUPY, UNASSIGNED, NONE};
     
     // TODO(theimer) default state fields
-    public static class Squad {
+    public static class SquadOrders {
     	public SquadType squadType;
-    	public int leaderID;
     	public IntVec2D originCoord;
-//    	public DoubleVec outboundVec;
+    	public DoubleVec2D outboundVec;
+    	public SquadOrders() {
+    		squadType = null;
+    		originCoord = null;
+    		outboundVec = null;
+    	}
     };
     
     public static class RobotState {
     	public RobotRole role;
-    	public RobotState(RobotRole role) {
+    	public SquadOrders orders;
+    	public RobotState(RobotRole role, SquadOrders orders) {
     		this.role = role;
+    		this.orders = orders;
     	}
     };
     
