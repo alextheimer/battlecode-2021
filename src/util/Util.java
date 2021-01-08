@@ -9,18 +9,18 @@ public class Util {
 	/**
 	 * Immutable struct-like class for storage of 2D (x, y) coordinate.
 	 */
-	public static class IntCoord {
+	public static class IntVec {
 		public final int x, y;
-		public IntCoord(final int x, final int y) {
+		public IntVec(final int x, final int y) {
 			this.x = x;
 			this.y = y;
 		}
-		public boolean sameValue(final IntCoord other) {
+		public boolean sameValue(final IntVec other) {
 			return (this.x == other.x) && (this.y == other.y);
 		}
 		@Override
 		public boolean equals(final Object other) {
-			return (other instanceof IntCoord) && (this.sameValue((IntCoord)other));
+			return (other instanceof IntVec) && (this.sameValue((IntVec)other));
 		}
 		@Override
 		public int hashCode() {
