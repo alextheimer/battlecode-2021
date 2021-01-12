@@ -2,6 +2,7 @@ package util;
 
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import battlecode.common.*;
 
@@ -59,6 +60,34 @@ public class Util {
 		@Override
 		public String toString() {
 			return "(" + this.x + ", " + this.y + ")";
+		}
+	}
+	
+	public static class PeekableIteratorWrapper<T> implements Iterator<T> {
+		private Iterator<T> iterator;
+		private Optional<T> peekedOptional;
+		public PeekableIteratorWrapper(Iterator<T> iterator) {
+			this.iterator = iterator;
+			this.peekedOptional = Optional.empty();
+		}
+		public boolean hasNext() {
+			return (this.peekedOptional.isPresent() || this.iterator.hasNext());
+		}
+		public T next() {
+			if (this.peekedOptional.isPresent()) {
+				T nextElt = this.peekedOptional.get();
+				this.peekedOptional = Optional.empty();
+				return nextElt;
+				
+			} else {
+				return this.iterator.next();
+			}
+		}
+		public T peek() {
+			if (!this.peekedOptional.isPresent()) {
+				this.peekedOptional = Optional.of(this.iterator.next());
+			}
+			return this.peekedOptional.get();
 		}
 	}
 	
