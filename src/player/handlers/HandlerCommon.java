@@ -25,17 +25,19 @@ public class HandlerCommon {
     
     public static enum RobotRole {UNASSIGNED, LEADER, FOLLOWER, NONE};
     public static enum SquadType {PATROL, OCCUPY, UNASSIGNED, NONE};
-    public static final int NULL_TARGET_ID = -1;
+    public static final int NULL_ROBOT_ID = -1;
     
     // TODO(theimer) default state fields
     public static class SquadOrders {
     	public SquadType squadType;
+    	public int leaderID;
     	public IntVec2D originCoord;
     	public DoubleVec2D outboundVec;
     	public SquadOrders() {
     		squadType = null;
     		originCoord = null;
     		outboundVec = null;
+    		leaderID = NULL_ROBOT_ID;
     	}
     };
     
@@ -46,7 +48,7 @@ public class HandlerCommon {
     	public RobotState(RobotRole role, SquadOrders orders) {
     		this.role = role;
     		this.orders = orders;
-    		this.targetID = NULL_TARGET_ID;
+    		this.targetID = NULL_ROBOT_ID;
     	}
     };
     
