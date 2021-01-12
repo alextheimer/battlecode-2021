@@ -185,6 +185,14 @@ public class Flag {
 			flagWalker.writeBits(DegreesField.NUM_BITS, this.outboundDegrees.toBits());
 			return flagWalker.getAllBits();
 		}
+		
+		public int getOutboundDegrees() {
+			return this.outboundDegrees.value();
+		}
+		
+		public SquadType getSquadType() {
+			return this.squadType.value();
+		}
 	}
 	
 //	public static class EnemySightedFlag {
