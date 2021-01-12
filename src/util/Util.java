@@ -60,6 +60,35 @@ public class Util {
 		}
 	}
 	
+	// TODO(theimer): more Java-thonic way to do this?
+	public static int log2Floor(int val) {
+		assert val > 0 : "val must be at least zero!";
+		int highest = Integer.highestOneBit(val);
+		return Integer.numberOfTrailingZeros(highest);
+	}
+	
+	// TODO(theimer): more Java-thonic way to do this?
+	public static int log2Ceil(int val) {
+		assert val > 0 : "val must be at least zero!";
+		int highest = Integer.highestOneBit(val);
+		int trailing = Integer.numberOfTrailingZeros(val);
+		if (highest == val) {
+			// Power of two!
+			return trailing;
+		} else {
+			// TODO(theimer): asserts
+			return trailing + 1;
+		}
+	}
+	
+	public static boolean isPow2(int val) {
+		return (val != 0) && ((val & (val - 1)) == 0);
+	}
+	
+	public static int numBits(int numValues) {
+		return 1 << log2Ceil(numValues);
+	}
+	
 	public static Stream<IntVec2D> makeAllAdjacentStream(IntVec2D coord) {
 		return Stream.of(
 				new IntVec2D(coord.x, coord.y + 1),
