@@ -89,6 +89,14 @@ public class Util {
 		return 1 << log2Ceil(numValues);
 	}
 	
+	public static DoubleVec2D degreesToVec(int degrees) {
+		assert degrees >= 0 && degrees < 360;
+		double radians = (Math.PI / 180) * degrees;
+		double x = Math.cos(radians);
+		double y = Math.sin(radians);
+		return new DoubleVec2D(x, y);
+	}
+	
 	public static Stream<IntVec2D> makeAllAdjacentStream(IntVec2D coord) {
 		return Stream.of(
 				new IntVec2D(coord.x, coord.y + 1),
