@@ -1,7 +1,9 @@
 package util;
 
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
+import battlecode.common.*;
 
 /**
  * Contains utility functions/classes.
@@ -95,6 +97,27 @@ public class Util {
 		double x = Math.cos(radians);
 		double y = Math.sin(radians);
 		return new DoubleVec2D(x, y);
+	}
+	
+	public static double euclidianDistance(DoubleVec2D coordA, DoubleVec2D coordB) {
+		return Math.sqrt(Math.pow(coordA.x - coordB.x, 2) + Math.pow(coordA.y - coordB.y, 2));
+	}
+	
+	public static Direction directionToGoal(DoubleVec2D startCoord, DoubleVec2D goalCoord) {
+		// TODO(theimer): literally anything better than this
+		if (goalCoord.x > startCoord.x) {
+			if (goalCoord.y > startCoord.y) {
+				return Direction.NORTHEAST;
+			} else {
+				return Direction.SOUTHEAST;
+			}
+		} else {
+			if (goalCoord.y > startCoord.y) {
+				return Direction.NORTHWEST;
+			} else {
+				return Direction.SOUTHWEST;
+			}			
+		}
 	}
 	
 	public static Stream<IntVec2D> makeAllAdjacentStream(IntVec2D coord) {
