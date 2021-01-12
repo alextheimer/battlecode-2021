@@ -28,8 +28,8 @@ public class FlagTest {
 		int rawFlag = flag.encode();
 		SquadAssignFlag parsedFlag = SquadAssignFlag.decode(rawFlag);
 		assertEquals("rawFlag: " + rawFlag, OpCode.SQUAD_ASSIGN, Flag.getOpCode(rawFlag));
-		assertEquals(degrees, parsedFlag.getOutboundDegrees());
 		assertEquals(squadType, parsedFlag.getSquadType());
+		assertEquals(degrees, parsedFlag.getOutboundDegrees());
 	}
 
 }

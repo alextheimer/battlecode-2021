@@ -28,7 +28,7 @@ class FlagWalker {
 		int mask = ((1 << numBits) - 1) << this.nextBitIndex;
 		// TODO(theimer): assert mask stuff
 		this.flag &= ~(mask << this.nextBitIndex);
-		this.flag &= (bits << this.nextBitIndex);
+		this.flag |= (bits << this.nextBitIndex);
 		this.nextBitIndex += numBits;
 	}
 	
@@ -39,7 +39,9 @@ class FlagWalker {
 	public int readBits(int numBits) {
 		int mask = ((1 << numBits) - 1) << this.nextBitIndex;
 		// TODO(theimer): assert mask stuff
-		return (this.flag & mask) >> this.nextBitIndex;
+		int result = (this.flag & mask) >> this.nextBitIndex;
+		this.nextBitIndex += numBits;
+		return result;
 	}
 	
 	/**
