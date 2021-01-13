@@ -91,6 +91,32 @@ public class Util {
 		}
 	}
 	
+	public static class Line2D {
+		public double a;
+		public double b;
+		public double c;
+		
+		public Line2D(double a, double b, double c) {
+			this.a = a;
+			this.b = b;
+			this.c = c;
+		}
+		
+		public static Line2D make(DoubleVec2D vec, DoubleVec2D origin) {
+			double a = 1;  // TODO(theimer): could probably get rid of this; currently just here for completeness.
+			double b = -(vec.y / vec.x);
+			double c = -((vec.x * origin.y) / (vec.y * origin.x));
+			return new Line2D(a, b, c);
+		}
+	}
+	
+	// TODO(theimer): doom fast sqrt divide!!! or just cache sqrt(a2 + b2) :(
+	public static double distanceFromLine(DoubleVec2D vec, Line2D line) {
+		double numerator = Math.abs((line.a * vec.x) + (line.b * vec.y) + line.c);
+		double denominator = Math.sqrt(Math.pow(line.a, 2) + Math.pow(line.b, 2));
+		return (numerator / denominator);
+	}
+	
 	// TODO(theimer): more Java-thonic way to do this?
 	public static int log2Floor(int val) {
 		assert val > 0 : "val must be at least zero!";
