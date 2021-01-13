@@ -1,8 +1,10 @@
 package util;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import battlecode.common.*;
 
@@ -115,6 +117,23 @@ public class Util {
 		double numerator = Math.abs((line.a * vec.x) + (line.b * vec.y) + line.c);
 		double denominator = Math.sqrt(Math.pow(line.a, 2) + Math.pow(line.b, 2));
 		return (numerator / denominator);
+	}
+	
+	public static <T> T findLeastCostLinear(Iterable<T> iterable, Function<T, Double> costFunc) {
+		Iterator<T> iterator = iterable.iterator();
+		assert iterator.hasNext();
+		T leastCostElt = iterator.next();
+		double leastCost = costFunc.apply(leastCostElt);
+		while (iterator.hasNext()) {
+			T nextElt = iterator.next();
+			double nextEltCost = costFunc.apply(nextElt);
+			if (nextEltCost < leastCost) {
+				leastCostElt = nextElt;
+				leastCost = nextEltCost;
+			}
+		}
+		return leastCostElt;
+		
 	}
 	
 	// TODO(theimer): more Java-thonic way to do this?
