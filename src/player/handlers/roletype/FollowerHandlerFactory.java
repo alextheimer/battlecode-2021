@@ -23,9 +23,16 @@ class FollowerHandler implements IRobotHandler {
 		Direction dir = Util.directionToGoal(
 				new Util.DoubleVec2D((double)robotLocation.x, (double)robotLocation.y),
 				new Util.DoubleVec2D((double)leaderLocation.x, (double)leaderLocation.y));
-		if (rc.canMove(dir)) {
-			rc.move(dir);
-		}
+
+		System.out.println("Want to move: " + dir);
+		rc.move(dir);
+		System.out.println("MOVE SUCCESSFUL");
+//		if (rc.canMove(dir)) {
+//			System.out.println("Ayyyyyyyyy");
+//			rc.move(dir);
+//		} else {
+//			System.out.println("large sad");
+//		}
 	}
 	
 }

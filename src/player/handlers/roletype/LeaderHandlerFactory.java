@@ -4,6 +4,7 @@ import battlecode.common.*;
 import player.handlers.HandlerCommon.IRobotHandler;
 import player.handlers.HandlerCommon.RobotState;
 import util.search.BFSGenerator;
+import util.Flag;
 
 import static util.Util.IntVec2D;
 import util.Util;
@@ -18,14 +19,17 @@ import static player.handlers.HandlerCommon.*;
 
 class LeaderHandler implements IRobotHandler {
 	
-	private enum PathDirection {INBOUND, OUTBOUND, NONE};
+	private static enum PathDirection {INBOUND, OUTBOUND, NONE};
+	private static final int CLAIM_COOLDOWN_START = 1;  // 1 full round for all bots to see flag
 	
 	private List<IntVec2D> plannedPath;
 	private PathDirection pathDirection;
+	private int claimCooldown;
 	
 	public LeaderHandler() {
 		plannedPath = null;
 		pathDirection = PathDirection.NONE;
+		claimCooldown = CLAIM_COOLDOWN_START;
 	}
 	
 	private static Set<IntVec2D> expandCoord(IntVec2D coord, RobotController rc) {
@@ -60,10 +64,23 @@ class LeaderHandler implements IRobotHandler {
 	
 	@Override
 	public void handle(RobotController rc, RobotState state) throws GameActionException {
+		// TODO(theimer): remove these checks?
+		if (this.claimCooldown > 0) {
+			this.claimCooldown--;
+			return;
+		}
+		if (this.claimCooldown == 0) {
+			this.claimCooldown--;
+			rc.setFlag(Flag.EMPTY_FLAG);
+		}
+		
 		switch(state.orders.squadType) {
 		case PATROL:
 //			handlePatrol(RobotController rc, RobotState state);
-			rc.move(Direction.NORTH);
+			
+			if (rc.canMove(Direction.NORTH)) {
+				rc.move(Direction.NORTH);
+			}
 			break;
 		case OCCUPY:
 //			handleOccupy(RobotController rc, RobotState state);

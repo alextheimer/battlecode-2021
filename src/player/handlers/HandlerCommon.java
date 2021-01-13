@@ -53,7 +53,7 @@ public class HandlerCommon {
     };
     
     public interface IRobotHandlerFactory {
-    	public IRobotHandler instantiate(RobotController rc, RobotState state);
+    	public IRobotHandler instantiate(RobotController rc, RobotState state) throws GameActionException;
     }
     
     public interface IRobotHandler {

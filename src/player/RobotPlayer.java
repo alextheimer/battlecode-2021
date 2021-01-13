@@ -34,12 +34,20 @@ public strictfp class RobotPlayer {
     	RobotRole currentRole = currentType == RobotType.ENLIGHTENMENT_CENTER ? RobotRole.NONE : RobotRole.UNASSIGNED;
     	RobotState state = new RobotState(currentRole, new SquadOrders());
     	
-    	IRobotHandler roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
-    	IRobotHandler typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);
+    	IRobotHandler roleHandler;
+    	IRobotHandler typeHandler;
+    	try {
+    		roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
+    		typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);    		
+    	} catch (GameActionException e) {
+    		System.out.println(rc.getType() + " GameActionException at instantiation!");
+    		return;
+    	}
     	
         System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
         	System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
+        	System.out.println("ROLE:" + state.role);
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
@@ -48,19 +56,19 @@ public strictfp class RobotPlayer {
                 typeHandler.handle(rc, state);
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
+                
+                if (currentType != rc.getType()) {
+                	currentType = rc.getType();
+                	typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);
+                }
+                if (currentRole != state.role) {
+                	currentRole = state.role;
+                	roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
+                }
 
             } catch (GameActionException e) {
                 System.out.println(rc.getType() + " GameActionException");
                 e.printStackTrace();
-            }
-            
-            if (currentType != rc.getType()) {
-            	currentType = rc.getType();
-            	typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);
-            }
-            if (currentRole != state.role) {
-            	currentRole = state.role;
-            	roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
             }
         }
     }

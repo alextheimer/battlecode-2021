@@ -20,6 +20,8 @@ import static player.handlers.HandlerCommon.*;
 
 class EnlightenmentCenterHandler implements IRobotHandler {
 	
+	private static final int FLAG_COOLDOWN_START = 2;  // 1 round for all bots to see SquadAssignFlag
+	                                                   // 1 round for all bots to see LeaderClaimFlag
 	private static Map<SquadType, List<RobotType>> squadSpecMap = new HashMap<>();
 	static {
 		// TODO(theimer): first is the leader?
@@ -28,12 +30,15 @@ class EnlightenmentCenterHandler implements IRobotHandler {
     
 	private PeekableIteratorWrapper<RobotType> robotBuildIterator;
 	private Direction nextBuildDir;
+	private int flagCooldown;
 	
 	public EnlightenmentCenterHandler() {
 		robotBuildIterator = new PeekableIteratorWrapper<>(Collections.emptyIterator());
 		nextBuildDir = Direction.NORTH;
+		flagCooldown = 0;
 	}
 	
+	// TODO(theimer): move to util?
 	private static Direction rotateDirectionClockwise(Direction dir) {
 		// TODO(theimer): use a map
 		switch (dir) {
@@ -96,6 +101,12 @@ class EnlightenmentCenterHandler implements IRobotHandler {
     
 	@Override
 	public void handle(RobotController rc, RobotState state) throws GameActionException {
+		
+		if (this.flagCooldown > 0) {
+			this.flagCooldown--;
+			return;
+		}
+		
         if (!this.robotBuildIterator.hasNext()) {
         	// queue a squad for construction
         	SquadType squadToQueue = chooseSquadType();
@@ -112,6 +123,7 @@ class EnlightenmentCenterHandler implements IRobotHandler {
         	// built the last robot of a squad
         	SquadAssignFlag flag = new SquadAssignFlag(SquadType.PATROL, 90);
         	rc.setFlag(flag.encode());
+        	this.flagCooldown = FLAG_COOLDOWN_START;
         }
 	}
 
