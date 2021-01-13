@@ -3,6 +3,7 @@ package player.handlers;
 import battlecode.common.*;
 import util.Util.DoubleVec2D;
 import util.Util.IntVec2D;
+import util.Util.Line2D;
 
 
 public class HandlerCommon {
@@ -31,12 +32,12 @@ public class HandlerCommon {
     public static class SquadOrders {
     	public SquadType squadType;
     	public int leaderID;
-    	public IntVec2D originCoord;
-    	public DoubleVec2D outboundVec;
+    	public Line2D pathLine;
+    	public DoubleVec2D pathVec;
     	public SquadOrders() {
     		squadType = null;
-    		originCoord = null;
-    		outboundVec = null;
+    		pathVec = null;
+    		pathLine = null;
     		leaderID = NULL_ROBOT_ID;
     	}
     };

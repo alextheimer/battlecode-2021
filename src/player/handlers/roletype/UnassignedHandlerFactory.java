@@ -5,6 +5,7 @@ import player.handlers.HandlerCommon.IRobotHandler;
 import player.handlers.HandlerCommon.RobotState;
 import util.Flag;
 import util.Util;
+import util.Util.DoubleVec2D;
 import util.Flag.LeaderClaimFlag;
 import util.Flag.SquadAssignFlag;
 
@@ -55,13 +56,15 @@ class UnassignedHandler implements IRobotHandler {
 	
 	@Override
 	public void handle(RobotController rc, RobotState state) throws GameActionException {
+		// TODO(theimer): all below -- this is gross
 		// Look for orders from origin EnlightenmentCenter
 		Optional<SquadAssignFlag> flagOpt = squadAssignSearch(rc, state);
 		if (flagOpt.isPresent()) {
 			// Orders found! Store the details...
 			SquadAssignFlag flag = flagOpt.get();
 			state.orders.squadType = flag.getSquadType();
-			state.orders.outboundVec = Util.degreesToVec(flag.getOutboundDegrees());
+			state.orders.pathVec = Util.degreesToVec(flag.getOutboundDegrees());
+			state.orders.pathLine = Util.Line2D.make(state.orders.pathVec, new DoubleVec2D(rc.getLocation().x, rc.getLocation().y));
 			// Note that this will cause RobotPlayer to instantiate a new handler.
 			if (state.orders.leaderID == rc.getID()) {
 				state.role = RobotRole.LEADER;
