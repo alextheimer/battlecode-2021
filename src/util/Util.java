@@ -81,4 +81,9 @@ public class Util {
 		}
 		return builder.build();
 	}
+	
+	@FunctionalInterface
+	public static interface GameActionFunction<T, R> {
+		public R apply(T t) throws GameActionException;
+	}
 }
