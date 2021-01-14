@@ -194,19 +194,6 @@ public class Util {
 		}
 	}
 	
-	public static Stream<IntVec2D> makeAllAdjacentStream(IntVec2D coord) {
-		return Stream.of(
-				new IntVec2D(coord.x, coord.y + 1),
-				new IntVec2D(coord.x, coord.y - 1),
-				new IntVec2D(coord.x + 1, coord.y),
-				new IntVec2D(coord.x + 1, coord.y + 1),
-				new IntVec2D(coord.x + 1, coord.y - 1),
-				new IntVec2D(coord.x - 1, coord.y),
-				new IntVec2D(coord.x - 1, coord.y + 1),
-				new IntVec2D(coord.x - 1, coord.y - 1)
-			);
-	}
-	
 	/**
 	 * Returns true if coord lies within the space defined by:
 	 *     {coord.x on [xMin, xMax) && coord.y on [yMin, yMax)}

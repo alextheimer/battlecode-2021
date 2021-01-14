@@ -1,5 +1,7 @@
 package player.handlers;
 
+import java.util.Iterator;
+
 import battlecode.common.*;
 import util.Util.DoubleVec2D;
 import util.Util.IntVec2D;
@@ -68,6 +70,26 @@ public class HandlerCommon {
      */
     public static Direction randomDirection() {
         return directions[(int) (Math.random() * directions.length)];
+    }
+    
+    public static Iterator<MapLocation> getAdjacentIterator(MapLocation mapLoc) {
+    	return new Iterator<MapLocation>() {
+    		
+    		private int dirIndex = 0;
+
+			@Override
+			public boolean hasNext() {
+				return (dirIndex < (directions.length));
+			}
+
+			@Override
+			public MapLocation next() {
+				Direction dir = directions[dirIndex];
+				++dirIndex;
+				return mapLoc.add(dir);
+			}
+    		
+    	};
     }
     
     /**
