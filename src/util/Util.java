@@ -42,8 +42,7 @@ public class Util {
 		}
 	}
 	
-	public static <T> T findLeastCostLinear(Iterable<T> iterable, Function<T, Double> costFunc) {
-		Iterator<T> iterator = iterable.iterator();
+	public static <T> T findLeastCostLinear(Iterator<T> iterator, Function<T, Double> costFunc) {
 		assert iterator.hasNext();
 		T leastCostElt = iterator.next();
 		double leastCost = costFunc.apply(leastCostElt);
@@ -56,7 +55,6 @@ public class Util {
 			}
 		}
 		return leastCostElt;
-		
 	}
 	
 	public static Direction directionToGoal(MapLocation startCoord, MapLocation goalCoord) {
@@ -74,5 +72,13 @@ public class Util {
 				return Direction.SOUTHWEST;
 			}			
 		}
+	}
+	
+	public static <T> Stream<T> streamifyIterator(Iterator<T> iterator) {
+		Stream.Builder<T> builder = Stream.builder();
+		while (iterator.hasNext()) {
+			builder.accept(iterator.next());
+		}
+		return builder.build();
 	}
 }
