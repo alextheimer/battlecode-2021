@@ -60,6 +60,9 @@ public class UtilMath {
 		public String toString() {
 			return "(" + this.x + ", " + this.y + ")";
 		}
+		public DoubleVec2D negate() {
+			return new DoubleVec2D(-this.x, -this.y);
+		}
 	}
 	
 	public static class Line2D {
