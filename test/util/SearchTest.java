@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 
-import util.Util.IntVec2D;
 import util.search.AStar;
+import util.UtilMath.*;
 
 public class SearchTest {
 
@@ -36,15 +36,15 @@ public class SearchTest {
 
 	// Utils ---------------------------------------------------------
 
-	/**
-	 * Returns true if coord lies within the space defined by:
-	 *     {coord.x on [xMin, xMax) && coord.y on [yMin, yMax)}
-	 */
-	static boolean intCoordInBounds(final IntVec2D coord, final int xMin, final int xMax,
-			                 final int yMin, final int yMax) {
-		return ((coord.x >= xMin) && (coord.x < xMax) &&
-			    (coord.y >= yMin) && (coord.y < yMax));
-	}
+//	/**
+//	 * Returns true if coord lies within the space defined by:
+//	 *     {coord.x on [xMin, xMax) && coord.y on [yMin, yMax)}
+//	 */
+//	static boolean intCoordInBounds(final IntVec2D coord, final int xMin, final int xMax,
+//			                 final int yMin, final int yMax) {
+//		return ((coord.x >= xMin) && (coord.x < xMax) &&
+//			    (coord.y >= yMin) && (coord.y < yMax));
+//	}
 
 	static boolean pathIsConnected(final List<IntVec2D> path, final Function<IntVec2D, Set<IntVec2D>> expandFunc) {
 		for (int i = 0; i < (path.size() - 1); ++i) {
@@ -94,7 +94,7 @@ public class SearchTest {
 		return new Function<IntVec2D, Set<IntVec2D>>() {
 			@Override
 			public Set<IntVec2D> apply(final IntVec2D coord) {
-				assert intCoordInBounds(coord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
+				assert UtilMath.intCoordInBounds(coord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
 				// TODO(theimer): make this faster if speed matters.
 				return Stream.of(
 					new IntVec2D(coord.x, coord.y + 1),
@@ -105,7 +105,7 @@ public class SearchTest {
 					new IntVec2D(coord.x - 1, coord.y),
 					new IntVec2D(coord.x - 1, coord.y + 1),
 					new IntVec2D(coord.x - 1, coord.y - 1)
-				).filter(expandedCoord -> (intCoordInBounds(expandedCoord, xMin, xMax, yMin, yMax) &&
+				).filter(expandedCoord -> (UtilMath.intCoordInBounds(expandedCoord, xMin, xMax, yMin, yMax) &&
 						                   intCoordFilter.test(coord, expandedCoord)))
 			     .collect(Collectors.toSet());
 			}

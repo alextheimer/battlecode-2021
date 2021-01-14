@@ -3,6 +3,7 @@ package util;
 import player.handlers.HandlerCommon.*;
 import util.Util.*;
 import util.FlagFields.*;
+import util.UtilMath.*;
 
 /**
  * Sequentially builds / reads (i.e. "walk") a flag.
@@ -113,7 +114,7 @@ class FlagFields {
 	}
 	
 	public static class SquadTypeField {
-		public static final int NUM_BITS = Util.numBits(SquadType.values().length);
+		public static final int NUM_BITS = UtilMath.numBits(SquadType.values().length);
 		
 		private SquadType squadType;
 		
@@ -144,7 +145,7 @@ public class Flag {
 	public static int NUM_BITS = 24;
 	
 	private static OpCode opCodeValues[] = OpCode.values();
-	private static int numOpCodeBits = Util.numBits(opCodeValues.length);
+	private static int numOpCodeBits = UtilMath.numBits(opCodeValues.length);
 	
 	public static OpCode getOpCode(int rawFlag) {
 		FlagWalker flagWalker = new FlagWalker(rawFlag);

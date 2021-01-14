@@ -3,9 +3,7 @@ package player.handlers;
 import java.util.Iterator;
 
 import battlecode.common.*;
-import util.Util.DoubleVec2D;
-import util.Util.IntVec2D;
-import util.Util.Line2D;
+import util.UtilMath.*;
 
 
 public class HandlerCommon {

@@ -5,9 +5,9 @@ import player.handlers.HandlerCommon.IRobotHandler;
 import player.handlers.HandlerCommon.RobotState;
 import util.Flag;
 import util.Util;
-import util.Util.DoubleVec2D;
 import util.Flag.LeaderClaimFlag;
 import util.Flag.SquadAssignFlag;
+import util.UtilMath;
 
 import static player.handlers.HandlerCommon.*;
 
@@ -63,8 +63,8 @@ class UnassignedHandler implements IRobotHandler {
 			// Orders found! Store the details...
 			SquadAssignFlag flag = flagOpt.get();
 			state.orders.squadType = flag.getSquadType();
-			state.orders.pathVec = Util.degreesToVec(flag.getOutboundDegrees());
-			state.orders.pathLine = Util.Line2D.make(state.orders.pathVec, new DoubleVec2D(rc.getLocation().x, rc.getLocation().y));
+			state.orders.pathVec = UtilMath.degreesToVec(flag.getOutboundDegrees());
+			state.orders.pathLine = UtilMath.Line2D.make(state.orders.pathVec, new UtilMath.DoubleVec2D(rc.getLocation().x, rc.getLocation().y));
 			// Note that this will cause RobotPlayer to instantiate a new handler.
 			if (state.orders.leaderID == rc.getID()) {
 				state.role = RobotRole.LEADER;
