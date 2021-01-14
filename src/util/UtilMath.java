@@ -42,6 +42,9 @@ public class UtilMath {
 			this.x = x;
 			this.y = y;
 		}
+		public double dot(DoubleVec2D otherVec) {
+			return ((this.x * otherVec.x) + (this.y * otherVec.y));
+		}
 		public boolean sameValue(final DoubleVec2D other) {
 			return (Math.abs(this.x - other.x) < EPS) && (Math.abs(this.y - other.y) < EPS);
 		}
