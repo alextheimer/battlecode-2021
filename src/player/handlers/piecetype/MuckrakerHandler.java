@@ -1,20 +1,18 @@
 package player.handlers.piecetype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.IRobotHandler;
-import player.handlers.HandlerCommon.IRobotHandlerFactory;
 import player.handlers.HandlerCommon.RobotState;
 
 import static player.handlers.HandlerCommon.*;
 
-class MuckrakerHandler implements IRobotHandler {
+public class MuckrakerHandler implements IRobotTypeHandler {
 	
-	public MuckrakerHandler() {
+	public MuckrakerHandler(RobotController rc, RobotState state) {
 		//blank
 	}
 	
 	@Override
-	public void handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotTypeHandler handle(RobotController rc, RobotState state) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
         for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
@@ -23,20 +21,14 @@ class MuckrakerHandler implements IRobotHandler {
                 if (rc.canExpose(robot.location)) {
                     System.out.println("e x p o s e d");
                     rc.expose(robot.location);
-                    return;
+                    return this;
                 }
             }
         }
         if (tryMove(rc, randomDirection()))
             System.out.println("I moved!");
+        return this;
 	}
 
 
-}
-
-public class MuckrakerHandlerFactory implements IRobotHandlerFactory {
-	@Override
-	public IRobotHandler instantiate(RobotController rc, RobotState state) {
-		return new MuckrakerHandler();
-	}
 }

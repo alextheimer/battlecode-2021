@@ -5,7 +5,7 @@ import static player.handlers.HandlerCommon.*;
 import util.Util;
 import util.UtilMath;
 
-class FollowerHandler implements IRobotHandler {
+public class FollowerHandler implements IRobotRoleHandler {
 
 	public FollowerHandler() {
 		// blank
@@ -17,7 +17,7 @@ class FollowerHandler implements IRobotHandler {
 	}
 	
 	@Override
-	public void handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotRoleHandler handle(RobotController rc, RobotState state) throws GameActionException {
 		MapLocation robotLocation = rc.getLocation();
 		MapLocation leaderLocation = getLeaderCoord(rc, state);
 		
@@ -32,15 +32,7 @@ class FollowerHandler implements IRobotHandler {
 //		} else {
 //			System.out.println("large sad");
 //		}
+		return this;
 	}
 	
-}
-
-public class FollowerHandlerFactory implements IRobotHandlerFactory {
-	
-	@Override
-	public IRobotHandler instantiate(RobotController rc, RobotState state) {
-		return new FollowerHandler();
-	}
-
 }

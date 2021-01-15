@@ -1,19 +1,18 @@
 package player.handlers.piecetype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.IRobotHandler;
 import player.handlers.HandlerCommon.RobotState;
 
 import static player.handlers.HandlerCommon.*;
 
-class PoliticianHandler implements IRobotHandler {
+public class PoliticianHandler implements IRobotTypeHandler {
 	
-	public PoliticianHandler() {
+	public PoliticianHandler(RobotController rc, RobotState state) {
 		// blank
 	}
 	
 	@Override
-	public void handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotTypeHandler handle(RobotController rc, RobotState state) throws GameActionException {
 //        Team enemy = rc.getTeam().opponent();
 //        int actionRadius = rc.getType().actionRadiusSquared;
 //        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
@@ -25,14 +24,6 @@ class PoliticianHandler implements IRobotHandler {
 //        }
 //        if (tryMove(rc, randomDirection()))
 //            System.out.println("I moved!");
+		return this;
 	}
-}
-
-public class PoliticianHandlerFactory implements IRobotHandlerFactory {
-
-	@Override
-	public IRobotHandler instantiate(RobotController rc, RobotState state) {
-		return new PoliticianHandler();
-	}
-
 }

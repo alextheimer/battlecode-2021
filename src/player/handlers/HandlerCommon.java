@@ -57,12 +57,12 @@ public class HandlerCommon {
     	}
     };
     
-    public interface IRobotHandlerFactory {
-    	public IRobotHandler instantiate(RobotController rc, RobotState state) throws GameActionException;
+    public interface IRobotRoleHandler {
+    	public IRobotRoleHandler handle(RobotController rc, RobotState state) throws GameActionException;
     }
     
-    public interface IRobotHandler {
-    	public void handle(RobotController rc, RobotState state) throws GameActionException;
+    public interface IRobotTypeHandler {
+    	public IRobotTypeHandler handle(RobotController rc, RobotState state) throws GameActionException;
     }
     
     /**

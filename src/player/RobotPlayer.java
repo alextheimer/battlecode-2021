@@ -2,6 +2,7 @@ package player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import battlecode.common.*;
 import player.handlers.piecetype.*;
@@ -9,20 +10,13 @@ import player.handlers.roletype.*;
 import player.handlers.HandlerCommon.*;
 
 public strictfp class RobotPlayer {
-
-	private static Map<RobotRole, IRobotHandlerFactory> roleHandlerFactoryMap = new HashMap<>();
-	private static Map<RobotType, IRobotHandlerFactory> typeHandlerFactoryMap = new HashMap<>();
+	
+	private static Map<RobotType, BiFunction<RobotController, RobotState, IRobotTypeHandler>> mapThing = new HashMap<>();
 	static {
-		// Role handlers ---------------------------------------------------------------------
-		roleHandlerFactoryMap.put(RobotRole.UNASSIGNED, new UnassignedHandlerFactory());
-		roleHandlerFactoryMap.put(RobotRole.LEADER, new LeaderHandlerFactory());
-		roleHandlerFactoryMap.put(RobotRole.FOLLOWER, new FollowerHandlerFactory());
-		roleHandlerFactoryMap.put(RobotRole.NONE, new NoneHandlerFactory());
-		// Type handlers ---------------------------------------------------------------------
-		typeHandlerFactoryMap.put(RobotType.POLITICIAN, new PoliticianHandlerFactory());
-		typeHandlerFactoryMap.put(RobotType.ENLIGHTENMENT_CENTER, new EnlightenmentCenterHandlerFactory());
-		typeHandlerFactoryMap.put(RobotType.MUCKRAKER, new MuckrakerHandlerFactory());
-		typeHandlerFactoryMap.put(RobotType.SLANDERER, new SlandererHandlerFactory());
+		mapThing.put(RobotType.POLITICIAN, (rc, state) -> new PoliticianHandler(rc, state));
+		mapThing.put(RobotType.MUCKRAKER, (rc, state) -> new MuckrakerHandler(rc, state));
+		mapThing.put(RobotType.SLANDERER, (rc, state) -> new SlandererHandler(rc, state));
+		mapThing.put(RobotType.ENLIGHTENMENT_CENTER, (rc, state) -> new EnlightenmentCenterHandler(rc, state));
 	}
 	
     /**
@@ -34,11 +28,12 @@ public strictfp class RobotPlayer {
     	RobotRole currentRole = currentType == RobotType.ENLIGHTENMENT_CENTER ? RobotRole.NONE : RobotRole.UNASSIGNED;
     	RobotState state = new RobotState(currentRole, new SquadOrders());
     	
-    	IRobotHandler roleHandler;
-    	IRobotHandler typeHandler;
+    	IRobotRoleHandler roleHandler;
+    	IRobotTypeHandler typeHandler;
+    	
     	try {
-    		roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
-    		typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);    		
+    		roleHandler = currentType == RobotType.ENLIGHTENMENT_CENTER ? new NoneHandler() : new UnassignedHandlerTODO(rc, state);
+    		typeHandler = mapThing.get(currentType).apply(rc, state);		
     	} catch (GameActionException e) {
     		System.out.println(rc.getType() + " GameActionException at instantiation!");
     		return;
@@ -52,19 +47,10 @@ public strictfp class RobotPlayer {
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
                 // You may rewrite this into your own control structure if you wish.
-                roleHandler.handle(rc, state);
-                typeHandler.handle(rc, state);
+                roleHandler = roleHandler.handle(rc, state);
+                typeHandler = typeHandler.handle(rc, state);
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
-                
-                if (currentType != rc.getType()) {
-                	currentType = rc.getType();
-                	typeHandler = typeHandlerFactoryMap.get(currentType).instantiate(rc, state);
-                }
-                if (currentRole != state.role) {
-                	currentRole = state.role;
-                	roleHandler = roleHandlerFactoryMap.get(currentRole).instantiate(rc, state);
-                }
 
             } catch (GameActionException e) {
                 System.out.println(rc.getType() + " GameActionException");

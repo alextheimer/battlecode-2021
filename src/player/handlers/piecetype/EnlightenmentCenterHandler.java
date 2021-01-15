@@ -1,8 +1,6 @@
 package player.handlers.piecetype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.IRobotHandler;
-import player.handlers.HandlerCommon.IRobotHandlerFactory;
 import player.handlers.HandlerCommon.RobotState;
 import util.Util.PeekableIteratorWrapper;
 import util.Flag;
@@ -18,7 +16,7 @@ import java.util.Optional;
 
 import static player.handlers.HandlerCommon.*;
 
-class EnlightenmentCenterHandler implements IRobotHandler {
+public class EnlightenmentCenterHandler implements IRobotTypeHandler {
 	
 	private static final int FLAG_COOLDOWN_START = 2;  // 1 round for all bots to see SquadAssignFlag
 	                                                   // 1 round for all bots to see LeaderClaimFlag
@@ -32,7 +30,7 @@ class EnlightenmentCenterHandler implements IRobotHandler {
 	private Direction nextBuildDir;
 	private int flagCooldown;
 	
-	public EnlightenmentCenterHandler() {
+	public EnlightenmentCenterHandler(RobotController rc, RobotState state) {
 		robotBuildIterator = new PeekableIteratorWrapper<>(Collections.emptyIterator());
 		nextBuildDir = Direction.NORTH;
 		flagCooldown = 0;
@@ -100,11 +98,11 @@ class EnlightenmentCenterHandler implements IRobotHandler {
     }
     
 	@Override
-	public void handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotTypeHandler handle(RobotController rc, RobotState state) throws GameActionException {
 		
 		if (this.flagCooldown > 0) {
 			this.flagCooldown--;
-			return;
+			return this;
 		}
 		
         if (!this.robotBuildIterator.hasNext()) {
@@ -125,16 +123,7 @@ class EnlightenmentCenterHandler implements IRobotHandler {
         	rc.setFlag(flag.encode());
         	this.flagCooldown = FLAG_COOLDOWN_START;
         }
+        
+        return this;
 	}
-
-
-}
-
-public class EnlightenmentCenterHandlerFactory implements IRobotHandlerFactory {
-
-	@Override
-	public IRobotHandler instantiate(RobotController rc, RobotState state) {
-		return new EnlightenmentCenterHandler();
-	}
-
 }

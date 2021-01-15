@@ -2,7 +2,6 @@ package player.handlers.roletype;
 
 import battlecode.common.*;
 import player.handlers.HandlerCommon;
-import player.handlers.HandlerCommon.IRobotHandler;
 import player.handlers.HandlerCommon.RobotState;
 import util.search.BFSGenerator;
 import util.Flag;
@@ -28,7 +27,7 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertArrayEquals;
 import static player.handlers.HandlerCommon.*;
 
-class LeaderHandler implements IRobotHandler {
+public class LeaderHandler implements IRobotRoleHandler {
 	
 	private static enum PathDirection {INBOUND, OUTBOUND, NONE};
 	private static final int CLAIM_COOLDOWN_START = 1;  // 1 full round for all bots to see flag
@@ -158,11 +157,11 @@ class LeaderHandler implements IRobotHandler {
 	}
 	
 	@Override
-	public void handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotRoleHandler handle(RobotController rc, RobotState state) throws GameActionException {
 		// TODO(theimer): remove these checks?
 		if (this.claimCooldown > 0) {
 			this.claimCooldown--;
-			return;
+			return this;
 		}
 		if (this.claimCooldown == 0) {
 			this.claimCooldown--;
@@ -181,15 +180,7 @@ class LeaderHandler implements IRobotHandler {
 			assert false : "leaders shouldn't have these SquadTypes!";
 			break;
 		}
-	}
-
-}
-
-public class LeaderHandlerFactory implements IRobotHandlerFactory {
-
-	@Override
-	public IRobotHandler instantiate(RobotController rc, RobotState state) {
-		return new LeaderHandler();
+		return this;
 	}
 
 }

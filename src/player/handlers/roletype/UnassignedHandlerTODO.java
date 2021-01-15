@@ -1,7 +1,6 @@
 package player.handlers.roletype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.IRobotHandler;
 import player.handlers.HandlerCommon.RobotState;
 import util.Flag;
 import util.Util;
@@ -13,7 +12,7 @@ import static player.handlers.HandlerCommon.*;
 
 import java.util.Optional;
 
-class UnassignedHandlerTODO implements IRobotHandler {
+public class UnassignedHandlerTODO implements IRobotRoleHandler {
 
 	public UnassignedHandlerTODO(RobotController rc, RobotState state) throws GameActionException {
 		int leaderID = this.discernLeaderID(rc, state);
@@ -55,7 +54,7 @@ class UnassignedHandlerTODO implements IRobotHandler {
 	}
 	
 	@Override
-	public void handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotRoleHandler handle(RobotController rc, RobotState state) throws GameActionException {
 		// TODO(theimer): all below -- this is gross
 		// Look for orders from origin EnlightenmentCenter
 		Optional<SquadAssignFlag> flagOpt = squadAssignSearch(rc, state);
@@ -67,19 +66,11 @@ class UnassignedHandlerTODO implements IRobotHandler {
 			state.orders.pathLine = UtilMath.Line2D.make(state.orders.pathVec, new UtilMath.DoubleVec2D(rc.getLocation().x, rc.getLocation().y));
 			// Note that this will cause RobotPlayer to instantiate a new handler.
 			if (state.orders.leaderID == rc.getID()) {
-				state.role = RobotRole.LEADER;
+				return new LeaderHandler();
 			} else {
-				state.role = RobotRole.FOLLOWER;
+				return new FollowerHandler();
 			}
 		}
+		return this;
 	}
-}
-
-public class UnassignedHandlerFactory implements IRobotHandlerFactory {
-
-	@Override
-	public IRobotHandler instantiate(RobotController rc, RobotState state) throws GameActionException {
-		return new UnassignedHandlerTODO(rc, state);
-	}
-
 }
