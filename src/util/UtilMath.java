@@ -6,6 +6,8 @@ import util.UtilMath.*;
 import java.lang.Math.*;
 
 public class UtilMath {
+	public static final double FLOAT_EPS = 1e-5;
+	
 	/**
 	 * Immutable struct-like class for storage of 2D integer (x, y) vector.
 	 */
@@ -36,7 +38,6 @@ public class UtilMath {
 	 * Immutable struct-like class for storage of 2D double (x, y) vector.
 	 */
 	public static class DoubleVec2D {
-		public final double EPS = 1e-5;
 		public final double x, y;
 		public DoubleVec2D(final double x, final double y) {
 			this.x = x;
@@ -46,7 +47,7 @@ public class UtilMath {
 			return ((this.x * otherVec.x) + (this.y * otherVec.y));
 		}
 		public boolean sameValue(final DoubleVec2D other) {
-			return (Math.abs(this.x - other.x) < EPS) && (Math.abs(this.y - other.y) < EPS);
+			return (Math.abs(this.x - other.x) < FLOAT_EPS) && (Math.abs(this.y - other.y) < FLOAT_EPS);
 		}
 		@Override
 		public boolean equals(final Object other) {
@@ -77,10 +78,21 @@ public class UtilMath {
 		}
 		
 		public static Line2D make(DoubleVec2D vec, DoubleVec2D origin) {
-			double a = 1;  // TODO(theimer): could probably get rid of this; currently just here for completeness.
-			double b = -(vec.y / vec.x);
-			double c = -((vec.x * origin.y) / (vec.y * origin.x));
+			assert !vec.equals(new DoubleVec2D(0.0, 0.0));
+			
+			if (doubleEquals(0.0, vec.x)) {
+				return new Line2D(1.0, 0.0, -origin.x);
+			}
+			
+			double a = -(vec.y / vec.x);
+			double b = 1;  // TODO(theimer): could probably get rid of this; currently just here for completeness.
+			double c = (vec.y * origin.x / vec.x) - origin.y;
 			return new Line2D(a, b, c);
+		}
+		
+		@Override
+		public String toString() {
+			return "(a:" + this.a + ", b:" + this.b + ", c:" + this.c + ")";
 		}
 	}
 	
@@ -140,5 +152,9 @@ public class UtilMath {
 			                 final int yMin, final int yMax) {
 		return ((coord.x >= xMin) && (coord.x < xMax) &&
 			    (coord.y >= yMin) && (coord.y < yMax));
+	}
+	
+	public static boolean doubleEquals(double d1, double d2) {
+		return Math.abs(d1 - d2) < FLOAT_EPS;
 	}
 }
