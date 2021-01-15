@@ -140,7 +140,7 @@ class FlagFields {
 }
 
 public class Flag {
-	public static enum OpCode {EMPTY, LEADER_CLAIM, SQUAD_ASSIGN, ENEMY_SIGHTED, ATTACK_TARGET, BASE_SIGHTED};
+	public static enum OpCode {EMPTY, LEADER_CLAIM, FOLLOWER_CLAIM, SQUAD_ASSIGN, ENEMY_SIGHTED, ATTACK_TARGET, BASE_SIGHTED};
 	public static int EMPTY_FLAG = 0;
 	public static int NUM_BITS = 24;
 	
@@ -151,6 +151,11 @@ public class Flag {
 		FlagWalker flagWalker = new FlagWalker(rawFlag);
 		int opCodeID = flagWalker.readBits(numOpCodeBits);
 		return opCodeValues[opCodeID];
+	}
+	
+	public static class FollowerClaimFlag {
+		public static FollowerClaimFlag decode(int rawFlag) {return new FollowerClaimFlag();}
+		public int encode() {return OpCode.FOLLOWER_CLAIM.ordinal();}
 	}
 	
 	public static class LeaderClaimFlag {
