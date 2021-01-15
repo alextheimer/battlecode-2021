@@ -3,6 +3,8 @@ package player.handlers;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import battlecode.common.*;
 import util.UtilMath.*;
@@ -28,34 +30,6 @@ public class HandlerCommon {
     
     public static enum RobotRole {UNASSIGNED, LEADER, FOLLOWER, NONE};
     public static enum SquadType {PATROL, OCCUPY, UNASSIGNED, NONE};
-    public static final int NULL_ROBOT_ID = -1;
-    
-    // TODO(theimer) default state fields
-    public static class SquadOrders {
-    	public SquadType squadType;
-    	public int leaderID;
-    	public Line2D pathLine;
-    	public DoubleVec2D pathVec;
-    	public List<Integer> squadIDs;
-    	public SquadOrders() {
-    		squadType = null;
-    		pathVec = null;
-    		pathLine = null;
-    		leaderID = NULL_ROBOT_ID;
-    		squadIDs = new ArrayList<>();
-    	}
-    };
-    
-    public static class SquadState {
-    	public RobotRole role;
-    	public SquadOrders orders;
-    	public int targetID;
-    	public SquadState(RobotRole role, SquadOrders orders) {
-    		this.role = role;
-    		this.orders = orders;
-    		this.targetID = NULL_ROBOT_ID;
-    	}
-    };
     
     public interface IRobotRoleHandler {
     	public IRobotRoleHandler handle(RobotController rc) throws GameActionException;

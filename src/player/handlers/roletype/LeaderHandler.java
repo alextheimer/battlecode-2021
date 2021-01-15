@@ -2,7 +2,6 @@ package player.handlers.roletype;
 
 import battlecode.common.*;
 import player.handlers.HandlerCommon;
-import player.handlers.HandlerCommon.SquadState;
 import util.search.BFSGenerator;
 import util.Flag;
 
@@ -104,11 +103,11 @@ public class LeaderHandler implements IRobotRoleHandler {
 		
 		return legalSetCollect(mapLocStream.filter(loc -> (
 					// close enough to the path line?
-					(UtilMath.distanceFromLine(new DoubleVec2D(loc.x, loc.y), squadState.orders.pathLine) < lineDistThresh) &&
+					(UtilMath.distanceFromLine(new DoubleVec2D(loc.x, loc.y), squadState.pathLine) < lineDistThresh) &&
 					// valid location on the map?
 				    pred.test(loc) &&
 				    // heading in the right direction?
-					(squadState.orders.pathVec.dot(new DoubleVec2D(loc.x - mapLoc.x, loc.y - mapLoc.y)) > 0)
+					(squadState.pathVec.dot(new DoubleVec2D(loc.x - mapLoc.x, loc.y - mapLoc.y)) > 0)
 		)));
 	}
 	
@@ -128,7 +127,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 				DoubleVec2D mapLocVec = new DoubleVec2D(mapLoc.x, mapLoc.y);
 				DoubleVec2D diffVec = new DoubleVec2D(mapLoc.x - startLoc.x,
 						                              mapLoc.y - startLoc.y);
-				return -diffVec.dot(squadState.orders.pathVec);  // negated for least cost
+				return -diffVec.dot(squadState.pathVec);  // negated for least cost
 			}
 		};
 		if (mapLocsUnoccupied.isEmpty()) {
@@ -140,7 +139,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 	private void handlePatrol(RobotController rc) throws GameActionException {
 		Set<MapLocation> progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 		if (progressMapLocSet.isEmpty()) {
-			squadState.orders.pathVec = squadState.orders.pathVec.negate();
+			squadState.pathVec = squadState.pathVec.negate();
 			progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 		}
 		assert !progressMapLocSet.isEmpty();
@@ -170,7 +169,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 			rc.setFlag(Flag.EMPTY_FLAG);
 		}
 		
-		switch(this.squadState.orders.squadType) {
+		switch(this.squadState.squadType) {
 		case PATROL:
 			handlePatrol(rc);
 			break;

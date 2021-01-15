@@ -1,25 +1,27 @@
 package player.handlers.roletype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.SquadState;
 import util.Flag;
 import util.Util;
 import util.Flag.LeaderClaimFlag;
 import util.Flag.SquadAssignFlag;
 import util.UtilMath;
+import util.UtilMath.DoubleVec2D;
+import player.handlers.roletype.SquadState;
 
 import static player.handlers.HandlerCommon.*;
 
+import java.util.HashSet;
 import java.util.Optional;
 
 public class UnassignedHandlerTODO implements IRobotRoleHandler {
 
-	private SquadState squadState;
+	private SquadState.Builder squadStateBuilder;
 	
 	public UnassignedHandlerTODO(RobotController rc) throws GameActionException {
-		this.squadState = new SquadState(RobotRole.UNASSIGNED, null);
-		int leaderID = this.discernLeaderID(rc, this.squadState);
-		this.squadState.orders.leaderID = leaderID;
+		this.squadStateBuilder = new SquadState.Builder();
+		int leaderID = this.discernLeaderID(rc);
+		this.squadStateBuilder.setLeaderID(leaderID);
 		if (leaderID == rc.getID()) {
 			// This bot is the squad leader; post the LeaderClaimFlag!
 			LeaderClaimFlag flag = new LeaderClaimFlag();
@@ -28,21 +30,21 @@ public class UnassignedHandlerTODO implements IRobotRoleHandler {
 	}
 	
 	// TODO(theimer): should probably restrict radius
-	private int getLeaderClaimFlagPosterID(RobotController rc) throws GameActionException  {
+	private Optional<Integer> getLeaderClaimFlagPosterIdOpt(RobotController rc) throws GameActionException  {
 		for (RobotInfo robotInfo : rc.senseNearbyRobots()) {
 			int id = robotInfo.getID();
 			int flag = rc.getFlag(id);
 			if (Flag.getOpCode(flag) == Flag.OpCode.LEADER_CLAIM) {
-				return id;
+				return Optional.of(id);
 			}
 		}
-		return NULL_ROBOT_ID;
+		return Optional.empty();
 	}
 	
-	private int discernLeaderID(RobotController rc, SquadState state) throws GameActionException {
+	private int discernLeaderID(RobotController rc) throws GameActionException {
 		// Look for a nearby LeaderClaimFlag.
-		int leaderID = getLeaderClaimFlagPosterID(rc);
-		return leaderID != NULL_ROBOT_ID ? leaderID : rc.getID();
+		Optional<Integer> leaderIdOpt = getLeaderClaimFlagPosterIdOpt(rc);
+		return leaderIdOpt.isPresent() ? leaderIdOpt.get() : rc.getID();
 	}
 	
 	private Optional<SquadAssignFlag> squadAssignSearch(RobotController rc) throws GameActionException {
@@ -64,11 +66,19 @@ public class UnassignedHandlerTODO implements IRobotRoleHandler {
 		if (flagOpt.isPresent()) {
 			// Orders found! Store the details...
 			SquadAssignFlag flag = flagOpt.get();
-			squadState.orders.squadType = flag.getSquadType();
-			squadState.orders.pathVec = UtilMath.degreesToVec(flag.getOutboundDegrees());
-			squadState.orders.pathLine = UtilMath.Line2D.make(squadState.orders.pathVec, new UtilMath.DoubleVec2D(rc.getLocation().x, rc.getLocation().y));
-			// Note that this will cause RobotPlayer to instantiate a new handler.
-			if (squadState.orders.leaderID == rc.getID()) {
+			DoubleVec2D pathVec = UtilMath.degreesToVec(flag.getOutboundDegrees());
+			
+			this.squadStateBuilder
+				.setSquadType(flag.getSquadType())
+				.setPathVec(pathVec)
+				.setPathLine(UtilMath.Line2D.make(pathVec, new UtilMath.DoubleVec2D(rc.getLocation().x, rc.getLocation().y)));
+			
+			// TODO(theimer): placeholder!!!!
+			this.squadStateBuilder.setSquadIdSet(new HashSet<>());
+			
+			SquadState squadState = this.squadStateBuilder.build();
+			
+			if (squadState.leaderID == rc.getID()) {
 				return new LeaderHandler(squadState);
 			} else {
 				return new FollowerHandler(squadState);

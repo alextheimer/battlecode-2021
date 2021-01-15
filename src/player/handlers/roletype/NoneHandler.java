@@ -1,7 +1,6 @@
 package player.handlers.roletype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.SquadState;
 
 import static player.handlers.HandlerCommon.*;
 

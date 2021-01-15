@@ -14,7 +14,7 @@ public class FollowerHandler implements IRobotRoleHandler {
 	}
 	
 	private MapLocation getLeaderCoord(RobotController rc) throws GameActionException {
-		RobotInfo leaderInfo = rc.senseRobot(this.squadState.orders.leaderID);
+		RobotInfo leaderInfo = rc.senseRobot(this.squadState.leaderID);
 		return leaderInfo.getLocation();
 	}
 	

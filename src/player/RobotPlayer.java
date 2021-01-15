@@ -27,7 +27,6 @@ public strictfp class RobotPlayer {
     public static void run(RobotController rc) {
     	RobotType currentType = rc.getType();
     	RobotRole currentRole = currentType == RobotType.ENLIGHTENMENT_CENTER ? RobotRole.NONE : RobotRole.UNASSIGNED;
-    	SquadState state = new SquadState(currentRole, new SquadOrders());
     	
     	IRobotRoleHandler roleHandler;
     	IRobotTypeHandler typeHandler;
@@ -43,7 +42,6 @@ public strictfp class RobotPlayer {
         System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
         	System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
-        	System.out.println("ROLE:" + state.role);
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.

@@ -1,7 +1,6 @@
 package player.handlers.piecetype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.SquadState;
 import util.Util.PeekableIteratorWrapper;
 import util.Flag;
 import util.Flag.*;
