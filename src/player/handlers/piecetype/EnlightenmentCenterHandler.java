@@ -1,7 +1,7 @@
 package player.handlers.piecetype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.RobotState;
+import player.handlers.HandlerCommon.SquadState;
 import util.Util.PeekableIteratorWrapper;
 import util.Flag;
 import util.Flag.*;
@@ -30,7 +30,7 @@ public class EnlightenmentCenterHandler implements IRobotTypeHandler {
 	private Direction nextBuildDir;
 	private int flagCooldown;
 	
-	public EnlightenmentCenterHandler(RobotController rc, RobotState state) {
+	public EnlightenmentCenterHandler() {
 		robotBuildIterator = new PeekableIteratorWrapper<>(Collections.emptyIterator());
 		nextBuildDir = Direction.NORTH;
 		flagCooldown = 0;
@@ -98,7 +98,7 @@ public class EnlightenmentCenterHandler implements IRobotTypeHandler {
     }
     
 	@Override
-	public IRobotTypeHandler handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotTypeHandler handle(RobotController rc) throws GameActionException {
 		
 		if (this.flagCooldown > 0) {
 			this.flagCooldown--;

@@ -2,7 +2,7 @@ package player.handlers.roletype;
 
 import battlecode.common.*;
 import player.handlers.HandlerCommon;
-import player.handlers.HandlerCommon.RobotState;
+import player.handlers.HandlerCommon.SquadState;
 import util.search.BFSGenerator;
 import util.Flag;
 
@@ -35,8 +35,10 @@ public class LeaderHandler implements IRobotRoleHandler {
 	private List<IntVec2D> plannedPath;
 	private PathDirection pathDirection;
 	private int claimCooldown;
+	private SquadState squadState;
 	
-	public LeaderHandler() {
+	public LeaderHandler(SquadState squadState) {
+		this.squadState = squadState;
 		plannedPath = null;
 		pathDirection = PathDirection.NONE;
 		claimCooldown = CLAIM_COOLDOWN_START;
@@ -88,7 +90,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 		return resultSet;
 	}
 	
-	private Set<MapLocation> getProgressMapLocs(MapLocation mapLoc, RobotController rc, RobotState state) throws GameActionException {
+	private Set<MapLocation> getProgressMapLocs(MapLocation mapLoc, RobotController rc) throws GameActionException {
 		final double lineDistThresh = 2.0;
 		Iterator<MapLocation> adjacentMapLocIterator = HandlerCommon.getAdjacentIterator(mapLoc);
 		Stream<MapLocation> mapLocStream = Util.streamifyIterator(adjacentMapLocIterator);
@@ -102,15 +104,15 @@ public class LeaderHandler implements IRobotRoleHandler {
 		
 		return legalSetCollect(mapLocStream.filter(loc -> (
 					// close enough to the path line?
-					(UtilMath.distanceFromLine(new DoubleVec2D(loc.x, loc.y), state.orders.pathLine) < lineDistThresh) &&
+					(UtilMath.distanceFromLine(new DoubleVec2D(loc.x, loc.y), squadState.orders.pathLine) < lineDistThresh) &&
 					// valid location on the map?
 				    pred.test(loc) &&
 				    // heading in the right direction?
-					(state.orders.pathVec.dot(new DoubleVec2D(loc.x - mapLoc.x, loc.y - mapLoc.y)) > 0)
+					(squadState.orders.pathVec.dot(new DoubleVec2D(loc.x - mapLoc.x, loc.y - mapLoc.y)) > 0)
 		)));
 	}
 	
-	private Optional<MapLocation> greedyNextLocation(Collection<MapLocation> progressMapLocs, RobotController rc, RobotState state) throws GameActionException {
+	private Optional<MapLocation> greedyNextLocation(Collection<MapLocation> progressMapLocs, RobotController rc) throws GameActionException {
 		assert !progressMapLocs.isEmpty();
 		Predicate<MapLocation> pred = new Predicate<MapLocation>() {
 			@Override
@@ -126,7 +128,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 				DoubleVec2D mapLocVec = new DoubleVec2D(mapLoc.x, mapLoc.y);
 				DoubleVec2D diffVec = new DoubleVec2D(mapLoc.x - startLoc.x,
 						                              mapLoc.y - startLoc.y);
-				return -diffVec.dot(state.orders.pathVec);  // negated for least cost
+				return -diffVec.dot(squadState.orders.pathVec);  // negated for least cost
 			}
 		};
 		if (mapLocsUnoccupied.isEmpty()) {
@@ -135,14 +137,14 @@ public class LeaderHandler implements IRobotRoleHandler {
 		return Optional.of(Util.findLeastCostLinear(mapLocsUnoccupied.iterator(), costFunc));
 	}
 	
-	private void handlePatrol(RobotController rc, RobotState state) throws GameActionException {
-		Set<MapLocation> progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc, state);
+	private void handlePatrol(RobotController rc) throws GameActionException {
+		Set<MapLocation> progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 		if (progressMapLocSet.isEmpty()) {
-			state.orders.pathVec = state.orders.pathVec.negate();
-			progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc, state);
+			squadState.orders.pathVec = squadState.orders.pathVec.negate();
+			progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 		}
 		assert !progressMapLocSet.isEmpty();
-		Optional<MapLocation> nextMapLocOptional = greedyNextLocation(progressMapLocSet, rc, state);
+		Optional<MapLocation> nextMapLocOptional = greedyNextLocation(progressMapLocSet, rc);
 		if (nextMapLocOptional.isPresent()) {
 			MapLocation nextLoc = nextMapLocOptional.get();
 			Direction dir = rc.getLocation().directionTo(nextLoc);
@@ -152,12 +154,12 @@ public class LeaderHandler implements IRobotRoleHandler {
 		}
 	}
 	
-	private void handleOccupy(RobotController rc, RobotState state) {
+	private void handleOccupy(RobotController rc) {
 		
 	}
 	
 	@Override
-	public IRobotRoleHandler handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotRoleHandler handle(RobotController rc) throws GameActionException {
 		// TODO(theimer): remove these checks?
 		if (this.claimCooldown > 0) {
 			this.claimCooldown--;
@@ -168,9 +170,9 @@ public class LeaderHandler implements IRobotRoleHandler {
 			rc.setFlag(Flag.EMPTY_FLAG);
 		}
 		
-		switch(state.orders.squadType) {
+		switch(this.squadState.orders.squadType) {
 		case PATROL:
-			handlePatrol(rc, state);
+			handlePatrol(rc);
 			break;
 		case OCCUPY:
 //			handleOccupy(RobotController rc, RobotState state);

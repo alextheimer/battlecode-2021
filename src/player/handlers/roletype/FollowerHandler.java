@@ -7,19 +7,21 @@ import util.UtilMath;
 
 public class FollowerHandler implements IRobotRoleHandler {
 
-	public FollowerHandler() {
-		// blank
+	private SquadState squadState;
+	
+	public FollowerHandler(SquadState squadState) {
+		this.squadState = squadState;
 	}
 	
-	private static MapLocation getLeaderCoord(RobotController rc, RobotState state) throws GameActionException {
-		RobotInfo leaderInfo = rc.senseRobot(state.orders.leaderID);
+	private MapLocation getLeaderCoord(RobotController rc) throws GameActionException {
+		RobotInfo leaderInfo = rc.senseRobot(this.squadState.orders.leaderID);
 		return leaderInfo.getLocation();
 	}
 	
 	@Override
-	public IRobotRoleHandler handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotRoleHandler handle(RobotController rc) throws GameActionException {
 		MapLocation robotLocation = rc.getLocation();
-		MapLocation leaderLocation = getLeaderCoord(rc, state);
+		MapLocation leaderLocation = getLeaderCoord(rc);
 		
 		Direction dir = Util.directionToGoal(robotLocation, leaderLocation);
 

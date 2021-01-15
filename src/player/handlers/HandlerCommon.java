@@ -46,11 +46,11 @@ public class HandlerCommon {
     	}
     };
     
-    public static class RobotState {
+    public static class SquadState {
     	public RobotRole role;
     	public SquadOrders orders;
     	public int targetID;
-    	public RobotState(RobotRole role, SquadOrders orders) {
+    	public SquadState(RobotRole role, SquadOrders orders) {
     		this.role = role;
     		this.orders = orders;
     		this.targetID = NULL_ROBOT_ID;
@@ -58,11 +58,11 @@ public class HandlerCommon {
     };
     
     public interface IRobotRoleHandler {
-    	public IRobotRoleHandler handle(RobotController rc, RobotState state) throws GameActionException;
+    	public IRobotRoleHandler handle(RobotController rc) throws GameActionException;
     }
     
     public interface IRobotTypeHandler {
-    	public IRobotTypeHandler handle(RobotController rc, RobotState state) throws GameActionException;
+    	public IRobotTypeHandler handle(RobotController rc) throws GameActionException;
     }
     
     /**

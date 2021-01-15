@@ -1,18 +1,18 @@
 package player.handlers.piecetype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.RobotState;
+import player.handlers.HandlerCommon.SquadState;
 
 import static player.handlers.HandlerCommon.*;
 
 public class MuckrakerHandler implements IRobotTypeHandler {
 	
-	public MuckrakerHandler(RobotController rc, RobotState state) {
+	public MuckrakerHandler() {
 		//blank
 	}
 	
 	@Override
-	public IRobotTypeHandler handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotTypeHandler handle(RobotController rc) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
         for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {

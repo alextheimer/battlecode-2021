@@ -1,7 +1,7 @@
 package player.handlers.roletype;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.RobotState;
+import player.handlers.HandlerCommon.SquadState;
 
 import static player.handlers.HandlerCommon.*;
 
@@ -12,7 +12,7 @@ public class NoneHandler implements IRobotRoleHandler {
 	}
 	
 	@Override
-	public IRobotRoleHandler handle(RobotController rc, RobotState state) throws GameActionException {
+	public IRobotRoleHandler handle(RobotController rc) throws GameActionException {
 		return this;
 	}
 
