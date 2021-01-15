@@ -13,9 +13,9 @@ import static player.handlers.HandlerCommon.*;
 
 import java.util.Optional;
 
-class UnassignedHandler implements IRobotHandler {
+class UnassignedHandlerTODO implements IRobotHandler {
 
-	public UnassignedHandler(RobotController rc, RobotState state) throws GameActionException {
+	public UnassignedHandlerTODO(RobotController rc, RobotState state) throws GameActionException {
 		int leaderID = this.discernLeaderID(rc, state);
 		state.orders.leaderID = leaderID;
 		if (leaderID == rc.getID()) {
@@ -79,7 +79,7 @@ public class UnassignedHandlerFactory implements IRobotHandlerFactory {
 
 	@Override
 	public IRobotHandler instantiate(RobotController rc, RobotState state) throws GameActionException {
-		return new UnassignedHandler(rc, state);
+		return new UnassignedHandlerTODO(rc, state);
 	}
 
 }
