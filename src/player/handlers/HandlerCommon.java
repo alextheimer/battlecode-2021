@@ -1,6 +1,8 @@
 package player.handlers;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import battlecode.common.*;
 import util.UtilMath.*;
@@ -34,11 +36,13 @@ public class HandlerCommon {
     	public int leaderID;
     	public Line2D pathLine;
     	public DoubleVec2D pathVec;
+    	public List<Integer> squadIDs;
     	public SquadOrders() {
     		squadType = null;
     		pathVec = null;
     		pathLine = null;
     		leaderID = NULL_ROBOT_ID;
+    		squadIDs = new ArrayList<>();
     	}
     };
     
