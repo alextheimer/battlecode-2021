@@ -9,13 +9,17 @@ import util.Flag.OpCode;
 import util.Flag.SquadAssignFlag;
 import util.UtilMath;
 import util.UtilMath.DoubleVec2D;
+import player.handlers.HandlerCommon;
 import player.handlers.roletype.SquadState;
 
 import static player.handlers.HandlerCommon.*;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.function.BiPredicate;
 
 public class UnassignedHandlerTODO implements IRobotRoleHandler {
 	
@@ -43,47 +47,36 @@ public class UnassignedHandlerTODO implements IRobotRoleHandler {
 		}
 	}
 	
-	// TODO(theimer): something of this same style should exist in HandlerCommon
-	// TODO(theimer): should probably restrict radius
-	private Optional<Integer> getLeaderClaimFlagPosterIdOpt(RobotController rc) throws GameActionException  {
-		for (RobotInfo robotInfo : rc.senseNearbyRobots()) {
-			int id = robotInfo.getID();
-			int flag = rc.getFlag(id);
-			if (Flag.getOpCode(flag) == Flag.OpCode.LEADER_CLAIM) {
-				return Optional.of(id);
-			}
-		}
-		return Optional.empty();
-	}
+
 	
 	private int discernLeaderID(RobotController rc) throws GameActionException {
 		// Look for a nearby LeaderClaimFlag.
-		Optional<Integer> leaderIdOpt = getLeaderClaimFlagPosterIdOpt(rc);
-		return leaderIdOpt.isPresent() ? leaderIdOpt.get() : rc.getID();
+		RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+		BiPredicate<RobotInfo, Integer> predicate = (robotInfo, rawFlag) -> (Flag.getOpCode(rawFlag) == Flag.OpCode.LEADER_CLAIM);
+		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOptional = HandlerCommon.findFirstMatchingFlag(rc, nearbyRobots, predicate);
+		return entryOptional.isPresent() ? entryOptional.get().getKey().getID() : rc.getID();
 	}
 	
 	private Optional<SquadAssignFlag> squadAssignSearch(RobotController rc) throws GameActionException {
-		for (RobotInfo robotInfo : rc.senseNearbyRobots()) {
-			int id = robotInfo.getID();
-			int rawFlag = rc.getFlag(id);
-			if (Flag.getOpCode(rawFlag) == Flag.OpCode.SQUAD_ASSIGN) {
-				return Optional.of(Flag.SquadAssignFlag.decode(rawFlag));
-			}
-		}
-		return Optional.empty();
+		RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+		BiPredicate<RobotInfo, Integer> predicate = (robotInfo, rawFlag) -> (Flag.getOpCode(rawFlag) == Flag.OpCode.SQUAD_ASSIGN);
+		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOptional = HandlerCommon.findFirstMatchingFlag(rc, nearbyRobots, predicate);
+		return entryOptional.isPresent() ? Optional.of(Flag.SquadAssignFlag.decode(entryOptional.get().getValue())) : Optional.empty();
+		
 	}
 	
 	private static Set<Integer> collectSquadIdSet(RobotController rc) throws GameActionException {
-		Set<Integer> squadIdSet = new HashSet<>();
-		squadIdSet.add(rc.getID());
-		for (RobotInfo robotInfo : rc.senseNearbyRobots()) {
-			int id = robotInfo.getID();
-			int rawFlag = rc.getFlag(id);
-			Flag.OpCode opCode = Flag.getOpCode(rawFlag);
-			if ((opCode == OpCode.FOLLOWER_CLAIM) || (opCode == OpCode.LEADER_CLAIM)) {
-				squadIdSet.add(id);
+		RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+		BiPredicate<RobotInfo, Integer> predicate = new BiPredicate<RobotInfo, Integer>() {
+			@Override
+			public boolean test(RobotInfo robotInfo, Integer rawFlag) {
+				Flag.OpCode opCode = Flag.getOpCode(rawFlag);
+				return ((opCode == OpCode.FOLLOWER_CLAIM) || (opCode == OpCode.LEADER_CLAIM));
 			}
-		}
+		};
+		Map<RobotInfo, Integer> matchingFlagMap = HandlerCommon.findAllMatchingFlags(rc, nearbyRobots, predicate);
+		Set<Integer> squadIdSet = Util.legalSetCollect(matchingFlagMap.keySet().stream().map(robotInfo -> robotInfo.getID()));
+		squadIdSet.add(rc.getID());
 		return squadIdSet;
 	}
 	

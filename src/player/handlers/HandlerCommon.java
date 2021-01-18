@@ -1,11 +1,16 @@
 package player.handlers;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.stream.Stream;
 
 import battlecode.common.*;
 import util.Flag;
@@ -70,6 +75,29 @@ public class HandlerCommon {
     		
     	};
     }
+    
+	public static Map<RobotInfo, Integer> findAllMatchingFlags(RobotController rc, RobotInfo[] nearbyRobots,
+	                                   BiPredicate<RobotInfo, Integer> predicate) throws GameActionException  {
+		Map<RobotInfo, Integer> robotFlagMap = new HashMap<>();
+		for (RobotInfo robotInfo : nearbyRobots) {
+			int rawFlag = rc.getFlag(robotInfo.getID());
+			if (predicate.test(robotInfo, rawFlag)) {
+				robotFlagMap.put(robotInfo, rawFlag);
+			}
+		}
+		return robotFlagMap;
+	}
+	
+	public static Optional<SimpleImmutableEntry<RobotInfo, Integer>> findFirstMatchingFlag(RobotController rc, RobotInfo[] nearbyRobots,
+                                       BiPredicate<RobotInfo, Integer> predicate) throws GameActionException  {
+		for (RobotInfo robotInfo : nearbyRobots) {
+			int rawFlag = rc.getFlag(robotInfo.getID());
+			if (predicate.test(robotInfo, rawFlag)) {
+				return Optional.of(new SimpleImmutableEntry<RobotInfo, Integer>(robotInfo, rawFlag));
+			}
+		}
+		return Optional.empty();
+	}
     
     /**
      * Attempts to move in a given direction.

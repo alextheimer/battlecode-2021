@@ -77,15 +77,6 @@ public class LeaderHandler implements IRobotRoleHandler {
 		}
 	}
 	
-	private static <T> Set<T> legalSetCollect(Stream<T> stream) {
-		Iterator<T> iterator = stream.iterator();
-		Set<T> resultSet = new HashSet<>();
-		while (iterator.hasNext()) {
-			resultSet.add(iterator.next());
-		}
-		return resultSet;
-	}
-	
 	private Set<MapLocation> getProgressMapLocs(MapLocation mapLoc, RobotController rc) throws GameActionException {
 		final double lineDistThresh = 2.0;
 		Iterator<MapLocation> adjacentMapLocIterator = HandlerCommon.getAdjacentIterator(mapLoc);

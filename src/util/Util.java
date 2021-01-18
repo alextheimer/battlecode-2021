@@ -1,9 +1,11 @@
 package util;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import battlecode.common.*;
@@ -80,6 +82,15 @@ public class Util {
 			builder.accept(iterator.next());
 		}
 		return builder.build();
+	}
+	
+	public static <T> Set<T> legalSetCollect(Stream<T> stream) {
+		Iterator<T> iterator = stream.iterator();
+		Set<T> resultSet = new HashSet<>();
+		while (iterator.hasNext()) {
+			resultSet.add(iterator.next());
+		}
+		return resultSet;
 	}
 	
 	@FunctionalInterface
