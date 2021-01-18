@@ -89,7 +89,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 			}
 		};
 		
-		return legalSetCollect(mapLocStream.filter(loc -> (
+		return Util.legalSetCollect(mapLocStream.filter(loc -> (
 					// close enough to the path line?
 					(UtilMath.distanceFromLine(new DoubleVec2D(loc.x, loc.y), squadState.pathLine) < lineDistThresh) &&
 					// valid location on the map?
@@ -108,7 +108,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 			}
 			
 		};
-		Set<MapLocation> mapLocsUnoccupied = legalSetCollect(progressMapLocs.stream().filter(pred));
+		Set<MapLocation> mapLocsUnoccupied = Util.legalSetCollect(progressMapLocs.stream().filter(pred));
 		MapLocation startLoc = rc.getLocation();
 		Function<MapLocation, Double> costFunc = new Function<MapLocation, Double>() {
 			public Double apply(MapLocation mapLoc) {
@@ -125,6 +125,9 @@ public class LeaderHandler implements IRobotRoleHandler {
 	}
 	
 	private void handlePatrol(RobotController rc) throws GameActionException {
+		if (this.needToWaitForSquad(rc)) {
+			return;
+		}
 		Set<MapLocation> progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 		if (progressMapLocSet.isEmpty()) {
 			squadState.pathVec = squadState.pathVec.negate();
@@ -145,8 +148,26 @@ public class LeaderHandler implements IRobotRoleHandler {
 		
 	}
 	
+	private static final int SENSE_RADIUS_SQUARED_EPS = 16;
+	
+	private boolean needToWaitForSquad(RobotController rc) throws GameActionException {
+		for (Integer robotId : this.squadState.squadIdSet) {
+			Util.battlecodeAssert(rc.canSenseRobot(robotId), "TODO", rc);
+			RobotInfo robotInfo = rc.senseRobot(robotId);
+			int minSenseDistSquared = Math.min(rc.getType().sensorRadiusSquared, robotInfo.getType().sensorRadiusSquared);
+			int distSquaredBetween = robotInfo.getLocation().distanceSquaredTo(rc.getLocation());
+			if (distSquaredBetween > (minSenseDistSquared - SENSE_RADIUS_SQUARED_EPS)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	public IRobotRoleHandler handle(RobotController rc) throws GameActionException {
+		// keep track of living squad members
+		Predicate<Integer> predicate = robotId -> !rc.canSenseRobot(robotId);
+		Set<Integer> removedIds = Util.removeMatching(squadState.squadIdSet, predicate);
 		switch(this.squadState.squadType) {
 			case PATROL:
 				handlePatrol(rc);

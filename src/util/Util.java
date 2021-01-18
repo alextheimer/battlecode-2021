@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import battlecode.common.*;
 
@@ -98,6 +99,20 @@ public class Util {
 			System.out.println("ASSESRTION FAIL: " + message);
 			rc.resign();
 		}
+	}
+
+	public static <T> Set<T> removeMatching(Iterable<T> iterable, Predicate<T> predicate) {
+		Set<T> removedSet = new HashSet<>();
+		Iterator<T> iterator = iterable.iterator();
+		while (iterator.hasNext()) {
+			// Note: must call next() before remove()
+			T element = iterator.next();
+			if (predicate.test(element)) {
+				removedSet.add(element);
+				iterator.remove();
+			}
+		}
+		return removedSet;
 	}
 	
 	@FunctionalInterface

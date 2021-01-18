@@ -17,21 +17,92 @@ import static player.handlers.HandlerCommon.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayDeque;
 import java.util.function.BiPredicate;
 
 public class UnassignedHandlerTODO implements IRobotRoleHandler {
 	
-	private static final int FLAG_COOLDOWN_START = 3;  // current round, then 1 full round to propagate
-	
 	private SquadState.Builder squadStateBuilder;
-	private int flagCooldown;
-	private boolean ordersReceived;
+	private Queue<StageHandler> stageHandlerQueue;
+	
+	private interface StageHandler {
+		public void handle(RobotController rc) throws GameActionException;
+		public boolean isComplete();
+	}
+	
+	private class OrdersStageHandler implements StageHandler {
+		
+		private boolean ordersReceived = false;
+		
+		@Override
+		public void handle(RobotController rc) throws GameActionException {
+			// Look for orders from origin EnlightenmentCenter
+			Optional<SquadAssignFlag> flagOpt = UnassignedHandlerTODO.this.squadAssignSearch(rc);
+			if (flagOpt.isPresent()) {
+				this.ordersReceived = true;
+				// Orders found! Store the details...
+				SquadAssignFlag flag = flagOpt.get();
+				DoubleVec2D pathVec = UtilMath.degreesToVec(flag.getOutboundDegrees());
+	
+				UnassignedHandlerTODO.this.squadStateBuilder
+					.setSquadType(flag.getSquadType())
+					.setPathVec(pathVec)
+					.setPathLine(UtilMath.Line2D.make(pathVec, new UtilMath.DoubleVec2D(rc.getLocation().x, rc.getLocation().y)));
+			}
+		}
+
+		@Override
+		public boolean isComplete() {
+			return this.ordersReceived;
+		}
+	}
+	
+	private class SquadStageHandler implements StageHandler {
+		
+		private int waitCountdown = 3;
+		
+		@Override
+		public void handle(RobotController rc) throws GameActionException {
+			waitCountdown--;
+			if (waitCountdown == 0) {
+				Set<Integer> squadIdSet = UnassignedHandlerTODO.collectSquadIdSet(rc);
+				System.out.println("found in squad: " + squadIdSet.size());
+				Util.battlecodeAssert(squadIdSet.size() > 1, "SQUAD TOO SMALL", rc);
+				UnassignedHandlerTODO.this.squadStateBuilder.setSquadIdSet(squadIdSet);				
+			}
+		}
+
+		@Override
+		public boolean isComplete() {
+			return this.waitCountdown == 0;
+		}
+	}
+	
+	private class FlagPropHandler implements StageHandler {
+		
+		private int waitCountdown = 3;
+		
+		@Override
+		public void handle(RobotController rc) throws GameActionException {
+			waitCountdown--;
+		}
+
+		@Override
+		public boolean isComplete() {
+			return this.waitCountdown == 0;
+		}
+	}
 	
 	public UnassignedHandlerTODO(RobotController rc) throws GameActionException {
-		this.flagCooldown = FLAG_COOLDOWN_START;
-		this.ordersReceived = false;
+		this.stageHandlerQueue = new ArrayDeque<StageHandler>();
+		
+		this.stageHandlerQueue.add(new OrdersStageHandler());
+		this.stageHandlerQueue.add(new SquadStageHandler());
+		this.stageHandlerQueue.add(new FlagPropHandler());
+		
 		this.squadStateBuilder = new SquadState.Builder();
 		int leaderID = this.discernLeaderID(rc);
 		this.squadStateBuilder.setLeaderID(leaderID);
@@ -82,33 +153,19 @@ public class UnassignedHandlerTODO implements IRobotRoleHandler {
 	
 	@Override
 	public IRobotRoleHandler handle(RobotController rc) throws GameActionException {
-		// TODO(theimer): all below -- this is gross
-		if (!this.ordersReceived) {
-			// Look for orders from origin EnlightenmentCenter
-			Optional<SquadAssignFlag> flagOpt = squadAssignSearch(rc);
-			if (flagOpt.isPresent()) {
-				this.ordersReceived = true;
-				// Orders found! Store the details...
-				SquadAssignFlag flag = flagOpt.get();
-				DoubleVec2D pathVec = UtilMath.degreesToVec(flag.getOutboundDegrees());
-				
-				this.squadStateBuilder
-					.setSquadType(flag.getSquadType())
-					.setPathVec(pathVec)
-					.setPathLine(UtilMath.Line2D.make(pathVec, new UtilMath.DoubleVec2D(rc.getLocation().x, rc.getLocation().y)));
-				
-				Set<Integer> squadIdSet = collectSquadIdSet(rc);
-				this.squadStateBuilder.setSquadIdSet(squadIdSet);
+		
+		while (!this.stageHandlerQueue.isEmpty()) {
+			StageHandler stageHandler = this.stageHandlerQueue.peek();
+			stageHandler.handle(rc);
+			if (stageHandler.isComplete()) {
+				this.stageHandlerQueue.remove();
+			} else {
+				break;
 			}
 		}
 		
-
-		if (this.ordersReceived) {
-			this.flagCooldown--;
-		}
-		
 		IRobotRoleHandler nextHandler;
-		if (this.flagCooldown == 0) {
+		if (this.stageHandlerQueue.isEmpty()) {
 			rc.setFlag(Flag.EMPTY_FLAG);
 			SquadState squadState = this.squadStateBuilder.build();
 			if (squadState.leaderID == rc.getID()) {
