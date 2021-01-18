@@ -93,6 +93,13 @@ public class Util {
 		return resultSet;
 	}
 	
+	public static void battlecodeAssert(boolean resignIfFalse, String message, RobotController rc) {
+		if (!resignIfFalse) {
+			System.out.println("ASSESRTION FAIL: " + message);
+			rc.resign();
+		}
+	}
+	
 	@FunctionalInterface
 	public static interface GameActionFunction<T, R> {
 		public R apply(T t) throws GameActionException;

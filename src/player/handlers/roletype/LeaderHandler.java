@@ -100,7 +100,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 	}
 	
 	private Optional<MapLocation> greedyNextLocation(Collection<MapLocation> progressMapLocs, RobotController rc) throws GameActionException {
-		assert !progressMapLocs.isEmpty();
+		Util.battlecodeAssert(!progressMapLocs.isEmpty(), "TODO", rc);
 		Predicate<MapLocation> pred = new Predicate<MapLocation>() {
 			@Override
 			public boolean test(MapLocation t) {
@@ -130,7 +130,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 			squadState.pathVec = squadState.pathVec.negate();
 			progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 		}
-		assert !progressMapLocSet.isEmpty();
+		Util.battlecodeAssert(!progressMapLocSet.isEmpty(), "TODO", rc);
 		Optional<MapLocation> nextMapLocOptional = greedyNextLocation(progressMapLocSet, rc);
 		if (nextMapLocOptional.isPresent()) {
 			MapLocation nextLoc = nextMapLocOptional.get();
@@ -156,7 +156,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 				break;
 			case NONE:
 			case UNASSIGNED:
-				assert false : "leaders shouldn't have these SquadTypes!";
+				Util.battlecodeAssert(false, "leaders shouldn't have these SquadTypes!", rc);
 				break;
 		}
 		return this;
