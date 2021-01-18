@@ -29,18 +29,15 @@ import static player.handlers.HandlerCommon.*;
 public class LeaderHandler implements IRobotRoleHandler {
 	
 	private static enum PathDirection {INBOUND, OUTBOUND, NONE};
-	private static final int CLAIM_COOLDOWN_START = 1;  // 1 full round for all bots to see flag
 	
 	private List<IntVec2D> plannedPath;
 	private PathDirection pathDirection;
-	private int claimCooldown;
 	private SquadState squadState;
 	
 	public LeaderHandler(SquadState squadState) {
 		this.squadState = squadState;
 		plannedPath = null;
 		pathDirection = PathDirection.NONE;
-		claimCooldown = CLAIM_COOLDOWN_START;
 	}
 	
 //	private static Set<IntVec2D> expandCoord(IntVec2D coord, RobotController rc) {
@@ -159,27 +156,17 @@ public class LeaderHandler implements IRobotRoleHandler {
 	
 	@Override
 	public IRobotRoleHandler handle(RobotController rc) throws GameActionException {
-		// TODO(theimer): remove these checks?
-		if (this.claimCooldown > 0) {
-			this.claimCooldown--;
-			return this;
-		}
-		if (this.claimCooldown == 0) {
-			this.claimCooldown--;
-			rc.setFlag(Flag.EMPTY_FLAG);
-		}
-		
 		switch(this.squadState.squadType) {
-		case PATROL:
-			handlePatrol(rc);
-			break;
-		case OCCUPY:
-//			handleOccupy(RobotController rc, RobotState state);
-			break;
-		case NONE:
-		case UNASSIGNED:
-			assert false : "leaders shouldn't have these SquadTypes!";
-			break;
+			case PATROL:
+				handlePatrol(rc);
+				break;
+			case OCCUPY:
+	//			handleOccupy(RobotController rc, RobotState state);
+				break;
+			case NONE:
+			case UNASSIGNED:
+				assert false : "leaders shouldn't have these SquadTypes!";
+				break;
 		}
 		return this;
 	}

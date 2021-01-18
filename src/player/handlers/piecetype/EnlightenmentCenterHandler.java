@@ -17,8 +17,8 @@ import static player.handlers.HandlerCommon.*;
 
 public class EnlightenmentCenterHandler implements IRobotTypeHandler {
 	
-	private static final int FLAG_COOLDOWN_START = 2;  // 1 round for all bots to see SquadAssignFlag
-	                                                   // 1 round for all bots to see LeaderClaimFlag
+	private static final int FLAG_COOLDOWN_START = 1;  // 2 rounds to guarantee all bots see
+	
 	private static Map<SquadType, List<RobotType>> squadSpecMap = new HashMap<>();
 	static {
 		// TODO(theimer): first is the leader?
