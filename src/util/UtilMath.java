@@ -114,7 +114,7 @@ public class UtilMath {
 	public static int log2Ceil(int val) {
 		assert val > 0 : "val must be at least zero!";
 		int highest = Integer.highestOneBit(val);
-		int trailing = Integer.numberOfTrailingZeros(val);
+		int trailing = Integer.numberOfTrailingZeros(highest);
 		if (highest == val) {
 			// Power of two!
 			return trailing;
@@ -129,7 +129,7 @@ public class UtilMath {
 	}
 	
 	public static int numBits(int numValues) {
-		return 1 << log2Ceil(numValues);
+		return log2Ceil(numValues);
 	}
 	
 	public static DoubleVec2D degreesToVec(int degrees) {
