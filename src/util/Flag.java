@@ -215,14 +215,29 @@ public class Flag {
 //		}
 //	}
 //	
-//	public static class AttackTargetFlag {
-//		public static AttackTargetFlag decode(int rawFlag) {
-//			
-//		}
-//		public int encode() {
-//			
-//		}
-//	}
+	public static class AttackTargetFlag {
+		private DiffVecField diffVec;
+		public AttackTargetFlag(int x, int y) {
+			this.diffVec = new DiffVecField(x, y);
+		}
+		private AttackTargetFlag(DiffVecField diffVec) {
+			this.diffVec = diffVec;
+		}
+		public static AttackTargetFlag decode(int rawFlag) {
+			FlagWalker flagWalker = new FlagWalker(rawFlag);
+			flagWalker.readBits(numOpCodeBits);
+			return new AttackTargetFlag(DiffVecField.fromBits(flagWalker.readBits(DiffVecField.NUM_BITS)));
+		}
+		public int encode() {
+			FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
+			flagWalker.writeBits(numOpCodeBits, OpCode.ATTACK_TARGET.ordinal());
+			flagWalker.writeBits(DiffVecField.NUM_BITS, this.diffVec.toBits());
+			return flagWalker.getAllBits();
+		}
+		public IntVec2D getDiffVec() {
+			return this.diffVec.value();
+		}
+	}
 //	
 //	public static class BaseSightedFlag {
 //		public static BaseSightedFlag decode(int rawFlag) {

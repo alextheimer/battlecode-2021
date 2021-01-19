@@ -43,8 +43,6 @@ public class FlagTest {
 		// Make sure encode / decode are working as intended.
 		int rawFlag = flag.encode();
 		AttackTargetFlag parsedFlag = AttackTargetFlag.decode(rawFlag);
-		System.out.println("" + Flag.numOpCodeBits);
-		System.out.println("" + Flag.OpCode.values().length);
 		assertEquals("rawFlag: " + rawFlag, OpCode.ATTACK_TARGET, Flag.getOpCode(rawFlag));
 		assertEquals(diffVec, parsedFlag.getDiffVec());
 	}
