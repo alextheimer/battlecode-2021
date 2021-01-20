@@ -17,6 +17,9 @@ public class UtilMath {
 			this.x = x;
 			this.y = y;
 		}
+		public IntVec2D add(IntVec2D other) {
+			return new IntVec2D(this.x + other.x, this.y + other.y);
+		}
 		public boolean sameValue(final IntVec2D other) {
 			return (this.x == other.x) && (this.y == other.y);
 		}

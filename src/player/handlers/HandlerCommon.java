@@ -10,11 +10,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import battlecode.common.*;
 import player.handlers.roletype.SquadState;
+import player.handlers.HandlerCommon;
 import util.Flag;
 import util.Flag.OpCode;
 import util.Util;
@@ -77,6 +79,52 @@ public class HandlerCommon {
 			}
     		
     	};
+    }
+    
+	@FunctionalInterface
+	public static interface GameActionPredicate<T> {
+		public boolean test(T t) throws GameActionException;
+	}
+    
+	public static <T> Predicate<T> wrapGameActionPredicate(GameActionPredicate<T> pred) {
+		return new Predicate<T>() {
+			@Override
+			public boolean test(T t) {
+				try {
+					return pred.test(t);
+				} catch (GameActionException e) {
+					System.out.println(e.getMessage());
+					e.printStackTrace();
+					throw new RuntimeException("Use of this function implies this should never happen!");
+				}
+			}
+			
+		};
+	}
+	
+	public static boolean attemptMove(RobotController rc, Direction dir) throws GameActionException {
+		System.out.println("Want to move: " + dir);
+		if (rc.canMove(dir)) {
+			rc.move(dir);
+			System.out.println("Move successful!");
+			return true;
+		} else {
+			System.out.println("Move failed!");
+			return false;
+		}
+	}
+    
+	// TODO(theimer): break this up / accept ranking heuristic
+    public static Optional<MapLocation> getAdjacentCloserTraversableMapLocation(MapLocation start, MapLocation goal, RobotController rc) {
+    	int distSquaredToGoal = start.distanceSquaredTo(goal);
+		Predicate<MapLocation> pred = HandlerCommon.<MapLocation>wrapGameActionPredicate(
+			mapLoc -> (
+			    (mapLoc.distanceSquaredTo(goal) < distSquaredToGoal) &&
+			    !rc.isLocationOccupied(mapLoc) && rc.onTheMap(mapLoc)
+			)
+		);
+    	Stream<MapLocation> mapLocStream = Util.streamifyIterator(getAdjacentIterator(start)).filter(pred);
+    	return mapLocStream.findAny();
     }
     
 	public static Map<RobotInfo, Integer> findAllMatchingFlags(RobotController rc, RobotInfo[] nearbyRobots,

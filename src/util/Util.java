@@ -100,6 +100,11 @@ public class Util {
 			rc.resign();
 		}
 	}
+	
+	public static void battlecodeThrow(String message, RobotController rc) {
+		System.out.println("EXCEPTION THROWN: " + message);
+		rc.resign();
+	}
 
 	public static <T> Set<T> removeMatching(Iterable<T> iterable, Predicate<T> predicate) {
 		Set<T> removedSet = new HashSet<>();
