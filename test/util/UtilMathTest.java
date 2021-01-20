@@ -1,7 +1,7 @@
 package util;
 
 import static org.junit.Assert.*;
-import static util.UtilMath.*;
+import static player.util.UtilMath.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +37,7 @@ public class UtilMathTest {
 				new TPPPT(new DoubleVec2D(1, -1), yEqXLineOrigin, Math.sqrt(2))
 				);
 		for (TPPPT t : listThing) {
-			assertEquals("" + t.line + ", " + t.coord, t.expectedDist, distanceFromLine(t.coord, t.line), UtilMath.FLOAT_EPS);
+			assertEquals("" + t.line + ", " + t.coord, t.expectedDist, distanceFromLine(t.coord, t.line), FLOAT_EPS);
 		}
 	}
 

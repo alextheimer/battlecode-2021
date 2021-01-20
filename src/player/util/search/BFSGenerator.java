@@ -1,4 +1,4 @@
-package util.search;
+package player.util.search;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;

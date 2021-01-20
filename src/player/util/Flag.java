@@ -1,4 +1,4 @@
-package util;
+package player.util;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
@@ -7,9 +7,9 @@ import java.util.Map;
 
 import battlecode.common.Direction;
 import player.handlers.HandlerCommon.*;
-import util.Util.*;
-import util.FlagFields.*;
-import util.UtilMath.*;
+import player.util.Util.*;
+import player.util.FlagFields.*;
+import player.util.UtilMath.*;
 
 /**
  * Sequentially builds / reads (i.e. "walk") a flag.

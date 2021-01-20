@@ -1,9 +1,9 @@
-package player.handlers.piecetype;
+package player.handlers;
 
 import battlecode.common.*;
-import util.Util.PeekableIteratorWrapper;
-import util.Flag;
-import util.Flag.*;
+import player.util.Util.PeekableIteratorWrapper;
+import player.util.Flag;
+import player.util.Flag.*;
 
 import java.util.Arrays;
 import java.util.Collections;

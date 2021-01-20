@@ -1,4 +1,4 @@
-package util;
+package player.util;
 
 import java.util.Collection;
 import java.util.HashSet;

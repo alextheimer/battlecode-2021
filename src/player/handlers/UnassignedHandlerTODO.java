@@ -1,16 +1,15 @@
-package player.handlers.roletype;
+package player.handlers;
 
 import battlecode.common.*;
-import util.Flag;
-import util.Util;
-import util.Flag.FollowerClaimFlag;
-import util.Flag.LeaderClaimFlag;
-import util.Flag.OpCode;
-import util.Flag.SquadAssignFlag;
-import util.UtilMath;
-import util.UtilMath.DoubleVec2D;
-import player.handlers.HandlerCommon;
-import player.handlers.roletype.SquadState;
+import player.util.Flag;
+import player.util.Util;
+import player.util.Flag.FollowerClaimFlag;
+import player.util.Flag.LeaderClaimFlag;
+import player.util.Flag.OpCode;
+import player.util.Flag.SquadAssignFlag;
+import player.util.UtilMath;
+import player.util.UtilMath.DoubleVec2D;
+import player.handlers.SquadState;
 
 import static player.handlers.HandlerCommon.*;
 

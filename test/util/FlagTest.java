@@ -1,8 +1,10 @@
 package util;
 
 import static org.junit.Assert.*;
-import util.Flag.*;
-import util.UtilMath.IntVec2D;
+
+import player.util.Flag;
+import player.util.Flag.*;
+import player.util.UtilMath.IntVec2D;
 
 import org.junit.Test;
 

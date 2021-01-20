@@ -1,8 +1,8 @@
-package util;
+package player.util;
 
 import java.util.Objects;
 
-import util.UtilMath.*;
+import player.util.UtilMath.*;
 import java.lang.Math.*;
 
 public class UtilMath {

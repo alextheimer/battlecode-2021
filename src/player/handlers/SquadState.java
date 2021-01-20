@@ -1,12 +1,12 @@
-package player.handlers.roletype;
+package player.handlers;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import player.handlers.HandlerCommon.SquadType;
-import util.UtilMath.DoubleVec2D;
-import util.UtilMath.Line2D;
+import player.util.UtilMath.DoubleVec2D;
+import player.util.UtilMath.Line2D;
 
 public class SquadState {
 	public SquadType squadType;

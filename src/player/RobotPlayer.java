@@ -6,8 +6,11 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import battlecode.common.*;
-import player.handlers.piecetype.*;
-import player.handlers.roletype.*;
+import player.handlers.*;
+import player.handlers.EnlightenmentCenterHandler;
+import player.handlers.MuckrakerHandler;
+import player.handlers.PoliticianHandler;
+import player.handlers.SlandererHandler;
 import player.handlers.HandlerCommon.*;
 
 public strictfp class RobotPlayer {

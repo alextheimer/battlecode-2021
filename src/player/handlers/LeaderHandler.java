@@ -1,13 +1,12 @@
-package player.handlers.roletype;
+package player.handlers;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon;
-import util.search.BFSGenerator;
-import util.Flag;
-import util.Flag.AttackTargetFlag;
-import util.Util;
-import util.UtilMath;
-import util.UtilMath.*;
+import player.util.search.BFSGenerator;
+import player.util.Flag;
+import player.util.Flag.AttackTargetFlag;
+import player.util.Util;
+import player.util.UtilMath;
+import player.util.UtilMath.*;
 
 import java.util.Arrays;
 import java.util.Collection;

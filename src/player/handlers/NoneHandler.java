@@ -1,4 +1,4 @@
-package player.handlers.roletype;
+package player.handlers;
 
 import battlecode.common.*;
 

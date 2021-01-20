@@ -1,9 +1,9 @@
-package player.handlers.roletype;
+package player.handlers;
 
 import battlecode.common.*;
 import static player.handlers.HandlerCommon.*;
-import util.Util;
-import util.UtilMath;
+import player.util.Util;
+import player.util.UtilMath;
 
 public class FollowerHandler implements IRobotRoleHandler {
 

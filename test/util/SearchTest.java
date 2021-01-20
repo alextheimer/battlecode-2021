@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 
-import util.search.AStar;
-import util.UtilMath.*;
+import player.util.search.AStar;
+import static player.util.UtilMath.*;
 
 public class SearchTest {
 
@@ -94,7 +94,7 @@ public class SearchTest {
 		return new Function<IntVec2D, Set<IntVec2D>>() {
 			@Override
 			public Set<IntVec2D> apply(final IntVec2D coord) {
-				assert UtilMath.intCoordInBounds(coord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
+				assert intCoordInBounds(coord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
 				// TODO(theimer): make this faster if speed matters.
 				return Stream.of(
 					new IntVec2D(coord.x, coord.y + 1),
@@ -105,7 +105,7 @@ public class SearchTest {
 					new IntVec2D(coord.x - 1, coord.y),
 					new IntVec2D(coord.x - 1, coord.y + 1),
 					new IntVec2D(coord.x - 1, coord.y - 1)
-				).filter(expandedCoord -> (UtilMath.intCoordInBounds(expandedCoord, xMin, xMax, yMin, yMax) &&
+				).filter(expandedCoord -> (intCoordInBounds(expandedCoord, xMin, xMax, yMin, yMax) &&
 						                   intCoordFilter.test(coord, expandedCoord)))
 			     .collect(Collectors.toSet());
 			}

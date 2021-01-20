@@ -1,4 +1,4 @@
-package player.handlers.piecetype;
+package player.handlers;
 
 import battlecode.common.*;
 

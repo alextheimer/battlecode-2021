@@ -15,12 +15,12 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import battlecode.common.*;
-import player.handlers.roletype.SquadState;
+import player.handlers.SquadState;
 import player.handlers.HandlerCommon;
-import util.Flag;
-import util.Flag.OpCode;
-import util.Util;
-import util.UtilMath.*;
+import player.util.Flag;
+import player.util.Flag.OpCode;
+import player.util.Util;
+import player.util.UtilMath.*;
 
 
 public class HandlerCommon {
