@@ -1,5 +1,11 @@
 package util;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import battlecode.common.Direction;
 import player.handlers.HandlerCommon.*;
 import util.Util.*;
 import util.FlagFields.*;
@@ -90,6 +96,53 @@ class FlagFields {
 		}
 	}
 	
+	public static class DirectionField {
+		public static final int NUM_BITS = 3;
+		
+		private static Map<Direction, Integer> dirToIndexMap;
+		private static Map<Integer, Direction> indexToDirMap;
+		
+		static {
+			List<SimpleImmutableEntry<Direction, Integer>> dirIndexPairs = Arrays.asList(
+					new SimpleImmutableEntry<>(Direction.NORTH, 0),
+					new SimpleImmutableEntry<>(Direction.NORTH, 1),
+					new SimpleImmutableEntry<>(Direction.NORTH, 2),
+					new SimpleImmutableEntry<>(Direction.NORTH, 3),
+					new SimpleImmutableEntry<>(Direction.NORTH, 4),
+					new SimpleImmutableEntry<>(Direction.NORTH, 5),
+					new SimpleImmutableEntry<>(Direction.NORTH, 6),
+					new SimpleImmutableEntry<>(Direction.NORTH, 7)
+			);
+			for (SimpleImmutableEntry<Direction, Integer> entry : dirIndexPairs) {
+				dirToIndexMap.put(entry.getKey(), entry.getValue());
+				indexToDirMap.put(entry.getValue(), entry.getKey());
+			}
+		}
+		
+		private Direction direction;
+		
+		public DirectionField(Direction direction) {
+			// TODO(theimer): assertions
+			this.direction = direction;
+		}
+		
+		public int toBits() {
+			FlagWalker flagWalker = new FlagWalker(0);
+			flagWalker.writeBits(NUM_BITS, DirectionField.dirToIndexMap.get(this.direction));
+			return flagWalker.getAllBits();
+		}
+		
+		public static DirectionField fromBits(int bits) {
+			FlagWalker flagWalker = new FlagWalker(bits);
+			int index = flagWalker.readBits(NUM_BITS);
+			return new DirectionField(DirectionField.indexToDirMap.get(index));
+		}
+		
+		public Direction value() {
+			return this.direction;
+		}
+	}
+	
 	public static class DegreesField {
 		public static final int NUM_BITS = 9;
 		
@@ -134,6 +187,30 @@ class FlagFields {
 		
 		public SquadType value() {
 			return this.squadType;
+		}
+	}
+	
+	public static class IdField {
+		public static final int NUM_BITS = 15;
+		
+		private int id;
+		
+		public IdField(int id) {
+			// TODO(theimer): assertions
+			this.id = id;
+		}
+		
+		public int toBits() {
+			return this.id;
+		}
+		
+		public static IdField fromBits(int bits) {
+			// TODO(theimer): !!!!!!!!!!
+			return new IdField(bits);
+		}
+		
+		public int value() {
+			return this.id;
 		}
 	}
 	
@@ -216,26 +293,35 @@ public class Flag {
 //	}
 //	
 	public static class AttackTargetFlag {
-		private DiffVecField diffVec;
-		public AttackTargetFlag(int x, int y) {
-			this.diffVec = new DiffVecField(x, y);
+		private IdField idField;
+		private DirectionField dirField;
+		public AttackTargetFlag(int id, Direction dir) {
+			this.idField = new IdField(id);
+			this.dirField = new DirectionField(dir);
 		}
-		private AttackTargetFlag(DiffVecField diffVec) {
-			this.diffVec = diffVec;
+		private AttackTargetFlag(IdField idField, DirectionField dirField) {
+			this.idField = idField;
+			this.dirField = dirField;
 		}
 		public static AttackTargetFlag decode(int rawFlag) {
 			FlagWalker flagWalker = new FlagWalker(rawFlag);
 			flagWalker.readBits(numOpCodeBits);
-			return new AttackTargetFlag(DiffVecField.fromBits(flagWalker.readBits(DiffVecField.NUM_BITS)));
+			int idBits = flagWalker.readBits(IdField.NUM_BITS);
+			int dirBits = flagWalker.readBits(DirectionField.NUM_BITS);
+			return new AttackTargetFlag(IdField.fromBits(idBits), DirectionField.fromBits(dirBits));
 		}
 		public int encode() {
 			FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
 			flagWalker.writeBits(numOpCodeBits, OpCode.ATTACK_TARGET.ordinal());
-			flagWalker.writeBits(DiffVecField.NUM_BITS, this.diffVec.toBits());
+			flagWalker.writeBits(IdField.NUM_BITS, this.idField.toBits());
+			flagWalker.writeBits(DirectionField.NUM_BITS, this.dirField.toBits());
 			return flagWalker.getAllBits();
 		}
-		public IntVec2D getDiffVec() {
-			return this.diffVec.value();
+		public int getId() {
+			return this.idField.value();
+		}
+		public Direction getDirection() {
+			return this.dirField.value();
 		}
 	}
 //	

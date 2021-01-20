@@ -132,8 +132,8 @@ public class LeaderHandler implements IRobotRoleHandler {
 				this.squadState.targetIdOpt = Optional.of(newTargetRobotInfo.getID());
 				MapLocation newTargetMapLoc = newTargetRobotInfo.getLocation();
 				MapLocation currentMapLoc = rc.getLocation();
-				AttackTargetFlag flag = new AttackTargetFlag(newTargetMapLoc.x - currentMapLoc.x,
-						                                     newTargetMapLoc.y - currentMapLoc.y);
+				Direction dirToEnemy = currentMapLoc.directionTo(newTargetMapLoc);
+				AttackTargetFlag flag = new AttackTargetFlag(newTargetRobotInfo.getID(), dirToEnemy);
 				Util.battlecodeAssert(rc.getFlag(rc.getID()) == Flag.EMPTY_FLAG, "flag should be empty!", rc);
 				rc.setFlag(flag.encode());
 			}
