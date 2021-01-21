@@ -2,6 +2,7 @@ package player.handlers;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -154,21 +155,6 @@ public class HandlerCommon {
 		}
 		return Optional.empty();
 	}
-    
-    /**
-     * Attempts to move in a given direction.
-     *
-     * @param dir The intended direction of movement
-     * @return true if a move was performed
-     * @throws GameActionException
-     */
-    public static boolean tryMove(RobotController rc, Direction dir) throws GameActionException {
-        System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            return true;
-        } else return false;
-    }
 
 	public static Direction directionToGoal(MapLocation startCoord, MapLocation goalCoord) {
 		// TODO(theimer): literally anything better than this
@@ -197,5 +183,15 @@ public class HandlerCommon {
 	public static void battlecodeThrow(String message, RobotController rc) {
 		System.out.println("EXCEPTION THROWN: " + message);
 		rc.resign();
+	}
+
+	public static Optional<RobotInfo> findNearestEnemy(RobotController rc, RobotInfo[] nearbyRobots) {
+		Iterator<RobotInfo> enemyIterator = Arrays.stream(nearbyRobots).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam()).iterator();
+		if (enemyIterator.hasNext()) {
+			Function<RobotInfo, Double> costFunc = robotInfo -> (double)robotInfo.getLocation().distanceSquaredTo(rc.getLocation());
+			return Optional.of(Util.findLeastCostLinear(enemyIterator, costFunc));
+		} else {
+			return Optional.empty();
+		}
 	}
 }

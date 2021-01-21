@@ -12,7 +12,7 @@ public class SlandererHandler implements IRobotTypeHandler {
 	
 	@Override
 	public IRobotTypeHandler handle(RobotController rc) throws GameActionException {
-        if (tryMove(rc, randomDirection()))
+        if (attemptMove(rc, randomDirection()))
             System.out.println("I moved!");
         return this;
 	}

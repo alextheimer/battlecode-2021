@@ -24,7 +24,7 @@ public class MuckrakerHandler implements IRobotTypeHandler {
                 }
             }
         }
-        if (tryMove(rc, randomDirection()))
+        if(attemptMove(rc, randomDirection()))
             System.out.println("I moved!");
         return this;
 	}

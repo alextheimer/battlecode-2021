@@ -8,7 +8,6 @@ import player.util.Util;
 import player.util.UtilMath;
 import player.util.UtilMath.*;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -102,16 +101,6 @@ public class LeaderHandler implements IRobotRoleHandler {
 		return Optional.of(Util.findLeastCostLinear(mapLocsUnoccupied.iterator(), costFunc));
 	}
 	
-	private Optional<RobotInfo> findNearestEnemy(RobotController rc, RobotInfo[] nearbyRobots) {
-		Iterator<RobotInfo> enemyIterator = Arrays.stream(nearbyRobots).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam()).iterator();
-		if (enemyIterator.hasNext()) {
-			Function<RobotInfo, Double> costFunc = robotInfo -> (double)robotInfo.getLocation().distanceSquaredTo(rc.getLocation());
-			return Optional.of(Util.findLeastCostLinear(enemyIterator, costFunc));
-		} else {
-			return Optional.empty();
-		}
-	}
-	
 	private void handlePatrol(RobotController rc) throws GameActionException {
 		// handle targeting/flag stuff first
 		if (this.squadState.targetIdOpt.isPresent()) {
@@ -124,7 +113,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 			}
 		} else {
 			// no existing target-- attempt to acquire a new one
-			Optional<RobotInfo> newTargetRobotInfoOpt = this.findNearestEnemy(rc, rc.senseNearbyRobots());
+			Optional<RobotInfo> newTargetRobotInfoOpt = HandlerCommon.findNearestEnemy(rc, rc.senseNearbyRobots());
 			if (newTargetRobotInfoOpt.isPresent()) {
 				// found one! store it and tell the squad to attack it.
 				RobotInfo newTargetRobotInfo = newTargetRobotInfoOpt.get();
