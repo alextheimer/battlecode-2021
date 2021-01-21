@@ -86,6 +86,11 @@ public class HandlerCommon {
 		public boolean test(T t) throws GameActionException;
 	}
     
+	@FunctionalInterface
+	public static interface GameActionFunction<T, R> {
+		public R apply(T t) throws GameActionException;
+	}
+
 	public static <T> Predicate<T> wrapGameActionPredicate(GameActionPredicate<T> pred) {
 		return new Predicate<T>() {
 			@Override
@@ -164,4 +169,33 @@ public class HandlerCommon {
             return true;
         } else return false;
     }
+
+	public static Direction directionToGoal(MapLocation startCoord, MapLocation goalCoord) {
+		// TODO(theimer): literally anything better than this
+		if (goalCoord.x > startCoord.x) {
+			if (goalCoord.y > startCoord.y) {
+				return Direction.NORTHEAST;
+			} else {
+				return Direction.SOUTHEAST;
+			}
+		} else {
+			if (goalCoord.y > startCoord.y) {
+				return Direction.NORTHWEST;
+			} else {
+				return Direction.SOUTHWEST;
+			}			
+		}
+	}
+
+	public static void battlecodeAssert(boolean resignIfFalse, String message, RobotController rc) {
+		if (!resignIfFalse) {
+			System.out.println("ASSESRTION FAIL: " + message);
+			rc.resign();
+		}
+	}
+
+	public static void battlecodeThrow(String message, RobotController rc) {
+		System.out.println("EXCEPTION THROWN: " + message);
+		rc.resign();
+	}
 }

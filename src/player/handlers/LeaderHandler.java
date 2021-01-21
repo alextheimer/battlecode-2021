@@ -84,7 +84,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 	}
 	
 	private Optional<MapLocation> greedyNextLocation(Collection<MapLocation> progressMapLocs, RobotController rc) throws GameActionException {
-		Util.battlecodeAssert(!progressMapLocs.isEmpty(), "TODO", rc);
+		HandlerCommon.battlecodeAssert(!progressMapLocs.isEmpty(), "TODO", rc);
 		Predicate<MapLocation> pred = HandlerCommon.<MapLocation>wrapGameActionPredicate(ll -> !rc.isLocationOccupied(ll));
 		Set<MapLocation> mapLocsUnoccupied = Util.legalSetCollect(progressMapLocs.stream().filter(pred));
 		MapLocation startLoc = rc.getLocation();
@@ -118,7 +118,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 			// existing target-- make sure it's still senseable
 			int targetId = this.squadState.targetIdOpt.get();
 			if (!rc.canSenseRobot(targetId)) {
-				Util.battlecodeAssert(rc.getFlag(rc.getID()) != Flag.EMPTY_FLAG, "flag shouldn't be empty!", rc);
+				HandlerCommon.battlecodeAssert(rc.getFlag(rc.getID()) != Flag.EMPTY_FLAG, "flag shouldn't be empty!", rc);
 				rc.setFlag(Flag.EMPTY_FLAG);
 				this.squadState.targetIdOpt = Optional.empty();
 			}
@@ -133,7 +133,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 				MapLocation currentMapLoc = rc.getLocation();
 				Direction dirToEnemy = currentMapLoc.directionTo(newTargetMapLoc);
 				AttackTargetFlag flag = new AttackTargetFlag(newTargetRobotInfo.getID(), dirToEnemy);
-				Util.battlecodeAssert(rc.getFlag(rc.getID()) == Flag.EMPTY_FLAG, "flag should be empty!", rc);
+				HandlerCommon.battlecodeAssert(rc.getFlag(rc.getID()) == Flag.EMPTY_FLAG, "flag should be empty!", rc);
 				rc.setFlag(flag.encode());
 			}
 		}
@@ -161,7 +161,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 				squadState.pathVec = squadState.pathVec.negate();
 				progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 			}
-			Util.battlecodeAssert(!progressMapLocSet.isEmpty(), "TODO", rc);
+			HandlerCommon.battlecodeAssert(!progressMapLocSet.isEmpty(), "TODO", rc);
 			Optional<MapLocation> nextMapLocOptional = greedyNextLocation(progressMapLocSet, rc);
 			if (nextMapLocOptional.isPresent()) {
 				MapLocation nextLoc = nextMapLocOptional.get();
@@ -177,7 +177,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 	
 	private boolean needToWaitForSquad(RobotController rc) throws GameActionException {
 		for (Integer robotId : this.squadState.squadIdSet) {
-			Util.battlecodeAssert(rc.canSenseRobot(robotId), "TODO", rc);
+			HandlerCommon.battlecodeAssert(rc.canSenseRobot(robotId), "TODO", rc);
 			RobotInfo robotInfo = rc.senseRobot(robotId);
 			int minSenseDistSquared = Math.min(rc.getType().sensorRadiusSquared, robotInfo.getType().sensorRadiusSquared);
 			int distSquaredBetween = robotInfo.getLocation().distanceSquaredTo(rc.getLocation());
@@ -202,7 +202,7 @@ public class LeaderHandler implements IRobotRoleHandler {
 				break;
 			case NONE:
 			case UNASSIGNED:
-				Util.battlecodeAssert(false, "leaders shouldn't have these SquadTypes!", rc);
+				HandlerCommon.battlecodeAssert(false, "leaders shouldn't have these SquadTypes!", rc);
 				break;
 		}
 		return this;

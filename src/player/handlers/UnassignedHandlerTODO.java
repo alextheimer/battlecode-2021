@@ -69,7 +69,7 @@ public class UnassignedHandlerTODO implements IRobotRoleHandler {
 			if (waitCountdown == 0) {
 				Set<Integer> squadIdSet = UnassignedHandlerTODO.collectSquadIdSet(rc);
 				System.out.println("found in squad: " + squadIdSet.size());
-				Util.battlecodeAssert(squadIdSet.size() > 1, "SQUAD TOO SMALL", rc);
+				HandlerCommon.battlecodeAssert(squadIdSet.size() > 1, "SQUAD TOO SMALL", rc);
 				UnassignedHandlerTODO.this.squadStateBuilder.setSquadIdSet(squadIdSet);				
 			}
 		}

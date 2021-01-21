@@ -60,23 +60,6 @@ public class Util {
 		return leastCostElt;
 	}
 	
-	public static Direction directionToGoal(MapLocation startCoord, MapLocation goalCoord) {
-		// TODO(theimer): literally anything better than this
-		if (goalCoord.x > startCoord.x) {
-			if (goalCoord.y > startCoord.y) {
-				return Direction.NORTHEAST;
-			} else {
-				return Direction.SOUTHEAST;
-			}
-		} else {
-			if (goalCoord.y > startCoord.y) {
-				return Direction.NORTHWEST;
-			} else {
-				return Direction.SOUTHWEST;
-			}			
-		}
-	}
-	
 	public static <T> Stream<T> streamifyIterator(Iterator<T> iterator) {
 		Stream.Builder<T> builder = Stream.builder();
 		while (iterator.hasNext()) {
@@ -94,18 +77,6 @@ public class Util {
 		return resultSet;
 	}
 	
-	public static void battlecodeAssert(boolean resignIfFalse, String message, RobotController rc) {
-		if (!resignIfFalse) {
-			System.out.println("ASSESRTION FAIL: " + message);
-			rc.resign();
-		}
-	}
-	
-	public static void battlecodeThrow(String message, RobotController rc) {
-		System.out.println("EXCEPTION THROWN: " + message);
-		rc.resign();
-	}
-
 	public static <T> Set<T> removeMatching(Iterable<T> iterable, Predicate<T> predicate) {
 		Set<T> removedSet = new HashSet<>();
 		Iterator<T> iterator = iterable.iterator();
@@ -118,10 +89,5 @@ public class Util {
 			}
 		}
 		return removedSet;
-	}
-	
-	@FunctionalInterface
-	public static interface GameActionFunction<T, R> {
-		public R apply(T t) throws GameActionException;
 	}
 }

@@ -2,7 +2,7 @@ package player.handlers;
 
 import battlecode.common.*;
 import static player.handlers.HandlerCommon.*;
-import player.util.Util;
+
 import player.util.UtilMath;
 
 public class FollowerHandler implements IRobotRoleHandler {
@@ -23,7 +23,7 @@ public class FollowerHandler implements IRobotRoleHandler {
 		MapLocation robotLocation = rc.getLocation();
 		MapLocation leaderLocation = getLeaderCoord(rc);
 		
-		Direction dir = Util.directionToGoal(robotLocation, leaderLocation);
+		Direction dir = HandlerCommon.directionToGoal(robotLocation, leaderLocation);
 
 		System.out.println("Want to move: " + dir);
 		rc.move(dir);
