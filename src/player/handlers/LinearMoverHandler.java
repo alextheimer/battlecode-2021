@@ -78,8 +78,12 @@ public class LinearMoverHandler {
 		this.vec = vec.negate();
 	}
 	
+	public boolean atEndOfLine() {
+		return this.endOfLine;
+	}
+	
 	public boolean step(RobotController rc) throws GameActionException {
-		HandlerCommon.battlecodeAssert(this.canStep(rc), "Illegal step!", rc);
+		HandlerCommon.battlecodeAssert(this.canStep(rc), "Illegal step (endOfLine:" + this.endOfLine + ")", rc);
 		Set<MapLocation> progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 		boolean stepAttempt;
 		if (progressMapLocSet.isEmpty()) {
