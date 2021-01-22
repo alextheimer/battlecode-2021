@@ -51,7 +51,7 @@ public class PoliticianHandler implements IRobotHandler {
 	}
 		
 	private boolean attemptEmpowerNearestEnemy(RobotController rc) throws GameActionException {
-		Optional<RobotInfo> enemyInfoOpt = HandlerCommon.findNearestEnemy(rc, rc.senseNearbyRobots());
+		Optional<RobotInfo> enemyInfoOpt = HandlerCommon.senseNearestNonTeam(rc, rc.senseNearbyRobots());
 		if (enemyInfoOpt.isPresent()) {
 			RobotInfo enemyInfo = enemyInfoOpt.get();
 			int enemyDistSquared = rc.getLocation().distanceSquaredTo(enemyInfo.getLocation());

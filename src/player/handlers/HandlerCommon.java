@@ -152,11 +152,11 @@ public class HandlerCommon {
 		rc.resign();
 	}
 
-	public static Optional<RobotInfo> findNearestEnemy(RobotController rc, RobotInfo[] nearbyRobots) {
-		Iterator<RobotInfo> enemyIterator = Arrays.stream(nearbyRobots).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam().opponent()).iterator();
-		if (enemyIterator.hasNext()) {
+	public static Optional<RobotInfo> senseNearestNonTeam(RobotController rc, RobotInfo[] nearbyRobots) {
+		Iterator<RobotInfo> otherTeamIterator = Arrays.stream(nearbyRobots).filter(robotInfo -> robotInfo.getTeam() != rc.getTeam()).iterator();
+		if (otherTeamIterator.hasNext()) {
 			Function<RobotInfo, Double> costFunc = robotInfo -> (double)robotInfo.getLocation().distanceSquaredTo(rc.getLocation());
-			return Optional.of(Util.findLeastCostLinear(enemyIterator, costFunc));
+			return Optional.of(Util.findLeastCostLinear(otherTeamIterator, costFunc));
 		} else {
 			return Optional.empty();
 		}
