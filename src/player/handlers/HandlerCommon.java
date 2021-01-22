@@ -119,19 +119,6 @@ public class HandlerCommon {
 		}
 	}
     
-	// TODO(theimer): break this up / accept ranking heuristic
-    public static Optional<MapLocation> getAdjacentCloserTraversableMapLocation(MapLocation start, MapLocation goal, RobotController rc) {
-    	int distSquaredToGoal = start.distanceSquaredTo(goal);
-		Predicate<MapLocation> pred = HandlerCommon.<MapLocation>wrapGameActionPredicate(
-			mapLoc -> (
-			    (mapLoc.distanceSquaredTo(goal) < distSquaredToGoal) &&
-			    !rc.isLocationOccupied(mapLoc) && rc.onTheMap(mapLoc)
-			)
-		);
-    	Stream<MapLocation> mapLocStream = Util.streamifyIterator(getAdjacentIterator(start)).filter(pred);
-    	return mapLocStream.findAny();
-    }
-    
 	public static Map<RobotInfo, Integer> findAllMatchingFlags(RobotController rc, RobotInfo[] nearbyRobots,
 	                                   BiPredicate<RobotInfo, Integer> predicate) throws GameActionException  {
 		Map<RobotInfo, Integer> robotFlagMap = new HashMap<>();
@@ -153,23 +140,6 @@ public class HandlerCommon {
 			}
 		}
 		return Optional.empty();
-	}
-
-	public static Direction directionToGoal(MapLocation startCoord, MapLocation goalCoord) {
-		// TODO(theimer): literally anything better than this
-		if (goalCoord.x > startCoord.x) {
-			if (goalCoord.y > startCoord.y) {
-				return Direction.NORTHEAST;
-			} else {
-				return Direction.SOUTHEAST;
-			}
-		} else {
-			if (goalCoord.y > startCoord.y) {
-				return Direction.NORTHWEST;
-			} else {
-				return Direction.SOUTHWEST;
-			}			
-		}
 	}
 
 	public static void battlecodeAssert(boolean resignIfFalse, String message, RobotController rc) {
