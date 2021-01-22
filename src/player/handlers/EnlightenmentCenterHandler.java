@@ -5,6 +5,7 @@ import player.util.Util.PeekableIteratorWrapper;
 import player.util.Flag;
 import player.util.Flag.*;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,88 +13,52 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import static player.handlers.HandlerCommon.*;
 
 public class EnlightenmentCenterHandler implements IRobotTypeHandler {
 	
-	private static final int FLAG_COOLDOWN_START = 1;  // 2 rounds to guarantee all bots see
+	private static final int FLAG_COOLDOWN_START = 1;
+	private static final Random rand = new Random();
 	
-	private static Map<SquadType, List<RobotType>> squadSpecMap = new HashMap<>();
-	static {
-		// TODO(theimer): first is the leader?
-		squadSpecMap.put(SquadType.PATROL, Arrays.asList(RobotType.POLITICIAN, RobotType.POLITICIAN));
-	}
-    
-	private PeekableIteratorWrapper<RobotType> robotBuildIterator;
-	private Direction nextBuildDir;
-	private int flagCooldown;
-	
-	public EnlightenmentCenterHandler() {
-		robotBuildIterator = new PeekableIteratorWrapper<>(Collections.emptyIterator());
-		nextBuildDir = Direction.NORTH;
-		flagCooldown = 0;
-	}
-	
-	// TODO(theimer): move to util?
-	private static Direction rotateDirectionClockwise(Direction dir) {
-		// TODO(theimer): use a map
-		switch (dir) {
-			case NORTH: return Direction.NORTHEAST;
-			case NORTHEAST: return Direction.EAST;
-			case EAST: return Direction.SOUTHEAST;
-			case SOUTHEAST: return Direction.SOUTH;
-			case SOUTH: return Direction.SOUTHWEST;
-			case SOUTHWEST: return Direction.WEST;
-			case WEST: return Direction.NORTHWEST;
-			case NORTHWEST: return Direction.NORTHEAST;
-			case CENTER: throw new IllegalArgumentException();
-			default: throw new IllegalArgumentException();
+	private static class Blueprint {
+		public RobotType robotType;
+		public SquadType assignment;
+		public Blueprint(RobotType robotType, SquadType assignment) {
+			this.robotType = robotType;
+			this.assignment = assignment;
 		}
 	}
 	
-    private static SquadType chooseSquadType() {
-    	return SquadType.PATROL;
-    }
+	private static final List<Blueprint> buildTypeSequence = Arrays.asList(
+			new Blueprint(RobotType.POLITICIAN, SquadType.PATROL)
+	);
+    
+	private int buildSequenceIndex = 0;
+	private int flagCooldown = 0;
 	
-    /**
-     * Returns a random spawnable RobotType
-     *
-     * @return a random RobotType
-     */
-    private static RobotType randomSpawnableRobotType() {
-        return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
-    }
-	
-    private Optional<Direction> buildableDirection(RobotController rc) {
-    	// TODO(theimer): constants?
-    	Direction dir = this.nextBuildDir;
-    	for (int i = 0; i < 8; ++i) {
-    		// TODO(theimer): this is the cheapest way to do this?
-    		if (rc.canBuildRobot(RobotType.POLITICIAN, dir, 1)) {
-    			return Optional.of(dir);
+    private boolean attemptBuild(RobotController rc, RobotType robotType) throws GameActionException {
+    	final int influence = 50;
+    	boolean buildSuccess = false;
+    	for (Direction dir : HandlerCommon.directions) {
+    		if (rc.canBuildRobot(robotType, dir, influence)) {
+    			rc.buildRobot(robotType, dir, influence);
+    			buildSuccess = true;
+    			break;
     		}
-    		dir = rotateDirectionClockwise(dir);
     	}
-    	return Optional.empty();
+    	return buildSuccess;
     }
     
     private boolean attemptBuildNext(RobotController rc) throws GameActionException {
-    	int influence = 50;
-        RobotType typeToBuild = this.robotBuildIterator.peek();
-        Optional<Direction> dirToBuildOptional = buildableDirection(rc);
-        if (dirToBuildOptional.isPresent()) {
-        	// we can build in some direction
-        	Direction dirToBuild = dirToBuildOptional.get();
-        	if (rc.canBuildRobot(typeToBuild, dirToBuild, influence)) {
-        		// we can successfully build the robot
-        		this.robotBuildIterator.next();
-        		this.nextBuildDir = rotateDirectionClockwise(dirToBuild);
-        		rc.buildRobot(typeToBuild, dirToBuild, influence);
-        		return true;
-        	}
-        }
-        return false;
+    	RobotType nextRobotType = EnlightenmentCenterHandler.buildTypeSequence.get(this.buildSequenceIndex).robotType;
+    	boolean buildSuccess = false;
+    	if (this.attemptBuild(rc, nextRobotType)) {
+    		buildSuccess = true;
+    		this.buildSequenceIndex = (this.buildSequenceIndex + 1) % EnlightenmentCenterHandler.buildTypeSequence.size();
+    	}
+    	return buildSuccess;
     }
     
 	@Override
@@ -104,24 +69,13 @@ public class EnlightenmentCenterHandler implements IRobotTypeHandler {
 			return this;
 		}
 		
-        if (!this.robotBuildIterator.hasNext()) {
-        	// queue a squad for construction
-        	SquadType squadToQueue = chooseSquadType();
-        	this.robotBuildIterator = new PeekableIteratorWrapper<>(squadSpecMap.get(squadToQueue).iterator());
-        	rc.setFlag(Flag.EMPTY_FLAG);
-        }
-        boolean builtRobot = false;
-        if (this.robotBuildIterator.hasNext()) {
-        	// attempt to build the next robot of the squad
-        	builtRobot = this.attemptBuildNext(rc);        	
-        }
-        
-        if (builtRobot && !this.robotBuildIterator.hasNext()) {
-        	// built the last robot of a squad
-        	SquadAssignFlag flag = new SquadAssignFlag(SquadType.PATROL, 90);
-        	rc.setFlag(flag.encode());
-        	this.flagCooldown = FLAG_COOLDOWN_START;
-        }
+		if (rc.canSetFlag(Flag.EMPTY_FLAG)) {
+			if (attemptBuildNext(rc)) {
+				Flag.SquadAssignFlag flag = new Flag.SquadAssignFlag(SquadType.PATROL, rand.nextInt(360));
+				rc.setFlag(flag.encode());
+				this.flagCooldown = FLAG_COOLDOWN_START;
+			}
+		}
         
         return this;
 	}

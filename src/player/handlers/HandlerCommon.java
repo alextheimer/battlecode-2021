@@ -16,7 +16,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import battlecode.common.*;
-import player.handlers.SquadState;
 import player.handlers.HandlerCommon;
 import player.util.Flag;
 import player.util.Flag.OpCode;
@@ -186,7 +185,7 @@ public class HandlerCommon {
 	}
 
 	public static Optional<RobotInfo> findNearestEnemy(RobotController rc, RobotInfo[] nearbyRobots) {
-		Iterator<RobotInfo> enemyIterator = Arrays.stream(nearbyRobots).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam()).iterator();
+		Iterator<RobotInfo> enemyIterator = Arrays.stream(nearbyRobots).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam().opponent()).iterator();
 		if (enemyIterator.hasNext()) {
 			Function<RobotInfo, Double> costFunc = robotInfo -> (double)robotInfo.getLocation().distanceSquaredTo(rc.getLocation());
 			return Optional.of(Util.findLeastCostLinear(enemyIterator, costFunc));

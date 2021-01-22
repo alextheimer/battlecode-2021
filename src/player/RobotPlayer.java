@@ -29,18 +29,15 @@ public strictfp class RobotPlayer {
      **/
     public static void run(RobotController rc) {
     	RobotType currentType = rc.getType();
-    	RobotRole currentRole = currentType == RobotType.ENLIGHTENMENT_CENTER ? RobotRole.NONE : RobotRole.UNASSIGNED;
     	
-    	IRobotRoleHandler roleHandler;
     	IRobotTypeHandler typeHandler;
     	
-    	try {
-    		roleHandler = currentType == RobotType.ENLIGHTENMENT_CENTER ? new NoneHandler() : new UnassignedHandlerTODO(rc);
+//    	try {
     		typeHandler = mapThing.get(currentType).get();
-    	} catch (GameActionException e) {
-    		System.out.println(rc.getType() + " GameActionException at instantiation!");
-    		return;
-    	}
+//    	} catch (GameActionException e) {
+//    		System.out.println(rc.getType() + " GameActionException at instantiation!");
+//    		return;
+//    	}
     	
         System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
@@ -49,7 +46,6 @@ public strictfp class RobotPlayer {
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
                 // You may rewrite this into your own control structure if you wish.
-                roleHandler = roleHandler.handle(rc);
                 typeHandler = typeHandler.handle(rc);
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
