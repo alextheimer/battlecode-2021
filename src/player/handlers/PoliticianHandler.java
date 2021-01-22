@@ -1,7 +1,6 @@
 package player.handlers;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon.IRobotRoleHandler;
 import player.util.Flag;
 import player.util.Util;
 import player.util.UtilMath;
@@ -9,7 +8,7 @@ import player.util.Flag.AttackTargetFlag;
 import player.util.Flag.FollowerClaimFlag;
 import player.util.Flag.LeaderClaimFlag;
 import player.util.Flag.OpCode;
-import player.util.Flag.SquadAssignFlag;
+import player.util.Flag.AssignmentFlag;
 import player.util.UtilMath.DoubleVec2D;
 import player.util.UtilMath.IntVec2D;
 import player.util.UtilMath.Line2D;
@@ -32,13 +31,14 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import player.handlers.LinearMoverHandler;
 
-public class PoliticianHandler implements IRobotTypeHandler {
+public class PoliticianHandler implements IRobotHandler {
 	
-	Optional<SquadType> role = Optional.of(SquadType.UNASSIGNED);
+	AssignmentType assignment = AssignmentType.UNASSIGNED;
 	Optional<LinearMoverHandler> moveHandler = Optional.empty();
 	
 	private boolean attemptEmpower(RobotController rc, int radiusSquared) throws GameActionException {
-		HandlerCommon.battlecodeAssert(radiusSquared <= RobotType.POLITICIAN.actionRadiusSquared, "radius squared exceeds action radius", rc);
+		HandlerCommon.battlecodeAssert(radiusSquared <= RobotType.POLITICIAN.actionRadiusSquared,
+				                       "radius squared exceeds action radius", rc);
 		boolean empowerSuccessful;
 		if (rc.canEmpower(radiusSquared)) {
 			rc.empower(radiusSquared);
@@ -69,14 +69,14 @@ public class PoliticianHandler implements IRobotTypeHandler {
 		return this.moveHandler.get().step(rc);
 	}
 	
-	private Optional<SquadAssignFlag> findAssignmentFlag(RobotController rc) throws GameActionException {
+	private Optional<AssignmentFlag> findAssignmentFlag(RobotController rc) throws GameActionException {
 		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOpt = HandlerCommon.findFirstMatchingFlag(
 				rc,
-				rc.senseNearbyRobots(RobotType.POLITICIAN.sensorRadiusSquared, rc.getTeam()),
-				(robotInfo, rawFlag) -> (Flag.getOpCode(rawFlag) == OpCode.SQUAD_ASSIGN)
+				rc.senseNearbyRobots(HandlerCommon.MAX_DIST_SQUARED_ADJACENT, rc.getTeam()),
+				(robotInfo, rawFlag) -> (Flag.getOpCode(rawFlag) == OpCode.ASSIGNMENT)
 		);
 		if (entryOpt.isPresent()) {
-			return Optional.of(SquadAssignFlag.decode(entryOpt.get().getValue()));
+			return Optional.of(AssignmentFlag.decode(entryOpt.get().getValue()));
 		} else {
 			return Optional.empty();
 		}
@@ -84,16 +84,16 @@ public class PoliticianHandler implements IRobotTypeHandler {
 	
 	private void selfInitialize(RobotController rc) {
 		Random rand = new Random();
-		int degrees = rand.nextInt(360);
+		int degrees = rand.nextInt(UtilMath.MAX_DEGREES);
 		MapLocation mapLoc = rc.getLocation();
 		DoubleVec2D vec = UtilMath.degreesToVec(degrees);
 		DoubleVec2D currCoord = new DoubleVec2D(mapLoc.x, mapLoc.y);
-		this.role = Optional.of(SquadType.PATROL);
+		this.assignment = AssignmentType.PATROL;
 		this.moveHandler = Optional.of(new LinearMoverHandler(Line2D.make(vec, currCoord), vec));
 	}
 	
-	private void flagInitialize(RobotController rc, SquadAssignFlag flag) {
-		this.role = Optional.of(flag.getSquadType());
+	private void flagInitialize(RobotController rc, AssignmentFlag flag) {
+		this.assignment = flag.getAssignmentType();
 		DoubleVec2D vec = UtilMath.degreesToVec(flag.getOutboundDegrees());
 		DoubleVec2D origin = new DoubleVec2D(rc.getLocation().x, rc.getLocation().y);
 		Line2D line = UtilMath.Line2D.make(vec, origin);
@@ -101,7 +101,7 @@ public class PoliticianHandler implements IRobotTypeHandler {
 	}
 	
 	private void handleUnassigned(RobotController rc) throws GameActionException {
-		Optional<SquadAssignFlag> flagOpt = this.findAssignmentFlag(rc);
+		Optional<AssignmentFlag> flagOpt = this.findAssignmentFlag(rc);
 		if (flagOpt.isPresent()) {
 			this.flagInitialize(rc, flagOpt.get());
 			System.out.println("initialized via flag");
@@ -120,8 +120,8 @@ public class PoliticianHandler implements IRobotTypeHandler {
 	}
 	
 	@Override
-	public IRobotTypeHandler handle(RobotController rc) throws GameActionException {
-		switch(this.role.get()) {
+	public IRobotHandler handle(RobotController rc) throws GameActionException {
+		switch(this.assignment) {
 			case UNASSIGNED:
 				handleUnassigned(rc);
 				break;

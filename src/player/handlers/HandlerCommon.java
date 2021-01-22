@@ -24,6 +24,9 @@ import player.util.UtilMath.*;
 
 
 public class HandlerCommon {
+	
+	public static final int MAX_DIST_SQUARED_ADJACENT = 2;
+	
     public static final RobotType[] spawnableRobot = {
             RobotType.POLITICIAN,
             RobotType.SLANDERER,
@@ -41,15 +44,10 @@ public class HandlerCommon {
             Direction.NORTHWEST,
     };
     
-    public static enum RobotRole {UNASSIGNED, LEADER, FOLLOWER, NONE};
-    public static enum SquadType {PATROL, OCCUPY, UNASSIGNED, NONE};
+    public static enum AssignmentType {PATROL, OCCUPY, UNASSIGNED};
     
-    public interface IRobotRoleHandler {
-    	public IRobotRoleHandler handle(RobotController rc) throws GameActionException;
-    }
-    
-    public interface IRobotTypeHandler {
-    	public IRobotTypeHandler handle(RobotController rc) throws GameActionException;
+    public interface IRobotHandler {
+    	public IRobotHandler handle(RobotController rc) throws GameActionException;
     }
     
     /**

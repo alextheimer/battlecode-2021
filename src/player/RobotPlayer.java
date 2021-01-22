@@ -15,7 +15,7 @@ import player.handlers.HandlerCommon.*;
 
 public strictfp class RobotPlayer {
 	
-	private static Map<RobotType, Supplier<IRobotTypeHandler>> mapThing = new HashMap<>();
+	private static Map<RobotType, Supplier<IRobotHandler>> mapThing = new HashMap<>();
 	static {
 		mapThing.put(RobotType.POLITICIAN, () -> new PoliticianHandler());
 		mapThing.put(RobotType.MUCKRAKER, () -> new MuckrakerHandler());
@@ -30,7 +30,7 @@ public strictfp class RobotPlayer {
     public static void run(RobotController rc) {
     	RobotType currentType = rc.getType();
     	
-    	IRobotTypeHandler typeHandler;
+    	IRobotHandler typeHandler;
     	
 //    	try {
     		typeHandler = mapThing.get(currentType).get();

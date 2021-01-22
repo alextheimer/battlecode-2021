@@ -4,14 +4,14 @@ import battlecode.common.*;
 
 import static player.handlers.HandlerCommon.*;
 
-public class MuckrakerHandler implements IRobotTypeHandler {
+public class MuckrakerHandler implements IRobotHandler {
 	
 	public MuckrakerHandler() {
 		//blank
 	}
 	
 	@Override
-	public IRobotTypeHandler handle(RobotController rc) throws GameActionException {
+	public IRobotHandler handle(RobotController rc) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
         for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {

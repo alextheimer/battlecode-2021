@@ -22,17 +22,17 @@ public class FlagTest {
 	
 	@Test
 	public void squadAssign() {
-		SquadType squadType = SquadType.PATROL;
+		AssignmentType squadType = AssignmentType.PATROL;
 		int degrees = 67;  // Just some random value.
-		SquadAssignFlag flag = new SquadAssignFlag(squadType, degrees);
+		AssignmentFlag flag = new AssignmentFlag(squadType, degrees);
 		// Make sure getters are working as intended.
 		assertEquals(degrees, flag.getOutboundDegrees());
-		assertEquals(squadType, flag.getSquadType());
+		assertEquals(squadType, flag.getAssignmentType());
 		// Make sure encode / decode are working as intended.
 		int rawFlag = flag.encode();
-		SquadAssignFlag parsedFlag = SquadAssignFlag.decode(rawFlag);
-		assertEquals("rawFlag: " + rawFlag, OpCode.SQUAD_ASSIGN, Flag.getOpCode(rawFlag));
-		assertEquals(squadType, parsedFlag.getSquadType());
+		AssignmentFlag parsedFlag = AssignmentFlag.decode(rawFlag);
+		assertEquals("rawFlag: " + rawFlag, OpCode.ASSIGNMENT, Flag.getOpCode(rawFlag));
+		assertEquals(squadType, parsedFlag.getAssignmentType());
 		assertEquals(degrees, parsedFlag.getOutboundDegrees());
 	}
 	

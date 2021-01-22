@@ -167,11 +167,11 @@ class FlagFields {
 	}
 	
 	public static class SquadTypeField {
-		public static final int NUM_BITS = UtilMath.numBits(SquadType.values().length);
+		public static final int NUM_BITS = UtilMath.numBits(AssignmentType.values().length);
 		
-		private SquadType squadType;
+		private AssignmentType squadType;
 		
-		public SquadTypeField(SquadType squadType) {
+		public SquadTypeField(AssignmentType squadType) {
 			// TODO(theimer): assertions
 			this.squadType = squadType;
 		}
@@ -182,10 +182,10 @@ class FlagFields {
 		
 		public static SquadTypeField fromBits(int bits) {
 			// TODO(theimer): !!!!!!!!!!
-			return new SquadTypeField(SquadType.values()[bits]);
+			return new SquadTypeField(AssignmentType.values()[bits]);
 		}
 		
-		public SquadType value() {
+		public AssignmentType value() {
 			return this.squadType;
 		}
 	}
@@ -217,7 +217,7 @@ class FlagFields {
 }
 
 public class Flag {
-	public static enum OpCode {EMPTY, LEADER_CLAIM, FOLLOWER_CLAIM, SQUAD_ASSIGN, ENEMY_SIGHTED, ATTACK_TARGET, BASE_SIGHTED};
+	public static enum OpCode {EMPTY, LEADER_CLAIM, FOLLOWER_CLAIM, ASSIGNMENT, ENEMY_SIGHTED, ATTACK_TARGET, BASE_SIGHTED};
 	public static int EMPTY_FLAG = 0;
 	public static int NUM_BITS = 24;
 	
@@ -240,32 +240,32 @@ public class Flag {
 		public int encode() {return OpCode.LEADER_CLAIM.ordinal();}
 	}
 	
-	public static class SquadAssignFlag {
+	public static class AssignmentFlag {
 		private SquadTypeField squadType;
 		private DegreesField outboundDegrees;
 		
-		public SquadAssignFlag(SquadType squadType, int outboundDegrees) {
+		public AssignmentFlag(AssignmentType squadType, int outboundDegrees) {
 			this.squadType = new SquadTypeField(squadType);
 			this.outboundDegrees = new DegreesField(outboundDegrees);
 		}
 		
-		private SquadAssignFlag(SquadTypeField squadType, DegreesField outboundDegrees) {
+		private AssignmentFlag(SquadTypeField squadType, DegreesField outboundDegrees) {
 			this.squadType = squadType;
 			this.outboundDegrees = outboundDegrees;
 		}
 		
-		public static SquadAssignFlag decode(int rawFlag) {
+		public static AssignmentFlag decode(int rawFlag) {
 			FlagWalker flagWalker = new FlagWalker(rawFlag);
 			flagWalker.readBits(numOpCodeBits);
 			int squadTypeBits = flagWalker.readBits(SquadTypeField.NUM_BITS);
 			int outboundDegreesBits = flagWalker.readBits(DegreesField.NUM_BITS);
 			SquadTypeField squadType = SquadTypeField.fromBits(squadTypeBits);
 			DegreesField outboundDegrees = DegreesField.fromBits(outboundDegreesBits);
-			return new SquadAssignFlag(squadType, outboundDegrees);	
+			return new AssignmentFlag(squadType, outboundDegrees);	
 		}
 		public int encode() {
 			FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
-			flagWalker.writeBits(numOpCodeBits, OpCode.SQUAD_ASSIGN.ordinal());
+			flagWalker.writeBits(numOpCodeBits, OpCode.ASSIGNMENT.ordinal());
 			flagWalker.writeBits(SquadTypeField.NUM_BITS, this.squadType.toBits());
 			flagWalker.writeBits(DegreesField.NUM_BITS, this.outboundDegrees.toBits());
 			return flagWalker.getAllBits();
@@ -275,7 +275,7 @@ public class Flag {
 			return this.outboundDegrees.value();
 		}
 		
-		public SquadType getSquadType() {
+		public AssignmentType getAssignmentType() {
 			return this.squadType.value();
 		}
 	}

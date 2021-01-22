@@ -7,6 +7,7 @@ import java.lang.Math.*;
 
 public class UtilMath {
 	public static final double FLOAT_EPS = 1e-5;
+	public static final int MAX_DEGREES = 360;
 	
 	/**
 	 * Immutable struct-like class for storage of 2D integer (x, y) vector.

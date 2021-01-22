@@ -2,6 +2,7 @@ package player.handlers;
 
 import battlecode.common.*;
 import player.util.Util.PeekableIteratorWrapper;
+import player.util.UtilMath;
 import player.util.Flag;
 import player.util.Flag.*;
 
@@ -17,22 +18,22 @@ import java.util.Random;
 
 import static player.handlers.HandlerCommon.*;
 
-public class EnlightenmentCenterHandler implements IRobotTypeHandler {
+public class EnlightenmentCenterHandler implements IRobotHandler {
 	
 	private static final int FLAG_COOLDOWN_START = 1;
 	private static final Random rand = new Random();
 	
 	private static class Blueprint {
 		public RobotType robotType;
-		public SquadType assignment;
-		public Blueprint(RobotType robotType, SquadType assignment) {
+		public AssignmentType assignment;
+		public Blueprint(RobotType robotType, AssignmentType assignment) {
 			this.robotType = robotType;
 			this.assignment = assignment;
 		}
 	}
 	
 	private static final List<Blueprint> buildTypeSequence = Arrays.asList(
-			new Blueprint(RobotType.POLITICIAN, SquadType.PATROL)
+			new Blueprint(RobotType.POLITICIAN, AssignmentType.PATROL)
 	);
     
 	private int buildSequenceIndex = 0;
@@ -62,7 +63,7 @@ public class EnlightenmentCenterHandler implements IRobotTypeHandler {
     }
     
 	@Override
-	public IRobotTypeHandler handle(RobotController rc) throws GameActionException {
+	public IRobotHandler handle(RobotController rc) throws GameActionException {
 		
 		if (this.flagCooldown > 0) {
 			this.flagCooldown--;
@@ -71,7 +72,7 @@ public class EnlightenmentCenterHandler implements IRobotTypeHandler {
 		
 		if (rc.canSetFlag(Flag.EMPTY_FLAG)) {
 			if (attemptBuildNext(rc)) {
-				Flag.SquadAssignFlag flag = new Flag.SquadAssignFlag(SquadType.PATROL, rand.nextInt(360));
+				Flag.AssignmentFlag flag = new Flag.AssignmentFlag(AssignmentType.PATROL, rand.nextInt(UtilMath.MAX_DEGREES));
 				rc.setFlag(flag.encode());
 				this.flagCooldown = FLAG_COOLDOWN_START;
 			}
