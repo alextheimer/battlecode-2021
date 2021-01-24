@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import battlecode.common.Direction;
+import battlecode.common.RobotType;
 import player.handlers.HandlerCommon.*;
 import player.util.Util.*;
 import player.util.FlagFields.*;
@@ -166,6 +167,38 @@ class FlagFields {
 		}
 	}
 	
+	public static class CoordField {
+		public static final int NUM_BITS = 14;
+		private static final int NUM_BITS_PER = 7;
+		
+		private int x;
+		private int y;
+		
+		public CoordField(int x, int y) {
+			// TODO(theimer): assertions
+			this.x = x;
+			this.y = y;
+		}
+		
+		public int toBits() {
+			FlagWalker flagWalker = new FlagWalker(0);
+			flagWalker.writeBits(NUM_BITS_PER, this.x);
+			flagWalker.writeBits(NUM_BITS_PER, this.y);
+			return flagWalker.getAllBits();
+		}
+		
+		public static CoordField fromBits(int bits) {
+			FlagWalker flagWalker = new FlagWalker(bits);
+			int x = flagWalker.readBits(NUM_BITS_PER);
+			int y = flagWalker.readBits(NUM_BITS_PER);
+			return new CoordField(x, y);
+		}
+		
+		public IntVec2D value() {
+			return new IntVec2D(this.x, this.y);
+		}
+	}
+	
 	public static class SquadTypeField {
 		public static final int NUM_BITS = UtilMath.numBits(AssignmentType.values().length);
 		
@@ -187,6 +220,30 @@ class FlagFields {
 		
 		public AssignmentType value() {
 			return this.squadType;
+		}
+	}
+	
+	public static class RobotTypeField {
+		public static final int NUM_BITS = UtilMath.numBits(RobotType.values().length);
+		
+		private RobotType robotType;
+		
+		public RobotTypeField(RobotType robotType) {
+			// TODO(theimer): assertions
+			this.robotType = robotType;
+		}
+		
+		public int toBits() {
+			return this.robotType.ordinal();
+		}
+		
+		public static RobotTypeField fromBits(int bits) {
+			// TODO(theimer): !!!!!!!!!!
+			return new RobotTypeField(RobotType.values()[bits]);
+		}
+		
+		public RobotType value() {
+			return this.robotType;
 		}
 	}
 	
@@ -280,18 +337,46 @@ public class Flag {
 		}
 	}
 	
-//	public static class EnemySightedFlag {
-//		
-//		
-//		public static EnemySightedFlag decode(int rawFlag) {
-//			
-//		}
-//		
-//		public int encode() {
-//			
-//		}
-//	}
-//	
+	public static class EnemySightedFlag {
+		private RobotTypeField robotType;
+		private CoordField coord;
+		
+		public EnemySightedFlag(RobotType robotType, int x, int y) {
+			this.robotType = new RobotTypeField(robotType);
+			this.coord = new CoordField(x, y);
+		}
+		
+		private EnemySightedFlag(RobotTypeField robotType, CoordField coordField) {
+			this.robotType = robotType;
+			this.coord = coordField;
+		}
+		
+		public static EnemySightedFlag decode(int rawFlag) {
+			FlagWalker flagWalker = new FlagWalker(rawFlag);
+			flagWalker.readBits(numOpCodeBits);
+			int robotTypeBits = flagWalker.readBits(RobotTypeField.NUM_BITS);
+			int coordBits = flagWalker.readBits(CoordField.NUM_BITS);
+			RobotTypeField robotType = RobotTypeField.fromBits(robotTypeBits);
+			CoordField coord = CoordField.fromBits(coordBits);
+			return new EnemySightedFlag(robotType, coord);	
+		}
+		public int encode() {
+			FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
+			flagWalker.writeBits(numOpCodeBits, OpCode.ASSIGNMENT.ordinal());
+			flagWalker.writeBits(RobotTypeField.NUM_BITS, this.robotType.toBits());
+			flagWalker.writeBits(CoordField.NUM_BITS, this.coord.toBits());
+			return flagWalker.getAllBits();
+		}
+		
+		public IntVec2D getCoord() {
+			return this.coord.value();
+		}
+		
+		public RobotType getRobotType() {
+			return this.robotType.value();
+		}
+	}
+
 	public static class AttackTargetFlag {
 		private IdField idField;
 		private DirectionField dirField;

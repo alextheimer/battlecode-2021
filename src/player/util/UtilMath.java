@@ -1,5 +1,6 @@
 package player.util;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import player.util.UtilMath.*;
@@ -137,7 +138,8 @@ public class UtilMath {
 	}
 	
 	public static DoubleVec2D degreesToVec(int degrees) {
-		assert degrees >= 0 && degrees < 360;
+		assert degrees >= 0;
+		assert degrees < 360;
 		double radians = (Math.PI / 180) * degrees;
 		double x = Math.cos(radians);
 		double y = Math.sin(radians);
@@ -160,5 +162,19 @@ public class UtilMath {
 	
 	public static boolean doubleEquals(double d1, double d2) {
 		return Math.abs(d1 - d2) < FLOAT_EPS;
+	}
+	
+	public static int diffMod(int subFrom, int subThis, int mod) {
+		assert subFrom >= 0;
+		assert subThis >= 0;
+		assert mod > subFrom;
+		assert mod > subThis;
+		
+		int directDiff = subFrom - subThis;
+		int aroundDiff = (mod - Math.abs(directDiff)) * ((directDiff >= 0) ? -1 : 1);
+		
+		assert (Math.abs(directDiff) + Math.abs(aroundDiff)) == mod;
+		
+		return (Math.abs(directDiff) < Math.abs(aroundDiff)) ? directDiff : aroundDiff;
 	}
 }

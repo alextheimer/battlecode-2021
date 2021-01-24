@@ -20,12 +20,14 @@ import player.handlers.HandlerCommon;
 import player.util.Flag;
 import player.util.Flag.OpCode;
 import player.util.Util;
+import player.util.UtilMath;
 import player.util.UtilMath.*;
 
 
 public class HandlerCommon {
 	
 	public static final int MAX_DIST_SQUARED_ADJACENT = 2;
+	public static final int MAX_WORLD_WIDTH = 64;
 	
     public static final RobotType[] spawnableRobot = {
             RobotType.POLITICIAN,
@@ -160,5 +162,19 @@ public class HandlerCommon {
 		} else {
 			return Optional.empty();
 		}
+	}
+	
+	public static MapLocation offsetToMapLocation(IntVec2D offset, MapLocation validMapLocation) {
+		assert UtilMath.isPow2(MAX_WORLD_WIDTH);
+		assert offset.x >= 0 && offset.x < MAX_WORLD_WIDTH;
+		assert offset.y >= 0 && offset.y < MAX_WORLD_WIDTH;
+		
+		final int modVal = 2 * MAX_WORLD_WIDTH;
+		final int mask = modVal - 1;
+		int xValidOffset = validMapLocation.x & mask;
+		int yValidOffset = validMapLocation.y & mask;
+		int xDiff = UtilMath.diffMod(offset.x, xValidOffset, modVal);
+		int yDiff = UtilMath.diffMod(offset.y, yValidOffset, modVal);
+		return new MapLocation(validMapLocation.x + xDiff, validMapLocation.y + yDiff);
 	}
 }
