@@ -164,6 +164,10 @@ public class HandlerCommon {
 		}
 	}
 	
+	public static Set<RobotInfo> senseAllNonTeam(RobotController rc) {
+		return Util.legalSetCollect(Arrays.stream(rc.senseNearbyRobots()).filter(robotInfo -> robotInfo.getTeam() != rc.getTeam()));
+	}
+	
 	public static MapLocation offsetToMapLocation(IntVec2D offset, MapLocation validMapLocation) {
 		assert UtilMath.isPow2(MAX_WORLD_WIDTH);
 		assert offset.x >= 0 && offset.x < MAX_WORLD_WIDTH;

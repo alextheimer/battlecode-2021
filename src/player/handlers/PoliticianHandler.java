@@ -5,6 +5,7 @@ import player.util.Flag;
 import player.util.Util;
 import player.util.UtilMath;
 import player.util.Flag.AttackTargetFlag;
+import player.util.Flag.EnemySightedFlag;
 import player.util.Flag.FollowerClaimFlag;
 import player.util.Flag.LeaderClaimFlag;
 import player.util.Flag.OpCode;
@@ -113,7 +114,36 @@ public class PoliticianHandler implements IRobotHandler {
 		this.attemptEmpowerNearestEnemy(rc);
 	}
 	
+	private Optional<RobotInfo> senseHighestPriorityNonTeammate(RobotController rc) {
+		Function<RobotInfo, Double> costFunc = new Function<RobotInfo, Double>(){
+
+			@Override
+			public Double apply(RobotInfo robotInfo) {
+				switch(robotInfo.getType()) {
+					case POLITICIAN: return -1.0;
+					case MUCKRAKER: return -2.0;
+					case SLANDERER: return -3.0;
+					case ENLIGHTENMENT_CENTER: return -4.0;
+					default: throw new RuntimeException("unrecognized RobotInfo");
+				}
+			}
+		};
+		
+		Collection<RobotInfo> sensedNonTeammates = HandlerCommon.senseAllNonTeam(rc);
+		if (sensedNonTeammates.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(Util.findLeastCostLinear(sensedNonTeammates.iterator(), costFunc));
+	}
+	
 	private void handlePatrol(RobotController rc) throws GameActionException {
+		Optional<RobotInfo> calloutOpt = this.senseHighestPriorityNonTeammate(rc);
+		if (calloutOpt.isPresent() && rc.canSetFlag(Flag.EMPTY_FLAG)) {
+			RobotInfo robotInfo = calloutOpt.get();
+			MapLocation mapLoc = robotInfo.getLocation(); 
+			EnemySightedFlag flag = new EnemySightedFlag(robotInfo.getType(), mapLoc.x, mapLoc.y);
+			rc.setFlag(flag.encode());
+		}
 		if (!this.attemptEmpowerNearestEnemy(rc)) {
 			this.patrolStep(rc);
 		}
