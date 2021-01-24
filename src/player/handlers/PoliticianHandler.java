@@ -137,11 +137,12 @@ public class PoliticianHandler implements IRobotHandler {
 	}
 	
 	private void handlePatrol(RobotController rc) throws GameActionException {
+		final int mask = (2 * HandlerCommon.MAX_WORLD_WIDTH) - 1;
 		Optional<RobotInfo> calloutOpt = this.senseHighestPriorityNonTeammate(rc);
 		if (calloutOpt.isPresent() && rc.canSetFlag(Flag.EMPTY_FLAG)) {
 			RobotInfo robotInfo = calloutOpt.get();
 			MapLocation mapLoc = robotInfo.getLocation(); 
-			EnemySightedFlag flag = new EnemySightedFlag(robotInfo.getType(), mapLoc.x, mapLoc.y);
+			EnemySightedFlag flag = new EnemySightedFlag(robotInfo.getType(), mapLoc.x & mask, mapLoc.y & mask);
 			rc.setFlag(flag.encode());
 		}
 		if (!this.attemptEmpowerNearestEnemy(rc)) {
