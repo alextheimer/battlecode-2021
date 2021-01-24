@@ -362,7 +362,7 @@ public class Flag {
 		}
 		public int encode() {
 			FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
-			flagWalker.writeBits(numOpCodeBits, OpCode.ASSIGNMENT.ordinal());
+			flagWalker.writeBits(numOpCodeBits, OpCode.ENEMY_SIGHTED.ordinal());
 			flagWalker.writeBits(RobotTypeField.NUM_BITS, this.robotType.toBits());
 			flagWalker.writeBits(CoordField.NUM_BITS, this.coord.toBits());
 			return flagWalker.getAllBits();
