@@ -26,11 +26,13 @@ public class LinearMoverHandler {
 	private Line2D line;
 	private DoubleVec2D vec;
 	private boolean endOfLine;
+	private boolean isBlocked;
 	
 	public LinearMoverHandler(Line2D line, DoubleVec2D vec) {
 		this.line = line;
 		this.vec = vec;
 		this.endOfLine = false;
+		isBlocked = false;
 	}
 	
 	private boolean canStep(RobotController rc) {
@@ -75,7 +77,12 @@ public class LinearMoverHandler {
 	
 	public void reverse() {
 		this.endOfLine = false;
+		this.isBlocked = false;
 		this.vec = vec.negate();
+	}
+	
+	public boolean blocked() {
+		return this.isBlocked;
 	}
 	
 	public boolean atEndOfLine() {
@@ -96,7 +103,9 @@ public class LinearMoverHandler {
 				Direction dir = rc.getLocation().directionTo(nextLoc);
 				HandlerCommon.attemptMove(rc, dir);
 				stepAttempt = true;
+				this.isBlocked = false;
 			} else {
+				this.isBlocked = true;
 				stepAttempt = false;
 			}
 		}

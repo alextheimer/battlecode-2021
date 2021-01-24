@@ -63,7 +63,7 @@ public class PoliticianHandler implements IRobotHandler {
 	}
 	
 	private boolean patrolStep(RobotController rc) throws GameActionException {
-		if (this.moveHandler.get().atEndOfLine()) {
+		if (this.moveHandler.get().atEndOfLine() || this.moveHandler.get().blocked()) {
 			this.moveHandler.get().reverse();
 		}
 		return this.moveHandler.get().step(rc);
