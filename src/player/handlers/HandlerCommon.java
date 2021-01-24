@@ -142,18 +142,6 @@ public class HandlerCommon {
 		return Optional.empty();
 	}
 
-	public static void battlecodeAssert(boolean resignIfFalse, String message, RobotController rc) {
-		if (!resignIfFalse) {
-			System.out.println("ASSESRTION FAIL: " + message);
-			rc.resign();
-		}
-	}
-
-	public static void battlecodeThrow(String message, RobotController rc) {
-		System.out.println("EXCEPTION THROWN: " + message);
-		rc.resign();
-	}
-
 	public static Optional<RobotInfo> senseNearestNonTeam(RobotController rc, RobotInfo[] nearbyRobots) {
 		Iterator<RobotInfo> otherTeamIterator = Arrays.stream(nearbyRobots).filter(robotInfo -> robotInfo.getTeam() != rc.getTeam()).iterator();
 		if (otherTeamIterator.hasNext()) {

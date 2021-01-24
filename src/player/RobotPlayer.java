@@ -49,14 +49,16 @@ public strictfp class RobotPlayer {
                 typeHandler = typeHandler.handle(rc);
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
-
-            } catch (AssertionError e) {
-            	e.printStackTrace();
-            	rc.resign();
             } catch (GameActionException e) {
                 System.out.println(rc.getType() + " GameActionException");
                 e.printStackTrace();
-            }
+            } catch (AssertionError e) {
+	        	e.printStackTrace();
+	        	rc.resign();
+	        } catch (Exception e) {
+	        	e.printStackTrace();
+	        	rc.resign();
+	        }
         }
     }
 }

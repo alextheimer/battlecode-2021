@@ -64,11 +64,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
     
 	@Override
 	public IRobotHandler handle(RobotController rc) throws GameActionException {
-		Optional<RobotInfo> nearestEnemyOpt = HandlerCommon.senseNearestNonTeam(rc, rc.senseNearbyRobots());
-		
-		
-//		if (h)
-		
+
 		if (this.flagCooldown > 0) {
 			this.flagCooldown--;
 			return this;

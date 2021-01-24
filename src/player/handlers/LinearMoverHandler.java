@@ -55,7 +55,7 @@ public class LinearMoverHandler {
 	}
 	
 	private Optional<MapLocation> greedyNextLocation(Collection<MapLocation> progressMapLocs, RobotController rc) throws GameActionException {
-		HandlerCommon.battlecodeAssert(!progressMapLocs.isEmpty(), "TODO", rc);
+	    assert !progressMapLocs.isEmpty() : "TODO";
 		Predicate<MapLocation> pred = HandlerCommon.<MapLocation>wrapGameActionPredicate(ll -> !rc.isLocationOccupied(ll));
 		Set<MapLocation> mapLocsUnoccupied = Util.legalSetCollect(progressMapLocs.stream().filter(pred));
 		MapLocation startLoc = rc.getLocation();
@@ -83,7 +83,7 @@ public class LinearMoverHandler {
 	}
 	
 	public boolean step(RobotController rc) throws GameActionException {
-		HandlerCommon.battlecodeAssert(this.canStep(rc), "Illegal step (endOfLine:" + this.endOfLine + ")", rc);
+		assert this.canStep(rc) : "Illegal step (endOfLine:" + this.endOfLine + ")";
 		Set<MapLocation> progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
 		boolean stepAttempt;
 		if (progressMapLocSet.isEmpty()) {

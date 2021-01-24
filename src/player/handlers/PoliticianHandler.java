@@ -38,8 +38,7 @@ public class PoliticianHandler implements IRobotHandler {
 	Optional<LinearMoverHandler> moveHandler = Optional.empty();
 	
 	private boolean attemptEmpower(RobotController rc, int radiusSquared) throws GameActionException {
-		HandlerCommon.battlecodeAssert(radiusSquared <= RobotType.POLITICIAN.actionRadiusSquared,
-				                       "radius squared exceeds action radius", rc);
+		assert radiusSquared <= RobotType.POLITICIAN.actionRadiusSquared : "radius squared exceeds action radius";
 		boolean empowerSuccessful;
 		if (rc.canEmpower(radiusSquared)) {
 			rc.empower(radiusSquared);
@@ -160,7 +159,7 @@ public class PoliticianHandler implements IRobotHandler {
 				handlePatrol(rc);
 				break;
 			default:
-				HandlerCommon.battlecodeAssert(false, "leaders shouldn't have these SquadTypes!", rc);
+				throw new RuntimeException("Illegal AssignmentType: " + this.assignment);
 		}
 		return this;
 	}
