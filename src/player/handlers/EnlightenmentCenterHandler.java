@@ -64,24 +64,24 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 	private int nextDegrees = DEGREES_START;
 	private Set<Integer> idSet = new HashSet<>();
 	
-    private boolean attemptBuild(RobotController rc, Blueprint blueprint, AssignmentFlag flag) throws GameActionException {
+    private boolean attemptBuild(RobotController rc, Blueprint blueprint, IFlag assignmentFlag) throws GameActionException {
     	final int influence = 50;
     	boolean buildSuccess = false;
     	for (Direction dir : HandlerCommon.directions) {
     		if (rc.canBuildRobot(blueprint.robotType, dir, influence)) {
     			rc.buildRobot(blueprint.robotType, dir, influence);
-    			rc.setFlag(flag.encode());
+    			rc.setFlag(assignmentFlag.encode());
     			this.flagCooldown = FLAG_COOLDOWN_START;
     			buildSuccess = true;
     			break;
     		}
     	}
-    	System.out.println("Build attempted: " + flag.getOutboundDegrees() + "; success: " + buildSuccess);
+    	System.out.println("Build attempted; success: " + buildSuccess);
     	return buildSuccess;
     }
     
     private Blueprint makeBlueprint(Target target) {
-    	return new Blueprint(RobotType.POLITICIAN, AssignmentType.PATROL);
+    	return new Blueprint(RobotType.POLITICIAN, AssignmentType.ATTACK_TARGET);
     }
     
     private boolean targetFilter(Target target, RobotController rc) {
@@ -158,13 +158,13 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 			MapLocation targetMapLoc = target.mapLoc;
 			DoubleVec2D vec = new DoubleVec2D(targetMapLoc.x - currMapLoc.x, targetMapLoc.y - currMapLoc.y);
 			int degrees = (int)UtilMath.vecToDegrees(vec);
-			Flag.AssignmentFlag flag = new Flag.AssignmentFlag(blueprint.assignmentType, degrees);
+			Flag.AttackAssignmentFlag flag = new Flag.AttackAssignmentFlag(targetMapLoc.x, targetMapLoc.y);
 			if (this.attemptBuild(rc, blueprint, flag) ) {
 				this.targetQueue.remove();  // TODO(theimer): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 		} else {
 			Blueprint blueprint = new Blueprint(RobotType.POLITICIAN, AssignmentType.PATROL);
-			Flag.AssignmentFlag flag = new Flag.AssignmentFlag(blueprint.assignmentType, this.nextDegrees);
+			Flag.PatrolAssignmentFlag flag = new Flag.PatrolAssignmentFlag(this.nextDegrees);
 			if (this.attemptBuild(rc, blueprint, flag)) {
 				this.incrementDegrees();
 			}

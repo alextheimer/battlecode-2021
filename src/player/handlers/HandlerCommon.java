@@ -46,7 +46,7 @@ public class HandlerCommon {
             Direction.NORTHWEST,
     };
     
-    public static enum AssignmentType {PATROL, OCCUPY, UNASSIGNED};
+    public static enum AssignmentType {PATROL, ATTACK_TARGET, UNASSIGNED};
     
     public interface IRobotHandler {
     	public IRobotHandler handle(RobotController rc) throws GameActionException;

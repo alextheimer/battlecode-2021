@@ -2,8 +2,10 @@ package player.util;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import battlecode.common.Direction;
 import battlecode.common.RobotType;
@@ -274,9 +276,14 @@ class FlagFields {
 }
 
 public class Flag {
-	public static enum OpCode {EMPTY, TARGET_MISSING, FOLLOWER_CLAIM, ASSIGNMENT, ENEMY_SIGHTED, ATTACK_TARGET, BASE_SIGHTED};
+	public static enum OpCode {EMPTY, ASSIGN_PATROL, TARGET_MISSING, FOLLOWER_CLAIM, ENEMY_SIGHTED, ASSIGN_ATTACK, BASE_SIGHTED};
 	public static int EMPTY_FLAG = 0;
 	public static int NUM_BITS = 24;
+	
+	public static interface IFlag {
+		public OpCode getOpCode();
+		public int encode();
+	}
 	
 	private static OpCode opCodeValues[] = OpCode.values();
 	private static int numOpCodeBits = UtilMath.numBits(opCodeValues.length);
@@ -287,43 +294,45 @@ public class Flag {
 		return opCodeValues[opCodeID];
 	}
 	
-	public static class FollowerClaimFlag {
+	public static class FollowerClaimFlag implements IFlag {
 		public static FollowerClaimFlag decode(int rawFlag) {return new FollowerClaimFlag();}
 		public int encode() {return OpCode.FOLLOWER_CLAIM.ordinal();}
+		@Override
+		public OpCode getOpCode() {
+			return OpCode.FOLLOWER_CLAIM;
+		}
 	}
 	
-	public static class TargetMissingFlag {
+	public static class TargetMissingFlag implements IFlag {
 		public static TargetMissingFlag decode(int rawFlag) {return new TargetMissingFlag();}
 		public int encode() {return OpCode.TARGET_MISSING.ordinal();}
+		@Override
+		public OpCode getOpCode() {
+			return OpCode.TARGET_MISSING;
+		}
 	}
 	
-	public static class AssignmentFlag {
-		private SquadTypeField squadType;
+	public static class PatrolAssignmentFlag implements IFlag {
 		private DegreesField outboundDegrees;
 		
-		public AssignmentFlag(AssignmentType squadType, int outboundDegrees) {
-			this.squadType = new SquadTypeField(squadType);
+		public PatrolAssignmentFlag(int outboundDegrees) {
 			this.outboundDegrees = new DegreesField(outboundDegrees);
 		}
 		
-		private AssignmentFlag(SquadTypeField squadType, DegreesField outboundDegrees) {
-			this.squadType = squadType;
+		private PatrolAssignmentFlag(DegreesField outboundDegrees) {
 			this.outboundDegrees = outboundDegrees;
 		}
 		
-		public static AssignmentFlag decode(int rawFlag) {
+		public static PatrolAssignmentFlag decode(int rawFlag) {
 			FlagWalker flagWalker = new FlagWalker(rawFlag);
 			flagWalker.readBits(numOpCodeBits);
-			int squadTypeBits = flagWalker.readBits(SquadTypeField.NUM_BITS);
 			int outboundDegreesBits = flagWalker.readBits(DegreesField.NUM_BITS);
-			SquadTypeField squadType = SquadTypeField.fromBits(squadTypeBits);
 			DegreesField outboundDegrees = DegreesField.fromBits(outboundDegreesBits);
-			return new AssignmentFlag(squadType, outboundDegrees);	
+			return new PatrolAssignmentFlag(outboundDegrees);	
 		}
 		public int encode() {
 			FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
-			flagWalker.writeBits(numOpCodeBits, OpCode.ASSIGNMENT.ordinal());
-			flagWalker.writeBits(SquadTypeField.NUM_BITS, this.squadType.toBits());
+			flagWalker.writeBits(numOpCodeBits, OpCode.ASSIGN_PATROL.ordinal());
 			flagWalker.writeBits(DegreesField.NUM_BITS, this.outboundDegrees.toBits());
 			return flagWalker.getAllBits();
 		}
@@ -331,13 +340,49 @@ public class Flag {
 		public int getOutboundDegrees() {
 			return this.outboundDegrees.value();
 		}
-		
-		public AssignmentType getAssignmentType() {
-			return this.squadType.value();
+
+		@Override
+		public OpCode getOpCode() {
+			return OpCode.ASSIGN_PATROL;
 		}
 	}
 	
-	public static class EnemySightedFlag {
+	public static class AttackAssignmentFlag implements IFlag {
+		private CoordField coord;
+		
+		public AttackAssignmentFlag(int x, int y) {
+			this.coord = new CoordField(x, y);
+		}
+		
+		private AttackAssignmentFlag(CoordField coord) {
+			this.coord = coord;
+		}
+		
+		public static AttackAssignmentFlag decode(int rawFlag) {
+			FlagWalker flagWalker = new FlagWalker(rawFlag);
+			flagWalker.readBits(numOpCodeBits);
+			int coordBits = flagWalker.readBits(CoordField.NUM_BITS);
+			CoordField coord = CoordField.fromBits(coordBits);
+			return new AttackAssignmentFlag(coord);	
+		}
+		public int encode() {
+			FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
+			flagWalker.writeBits(numOpCodeBits, OpCode.ASSIGN_ATTACK.ordinal());
+			flagWalker.writeBits(DegreesField.NUM_BITS, this.coord.toBits());
+			return flagWalker.getAllBits();
+		}
+		
+		public IntVec2D getCoord() {
+			return this.coord.value();
+		}
+
+		@Override
+		public OpCode getOpCode() {
+			return OpCode.ASSIGN_ATTACK;
+		}
+	}
+	
+	public static class EnemySightedFlag implements IFlag {
 		private RobotTypeField robotType;
 		private CoordField coord;
 		
@@ -375,47 +420,10 @@ public class Flag {
 		public RobotType getRobotType() {
 			return this.robotType.value();
 		}
-	}
 
-	public static class AttackTargetFlag {
-		private IdField idField;
-		private DirectionField dirField;
-		public AttackTargetFlag(int id, Direction dir) {
-			this.idField = new IdField(id);
-			this.dirField = new DirectionField(dir);
-		}
-		private AttackTargetFlag(IdField idField, DirectionField dirField) {
-			this.idField = idField;
-			this.dirField = dirField;
-		}
-		public static AttackTargetFlag decode(int rawFlag) {
-			FlagWalker flagWalker = new FlagWalker(rawFlag);
-			flagWalker.readBits(numOpCodeBits);
-			int idBits = flagWalker.readBits(IdField.NUM_BITS);
-			int dirBits = flagWalker.readBits(DirectionField.NUM_BITS);
-			return new AttackTargetFlag(IdField.fromBits(idBits), DirectionField.fromBits(dirBits));
-		}
-		public int encode() {
-			FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
-			flagWalker.writeBits(numOpCodeBits, OpCode.ATTACK_TARGET.ordinal());
-			flagWalker.writeBits(IdField.NUM_BITS, this.idField.toBits());
-			flagWalker.writeBits(DirectionField.NUM_BITS, this.dirField.toBits());
-			return flagWalker.getAllBits();
-		}
-		public int getId() {
-			return this.idField.value();
-		}
-		public Direction getDirection() {
-			return this.dirField.value();
+		@Override
+		public OpCode getOpCode() {
+			return OpCode.ENEMY_SIGHTED;
 		}
 	}
-//	
-//	public static class BaseSightedFlag {
-//		public static BaseSightedFlag decode(int rawFlag) {
-//			
-//		}
-//		public int encode() {
-//			
-//		}
-//	}
 }
