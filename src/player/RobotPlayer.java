@@ -28,6 +28,11 @@ public strictfp class RobotPlayer {
      * If this method returns, the robot dies!
      **/
     public static void run(RobotController rc) {
+    	
+//    	while (rc.getTeam() == Team.A) {
+//    		Clock.yield();
+//    	}
+    	
     	RobotType currentType = rc.getType();
     	
     	IRobotHandler typeHandler;

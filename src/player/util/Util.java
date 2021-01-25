@@ -11,11 +11,13 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import battlecode.common.*;
 
+import java.util.Queue;
+import java.util.ArrayDeque;
+
 /**
  * Contains utility functions/classes.
  */
 public class Util {	
-
 	
 	public static class PeekableIteratorWrapper<T> implements Iterator<T> {
 		private Iterator<T> iterator;
