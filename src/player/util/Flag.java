@@ -274,7 +274,7 @@ class FlagFields {
 }
 
 public class Flag {
-	public static enum OpCode {EMPTY, LEADER_CLAIM, FOLLOWER_CLAIM, ASSIGNMENT, ENEMY_SIGHTED, ATTACK_TARGET, BASE_SIGHTED};
+	public static enum OpCode {EMPTY, TARGET_MISSING, FOLLOWER_CLAIM, ASSIGNMENT, ENEMY_SIGHTED, ATTACK_TARGET, BASE_SIGHTED};
 	public static int EMPTY_FLAG = 0;
 	public static int NUM_BITS = 24;
 	
@@ -292,9 +292,9 @@ public class Flag {
 		public int encode() {return OpCode.FOLLOWER_CLAIM.ordinal();}
 	}
 	
-	public static class LeaderClaimFlag {
-		public static LeaderClaimFlag decode(int rawFlag) {return new LeaderClaimFlag();}
-		public int encode() {return OpCode.LEADER_CLAIM.ordinal();}
+	public static class TargetMissingFlag {
+		public static TargetMissingFlag decode(int rawFlag) {return new TargetMissingFlag();}
+		public int encode() {return OpCode.TARGET_MISSING.ordinal();}
 	}
 	
 	public static class AssignmentFlag {
