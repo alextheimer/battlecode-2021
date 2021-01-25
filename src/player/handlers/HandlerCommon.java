@@ -175,4 +175,10 @@ public class HandlerCommon {
 		int yDiff = UtilMath.diffMod(offset.y, yValidOffset, modVal);
 		return new MapLocation(validMapLocation.x + xDiff, validMapLocation.y + yDiff);
 	}
+	
+	public static IntVec2D mapLocationToOffset(MapLocation mapLocation) {
+		final int modVal = 2 * MAX_WORLD_WIDTH;
+		final int mask = modVal - 1;
+		return new IntVec2D(mapLocation.x & mask, mapLocation.y & mask);
+	}
 }

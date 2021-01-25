@@ -9,6 +9,7 @@ import player.util.Flag.EnemySightedFlag;
 import player.util.Flag.FollowerClaimFlag;
 import player.util.Flag.OpCode;
 import player.util.Flag.PatrolAssignmentFlag;
+import player.util.Flag.TargetMissingFlag;
 import player.util.UtilMath.DoubleVec2D;
 import player.util.UtilMath.IntVec2D;
 import player.util.UtilMath.Line2D;
@@ -155,15 +156,19 @@ public class PoliticianHandler implements IRobotHandler {
 				RobotInfo[] sensedRobots = rc.senseNearbyRobots();
 				boolean sensedTarget = false;
 				for (RobotInfo robotInfo : sensedRobots) {
-					if (robotInfo.getLocation().equals(this.targetMapLoc)) {
+					if (robotInfo.getLocation().equals(this.targetMapLoc) && robotInfo.getTeam() != rc.getTeam()) {
 						sensedTarget = true;
 						break;
 					}
 				}
 				
 				if (!sensedTarget) {
-					// post flag TODO!!!!
 					System.out.println("no target sensed; unassigned handler");
+					IntVec2D offset = HandlerCommon.mapLocationToOffset(targetMapLoc);
+					TargetMissingFlag flag = new TargetMissingFlag(offset.x, offset.y);
+					rc.setFlag(flag.encode());
+					Clock.yield();
+					Clock.yield();
 					IAssignmentHandler nextHandler = new UnassignedAssignmentHandler();
 					nextHandler.handle(rc);
 					return nextHandler;
@@ -232,8 +237,9 @@ public class PoliticianHandler implements IRobotHandler {
 		Stream<MapLocation> filteredStream = Util.streamifyIterator(adjacentIterator)
 			.filter(mapLoc -> mapLoc.distanceSquaredTo(targetLoc) < currDistSquared)
 			.filter(HandlerCommon.wrapGameActionPredicate(mapLoc -> !rc.isLocationOccupied(mapLoc) && rc.onTheMap(mapLoc)));
-		if (filteredStream.findAny().isPresent()) {
-			MapLocation moveTo = Util.findLeastCostLinear(filteredStream.iterator(), costFunc);
+		Iterator<MapLocation> streamIterator = filteredStream.iterator();
+		if (streamIterator.hasNext()) {
+			MapLocation moveTo = Util.findLeastCostLinear(streamIterator, costFunc);
 			Direction dir = rc.getLocation().directionTo(moveTo);
 			if (rc.canMove(dir)) {
 				rc.move(dir);

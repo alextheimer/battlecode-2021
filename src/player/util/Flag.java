@@ -324,6 +324,9 @@ public class Flag {
 			flagWalker.writeBits(CoordField.NUM_BITS, coord.toBits());
 			return flagWalker.getAllBits();
 		}
+		public IntVec2D getCoord() {
+			return this.coord.value();
+		}
 		@Override
 		public OpCode getOpCode() {
 			return OpCode.TARGET_MISSING;

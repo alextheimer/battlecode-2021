@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -33,6 +34,20 @@ class Target implements Comparable<Target> {
 	public Target(RobotType robotType, MapLocation mapLoc) {
 		this.robotType = robotType;
 		this.mapLoc = mapLoc;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(robotType, mapLoc);
+	}
+	
+	public boolean sameValue(Target other) {
+		return (this.robotType == other.robotType) && (this.mapLoc.equals(other.mapLoc));
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return (other instanceof Target) && this.sameValue((Target)other);
 	}
 	
 	@Override
@@ -54,13 +69,12 @@ class Blueprint {
 public class EnlightenmentCenterHandler implements IRobotHandler {
 	
 	private static final int FLAG_COOLDOWN_START = 1;
-	private static final Random rand = new Random();
 	private static final int DEGREES_DELTA = 5;
 	private static final int DEGREES_START = 0;
 	
-	private int buildSequenceIndex = 0;
 	private int flagCooldown = 0;
 	private Queue<Target> targetQueue = new PriorityQueue<>();
+	private Set<Target> addedTargets = new HashSet<>();
 	private int nextDegrees = DEGREES_START;
 	private Set<Integer> idSet = new HashSet<>();
 	
@@ -85,7 +99,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
     }
     
     private boolean targetFilter(Target target, RobotController rc) {
-    	return (target.robotType == RobotType.ENLIGHTENMENT_CENTER) && !rc.getLocation().equals(target.mapLoc);
+    	return (target.robotType == RobotType.ENLIGHTENMENT_CENTER) && !rc.getLocation().equals(target.mapLoc) && !this.addedTargets.contains(target);
     }
     
     private int incrementDegrees() {
@@ -141,8 +155,16 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 					Target target = new Target(robotType, mapLoc);
 					if (this.targetFilter(target, rc)) {
 						this.targetQueue.add(target);
+						this.addedTargets.add(target);
 						System.out.println("Added target @ " + target.mapLoc);
 					}					
+				} else if ((this.targetQueue.size() > 0) && Flag.getOpCode(rawFlag) == OpCode.TARGET_MISSING) {
+					TargetMissingFlag flag = TargetMissingFlag.decode(rawFlag);
+					IntVec2D offset = flag.getCoord();
+					MapLocation mapLoc = HandlerCommon.offsetToMapLocation(offset, rc.getLocation());
+					if (mapLoc.equals(this.targetQueue.peek().mapLoc)) {
+						this.targetQueue.remove();
+					}
 				}
 			} else {
 				idIterator.remove();
@@ -154,14 +176,9 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 			System.out.println("HAS TARGET");
 			Target target = this.targetQueue.peek();
 			Blueprint blueprint = this.makeBlueprint(target);
-			MapLocation currMapLoc = rc.getLocation();
-			MapLocation targetMapLoc = target.mapLoc;
-			DoubleVec2D vec = new DoubleVec2D(targetMapLoc.x - currMapLoc.x, targetMapLoc.y - currMapLoc.y);
-			int degrees = (int)UtilMath.vecToDegrees(vec);
-			Flag.AttackAssignmentFlag flag = new Flag.AttackAssignmentFlag(targetMapLoc.x, targetMapLoc.y);
-			if (this.attemptBuild(rc, blueprint, flag) ) {
-				this.targetQueue.remove();  // TODO(theimer): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
+			IntVec2D offset = HandlerCommon.mapLocationToOffset(target.mapLoc);
+			Flag.AttackAssignmentFlag flag = new Flag.AttackAssignmentFlag(offset.x, offset.y);
+			this.attemptBuild(rc, blueprint, flag);
 		} else {
 			Blueprint blueprint = new Blueprint(RobotType.POLITICIAN, AssignmentType.PATROL);
 			Flag.PatrolAssignmentFlag flag = new Flag.PatrolAssignmentFlag(this.nextDegrees);

@@ -29,9 +29,9 @@ public strictfp class RobotPlayer {
      **/
     public static void run(RobotController rc) {
     	
-//    	while (rc.getTeam() == Team.A) {
-//    		Clock.yield();
-//    	}
+    	while (rc.getTeam() == Team.A) {
+    		Clock.yield();
+    	}
     	
     	RobotType currentType = rc.getType();
     	
