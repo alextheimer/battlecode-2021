@@ -252,7 +252,7 @@ public class PoliticianHandler implements IRobotHandler {
 	private boolean attemptMoveCloser(RobotController rc, MapLocation targetLoc) throws GameActionException {
 		Iterator<MapLocation> adjacentIterator = HandlerCommon.getAdjacentIterator(rc.getLocation());
 		int currDistSquared = targetLoc.distanceSquaredTo(rc.getLocation());
-		Function<MapLocation, Double> costFunc = wrapGameActionFunctionEmergency(mapLoc -> -rc.sensePassability(mapLoc));
+		Function<MapLocation, Double> costFunc = wrapGameActionFunctionEmergency(mapLoc -> -rc.sensePassability(mapLoc)*100000 + mapLoc.distanceSquaredTo(targetLoc));
 		Stream<MapLocation> filteredStream = Util.streamifyIterator(adjacentIterator)
 			.filter(mapLoc -> mapLoc.distanceSquaredTo(targetLoc) < currDistSquared)
 			.filter(HandlerCommon.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc)));
