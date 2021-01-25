@@ -119,23 +119,25 @@ public class HandlerCommon {
 		}
 	}
     
-	public static Map<RobotInfo, Integer> findAllMatchingFlags(RobotController rc, RobotInfo[] nearbyRobots,
+	// TODO(theimer): remove team check from all uses
+	public static Map<RobotInfo, Integer> findAllMatchingTeamFlags(RobotController rc, RobotInfo[] nearbyRobots,
 	                                   BiPredicate<RobotInfo, Integer> predicate) throws GameActionException  {
 		Map<RobotInfo, Integer> robotFlagMap = new HashMap<>();
 		for (RobotInfo robotInfo : nearbyRobots) {
 			int rawFlag = rc.getFlag(robotInfo.getID());
-			if (predicate.test(robotInfo, rawFlag)) {
+			if ((robotInfo.getTeam() == rc.getTeam()) && predicate.test(robotInfo, rawFlag)) {
 				robotFlagMap.put(robotInfo, rawFlag);
 			}
 		}
 		return robotFlagMap;
 	}
 	
-	public static Optional<SimpleImmutableEntry<RobotInfo, Integer>> findFirstMatchingFlag(RobotController rc, RobotInfo[] nearbyRobots,
+	// TODO(theimer): remove team check from all uses
+	public static Optional<SimpleImmutableEntry<RobotInfo, Integer>> findFirstMatchingTeamFlag(RobotController rc, RobotInfo[] nearbyRobots,
                                        BiPredicate<RobotInfo, Integer> predicate) throws GameActionException  {
 		for (RobotInfo robotInfo : nearbyRobots) {
 			int rawFlag = rc.getFlag(robotInfo.getID());
-			if (predicate.test(robotInfo, rawFlag)) {
+			if ((robotInfo.getTeam() == rc.getTeam()) && predicate.test(robotInfo, rawFlag)) {
 				return Optional.of(new SimpleImmutableEntry<RobotInfo, Integer>(robotInfo, rawFlag));
 			}
 		}
@@ -156,10 +158,14 @@ public class HandlerCommon {
 		return Util.legalSetCollect(Arrays.stream(rc.senseNearbyRobots()).filter(robotInfo -> robotInfo.getTeam() != rc.getTeam()));
 	}
 	
+	public static Set<RobotInfo> senseAllTeam(RobotController rc) {
+		return Util.legalSetCollect(Arrays.stream(rc.senseNearbyRobots()).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam()));
+	}
+	
 	public static MapLocation offsetToMapLocation(IntVec2D offset, MapLocation validMapLocation) {
 		assert UtilMath.isPow2(MAX_WORLD_WIDTH);
-		assert offset.x >= 0 && offset.x < MAX_WORLD_WIDTH;
-		assert offset.y >= 0 && offset.y < MAX_WORLD_WIDTH;
+		assert (offset.x >= 0) && (offset.x < 2 * MAX_WORLD_WIDTH) : "" + offset.x;
+		assert (offset.y >= 0) && (offset.y < 2 * MAX_WORLD_WIDTH) : "" + offset.y;
 		
 		final int modVal = 2 * MAX_WORLD_WIDTH;
 		final int mask = modVal - 1;

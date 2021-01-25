@@ -70,7 +70,7 @@ public class PoliticianHandler implements IRobotHandler {
 	}
 	
 	private Optional<AssignmentFlag> findAssignmentFlag(RobotController rc) throws GameActionException {
-		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOpt = HandlerCommon.findFirstMatchingFlag(
+		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOpt = HandlerCommon.findFirstMatchingTeamFlag(
 				rc,
 				rc.senseNearbyRobots(HandlerCommon.MAX_DIST_SQUARED_ADJACENT, rc.getTeam()),
 				(robotInfo, rawFlag) -> (Flag.getOpCode(rawFlag) == OpCode.ASSIGNMENT)

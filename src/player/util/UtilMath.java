@@ -164,6 +164,10 @@ public class UtilMath {
 		return Math.abs(d1 - d2) < FLOAT_EPS;
 	}
 	
+	public static double vecToDegrees(DoubleVec2D vec) {
+		return Math.toDegrees(Math.atan2(vec.y, vec.x));
+	}
+	
 	public static int diffMod(int subFrom, int subThis, int mod) {
 		assert subFrom >= 0;
 		assert subThis >= 0;
