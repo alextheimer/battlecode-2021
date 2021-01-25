@@ -111,15 +111,20 @@ public class PoliticianHandler implements IRobotHandler {
 
 	class PatrolAssignmentHandler implements IAssignmentHandler {
 
+		private static final int MAX_REVERSE_COUNT = 3;
+		
 		LinearMoverHandler moveHandler;
+		int reverseCount;
 		
 		public PatrolAssignmentHandler(Line2D line, DoubleVec2D vec) {
 			this.moveHandler = new LinearMoverHandler(line, vec);
+			this.reverseCount = 0;
 		}
 		
 		private boolean patrolStep(RobotController rc) throws GameActionException {
 			if (this.moveHandler.atEndOfLine() || this.moveHandler.blocked()) {
 				this.moveHandler.reverse();
+				this.reverseCount++;
 			}
 			return this.moveHandler.step(rc);
 		}
@@ -136,6 +141,9 @@ public class PoliticianHandler implements IRobotHandler {
 			}
 			if (!PoliticianHandler.this.attemptEmpowerNearestEnemy(rc)) {
 				this.patrolStep(rc);
+				if (this.reverseCount >= MAX_REVERSE_COUNT) {
+					return new UnassignedAssignmentHandler().handle(rc);
+				}
 			}
 			return this;
 		}
