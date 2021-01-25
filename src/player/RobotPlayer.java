@@ -15,6 +15,8 @@ import player.handlers.HandlerCommon.*;
 
 public strictfp class RobotPlayer {
 	
+	private static final boolean RESIGN_ON_EXCEPTION = true;
+	
 	private static Map<RobotType, Supplier<IRobotHandler>> mapThing = new HashMap<>();
 	static {
 		mapThing.put(RobotType.POLITICIAN, () -> new PoliticianHandler());
@@ -57,12 +59,19 @@ public strictfp class RobotPlayer {
             } catch (GameActionException e) {
                 System.out.println(rc.getType() + " GameActionException");
                 e.printStackTrace();
+	        	if (RESIGN_ON_EXCEPTION) {
+	        		rc.resign();	        		
+	        	}
             } catch (AssertionError e) {
 	        	e.printStackTrace();
-	        	rc.resign();
+	        	if (RESIGN_ON_EXCEPTION) {
+	        		rc.resign();	        		
+	        	}
 	        } catch (Exception e) {
 	        	e.printStackTrace();
-	        	rc.resign();
+	        	if (RESIGN_ON_EXCEPTION) {
+	        		rc.resign();	        		
+	        	}
 	        }
         }
     }
