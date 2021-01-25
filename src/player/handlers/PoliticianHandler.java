@@ -229,14 +229,33 @@ public class PoliticianHandler implements IRobotHandler {
 		}
 		return Optional.of(Util.findLeastCostLinear(sensedNonTeammates.iterator(), costFunc));
 	}
-
+	
+	@FunctionalInterface
+	private static interface GameActionFunction<T, R> {
+		public R apply(T arg0) throws GameActionException;
+	}
+	
+	private static <T, R> Function<T, R> wrapGameActionFunctionEmergency(GameActionFunction<T, R> gafunc) {
+		return new Function<T, R>() {
+			@Override
+			public R apply(T arg0) {
+				try {
+					return gafunc.apply(arg0);					
+				} catch (GameActionException e) {
+					throw new RuntimeException("this should never happen TODO");
+				}
+			}
+			
+		};
+	}
+	
 	private boolean attemptMoveCloser(RobotController rc, MapLocation targetLoc) throws GameActionException {
 		Iterator<MapLocation> adjacentIterator = HandlerCommon.getAdjacentIterator(rc.getLocation());
 		int currDistSquared = targetLoc.distanceSquaredTo(rc.getLocation());
-		Function<MapLocation, Double> costFunc = mapLoc -> (double)mapLoc.distanceSquaredTo(targetLoc);
+		Function<MapLocation, Double> costFunc = wrapGameActionFunctionEmergency(mapLoc -> -rc.sensePassability(mapLoc));
 		Stream<MapLocation> filteredStream = Util.streamifyIterator(adjacentIterator)
 			.filter(mapLoc -> mapLoc.distanceSquaredTo(targetLoc) < currDistSquared)
-			.filter(HandlerCommon.wrapGameActionPredicate(mapLoc -> !rc.isLocationOccupied(mapLoc) && rc.onTheMap(mapLoc)));
+			.filter(HandlerCommon.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc)));
 		Iterator<MapLocation> streamIterator = filteredStream.iterator();
 		if (streamIterator.hasNext()) {
 			MapLocation moveTo = Util.findLeastCostLinear(streamIterator, costFunc);
