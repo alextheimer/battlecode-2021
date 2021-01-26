@@ -24,9 +24,9 @@ public class UtilMathTest {
 				this.expectedDist = expectedDist;
 			}
 		}
-		Line2D vertLineOrigin = Line2D.make(new DoubleVec2D(0, 1), new DoubleVec2D(0, 0));
-		Line2D horizLineOrigin = Line2D.make(new DoubleVec2D(1, 0), new DoubleVec2D(0, 0));
-		Line2D yEqXLineOrigin = Line2D.make(new DoubleVec2D(1, 1), new DoubleVec2D(0, 0));
+		Line2D vertLineOrigin = new Line2D(new DoubleVec2D(0, 1), new DoubleVec2D(0, 0));
+		Line2D horizLineOrigin = new Line2D(new DoubleVec2D(1, 0), new DoubleVec2D(0, 0));
+		Line2D yEqXLineOrigin = new Line2D(new DoubleVec2D(1, 1), new DoubleVec2D(0, 0));
 		
 		List<TPPPT> listThing = Arrays.asList(
 				new TPPPT(new DoubleVec2D(0, 0), vertLineOrigin, 0.0),

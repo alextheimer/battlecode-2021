@@ -64,7 +64,7 @@ public class PoliticianHandler implements IRobotHandler {
 					PatrolAssignmentFlag flag = PatrolAssignmentFlag.decode(rawFlag);
 					DoubleVec2D vec = UtilMath.degreesToVec(flag.getOutboundDegrees());
 					DoubleVec2D origin = new DoubleVec2D(rc.getLocation().x, rc.getLocation().y);
-					Line2D line = UtilMath.Line2D.make(vec, origin);
+					Line2D line = new Line2D(vec, origin);
 					handler = new PatrolAssignmentHandler(line, vec);
 				}
 				break;
@@ -88,7 +88,7 @@ public class PoliticianHandler implements IRobotHandler {
 			MapLocation mapLoc = rc.getLocation();
 			DoubleVec2D vec = UtilMath.degreesToVec(degrees);
 			DoubleVec2D currCoord = new DoubleVec2D(mapLoc.x, mapLoc.y);
-			Line2D line = Line2D.make(vec, currCoord);
+			Line2D line = new Line2D(vec, currCoord);
 			return new PatrolAssignmentHandler(line, vec);
 		}
 		

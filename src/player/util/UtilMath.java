@@ -99,27 +99,43 @@ public class UtilMath {
 	}
 	
 	public static class Line2D {
-		public double a;
-		public double b;
-		public double c;
 		
+		// Each coefficient of ax + by + c = 0;
+		public final double a;
+		public final double b;
+		public final double c;
+		
+		/**
+		 * Immutable struct-like class for the storage of the coefficients in:
+		 *     ax + by + c = 0
+		 * (i.e. the equation of a line).
+		 */
 		public Line2D(double a, double b, double c) {
 			this.a = a;
 			this.b = b;
 			this.c = c;
 		}
 		
-		public static Line2D make(DoubleVec2D vec, DoubleVec2D origin) {
-			assert !vec.equals(new DoubleVec2D(0.0, 0.0));
+		/**
+		 * See {@link Line2D#Line2D(double, double, double)}
+		 * 
+		 * @param parallelTo the instantiated line will run parallel to this vector.
+		 * @param onLine any point on the line
+		 */
+		public Line2D(DoubleVec2D parallelTo, DoubleVec2D onLine) {
+			assert !parallelTo.equals(new DoubleVec2D(0.0, 0.0)) : "parallelTo must have positive magnitude";
 			
-			if (doubleEquals(0.0, vec.x)) {
-				return new Line2D(1.0, 0.0, -origin.x);
+			// the below assignments follow from solving: y = mx + b
+			if (doubleEquals(0.0, parallelTo.x)) {
+				// prevents division by zero; parallelTo is vertical.
+				this.a = 1.0;
+				this.b = 0.0;
+				this.c = -onLine.x;
+			} else {
+				this.a = -(parallelTo.y / parallelTo.x);
+				this.b = 1;
+				this.c = (parallelTo.y * onLine.x / parallelTo.x) - onLine.y;
 			}
-			
-			double a = -(vec.y / vec.x);
-			double b = 1;  // TODO(theimer): could probably get rid of this; currently just here for completeness.
-			double c = (vec.y * origin.x / vec.x) - origin.y;
-			return new Line2D(a, b, c);
 		}
 		
 		@Override
