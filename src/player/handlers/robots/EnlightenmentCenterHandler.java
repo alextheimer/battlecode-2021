@@ -7,7 +7,6 @@ import player.handlers.common.HandlerCommon;
 import player.util.battlecode.Flag;
 import player.util.battlecode.Flag.*;
 import player.util.battlecode.UtilBattlecode;
-import player.util.battlecode.UtilBattlecode.AssignmentType;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
@@ -63,14 +62,19 @@ class Target implements Comparable<Target> {
 
 class Blueprint {
 	public RobotType robotType;
-	public UtilBattlecode.AssignmentType assignmentType;
-	public Blueprint(RobotType robotType, UtilBattlecode.AssignmentType assignmentType) {
+	public EnlightenmentCenterHandler.Assignment assignmentType;
+	public Blueprint(RobotType robotType, EnlightenmentCenterHandler.Assignment assignmentType) {
 		this.robotType = robotType;
 		this.assignmentType = assignmentType;
 	}
 }
 
 public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
+	
+	/**
+	 * Each unit is given an Assignment 
+	 */
+	public static enum Assignment { PATROL, ATTACK_TARGET, UNASSIGNED }
 	
 	private static final int FLAG_COOLDOWN_START = 1;
 	private static final int DEGREES_DELTA = 5;
@@ -101,7 +105,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
     }
     
     private Blueprint makeBlueprint(Target target) {
-    	return new Blueprint(RobotType.POLITICIAN, UtilBattlecode.AssignmentType.ATTACK_TARGET);
+    	return new Blueprint(RobotType.POLITICIAN, Assignment.ATTACK_TARGET);
     }
     
     private boolean targetFilter(Target target, RobotController rc) {
@@ -179,7 +183,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 		
 		// select Target / Blueprint, build / deplay
 		if (this.buildNum % 2 == 1) {
-			if (this.attemptBuild(rc, new Blueprint(RobotType.SLANDERER, UtilBattlecode.AssignmentType.PATROL), new PatrolAssignmentFlag(this.nextDegrees))) {
+			if (this.attemptBuild(rc, new Blueprint(RobotType.SLANDERER, Assignment.PATROL), new PatrolAssignmentFlag(this.nextDegrees))) {
 				this.incrementDegrees();
 			}
 		}
@@ -191,7 +195,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 			Flag.AttackAssignmentFlag flag = new Flag.AttackAssignmentFlag(offset.x, offset.y);
 			this.attemptBuild(rc, blueprint, flag);
 		} else {
-			Blueprint blueprint = new Blueprint(RobotType.POLITICIAN, UtilBattlecode.AssignmentType.PATROL);
+			Blueprint blueprint = new Blueprint(RobotType.POLITICIAN, Assignment.PATROL);
 			Flag.PatrolAssignmentFlag flag = new Flag.PatrolAssignmentFlag(this.nextDegrees);
 			if (this.attemptBuild(rc, blueprint, flag)) {
 				this.incrementDegrees();

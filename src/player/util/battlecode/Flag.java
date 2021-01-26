@@ -203,30 +203,6 @@ class FlagFields {
 		}
 	}
 	
-	public static class SquadTypeField {
-		public static final int NUM_BITS = UtilMath.log2Ceil(UtilBattlecode.AssignmentType.values().length);
-		
-		private UtilBattlecode.AssignmentType squadType;
-		
-		public SquadTypeField(UtilBattlecode.AssignmentType squadType) {
-			// TODO(theimer): assertions
-			this.squadType = squadType;
-		}
-		
-		public int toBits() {
-			return this.squadType.ordinal();
-		}
-		
-		public static SquadTypeField fromBits(int bits) {
-			// TODO(theimer): !!!!!!!!!!
-			return new SquadTypeField(UtilBattlecode.AssignmentType.values()[bits]);
-		}
-		
-		public UtilBattlecode.AssignmentType value() {
-			return this.squadType;
-		}
-	}
-	
 	public static class RobotTypeField {
 		public static final int NUM_BITS = UtilMath.log2Ceil(RobotType.values().length);
 		

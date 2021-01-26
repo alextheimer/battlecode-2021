@@ -8,11 +8,9 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 
 /**
- * TODO
+ * Contains constants/types/functions related to Battlecode.
  */
 public class UtilBattlecode {
-
-	public static enum AssignmentType {PATROL, ATTACK_TARGET, UNASSIGNED}
 	
 	@FunctionalInterface
 	public static interface GameActionPredicate<T> {
