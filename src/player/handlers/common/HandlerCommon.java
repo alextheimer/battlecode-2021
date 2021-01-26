@@ -1,4 +1,4 @@
-package player.handlers;
+package player.handlers.common;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -16,12 +16,13 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import battlecode.common.*;
-import player.handlers.HandlerCommon;
-import player.util.Flag;
-import player.util.Flag.OpCode;
-import player.util.Util;
-import player.util.UtilMath;
-import player.util.UtilMath.*;
+import player.handlers.common.HandlerCommon;
+import player.util.battlecode.Flag;
+import player.util.battlecode.Flag.OpCode;
+import player.util.general.UtilGeneral;
+import player.util.math.IntVec2D;
+import player.util.math.UtilMath;
+import player.util.math.UtilMath.*;
 
 
 public class HandlerCommon {
@@ -148,18 +149,18 @@ public class HandlerCommon {
 		Iterator<RobotInfo> otherTeamIterator = Arrays.stream(nearbyRobots).filter(robotInfo -> robotInfo.getTeam() != rc.getTeam()).iterator();
 		if (otherTeamIterator.hasNext()) {
 			Function<RobotInfo, Double> costFunc = robotInfo -> (double)robotInfo.getLocation().distanceSquaredTo(rc.getLocation());
-			return Optional.of(Util.findLeastCostLinear(otherTeamIterator, costFunc));
+			return Optional.of(UtilGeneral.findLeastCostLinear(otherTeamIterator, costFunc));
 		} else {
 			return Optional.empty();
 		}
 	}
 	
 	public static Set<RobotInfo> senseAllNonTeam(RobotController rc) {
-		return Util.legalSetCollect(Arrays.stream(rc.senseNearbyRobots()).filter(robotInfo -> robotInfo.getTeam() != rc.getTeam()));
+		return UtilGeneral.legalSetCollect(Arrays.stream(rc.senseNearbyRobots()).filter(robotInfo -> robotInfo.getTeam() != rc.getTeam()));
 	}
 	
 	public static Set<RobotInfo> senseAllTeam(RobotController rc) {
-		return Util.legalSetCollect(Arrays.stream(rc.senseNearbyRobots()).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam()));
+		return UtilGeneral.legalSetCollect(Arrays.stream(rc.senseNearbyRobots()).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam()));
 	}
 	
 	public static MapLocation offsetToMapLocation(IntVec2D offset, MapLocation validMapLocation) {

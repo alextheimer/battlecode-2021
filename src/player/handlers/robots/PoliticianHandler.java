@@ -1,20 +1,23 @@
-package player.handlers;
+package player.handlers.robots;
 
 import battlecode.common.*;
-import player.util.Flag;
-import player.util.Util;
-import player.util.UtilMath;
-import player.util.Flag.AttackAssignmentFlag;
-import player.util.Flag.EnemySightedFlag;
-import player.util.Flag.FollowerClaimFlag;
-import player.util.Flag.OpCode;
-import player.util.Flag.PatrolAssignmentFlag;
-import player.util.Flag.TargetMissingFlag;
-import player.util.UtilMath.DoubleVec2D;
-import player.util.UtilMath.IntVec2D;
-import player.util.UtilMath.Line2D;
+import player.handlers.common.HandlerCommon;
+import player.handlers.common.LinearMoverHandler;
+import player.handlers.common.HandlerCommon.IRobotHandler;
+import player.util.battlecode.Flag;
+import player.util.battlecode.Flag.AttackAssignmentFlag;
+import player.util.battlecode.Flag.EnemySightedFlag;
+import player.util.battlecode.Flag.FollowerClaimFlag;
+import player.util.battlecode.Flag.OpCode;
+import player.util.battlecode.Flag.PatrolAssignmentFlag;
+import player.util.battlecode.Flag.TargetMissingFlag;
+import player.util.general.UtilGeneral;
+import player.util.math.DoubleVec2D;
+import player.util.math.IntVec2D;
+import player.util.math.Line2D;
+import player.util.math.UtilMath;
 
-import static player.handlers.HandlerCommon.*;
+import static player.handlers.common.HandlerCommon.*;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -30,7 +33,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import player.handlers.LinearMoverHandler;
 
 interface IAssignmentHandler {
 	public IAssignmentHandler handle(RobotController rc) throws GameActionException;
@@ -235,7 +237,7 @@ public class PoliticianHandler implements IRobotHandler {
 		if (sensedNonTeammates.isEmpty()) {
 			return Optional.empty();
 		}
-		return Optional.of(Util.findLeastCostLinear(sensedNonTeammates.iterator(), costFunc));
+		return Optional.of(UtilGeneral.findLeastCostLinear(sensedNonTeammates.iterator(), costFunc));
 	}
 	
 	@FunctionalInterface
@@ -261,12 +263,12 @@ public class PoliticianHandler implements IRobotHandler {
 		Iterator<MapLocation> adjacentIterator = HandlerCommon.getAdjacentIterator(rc.getLocation());
 		int currDistSquared = targetLoc.distanceSquaredTo(rc.getLocation());
 		Function<MapLocation, Double> costFunc = wrapGameActionFunctionEmergency(mapLoc -> -rc.sensePassability(mapLoc)*100000 + mapLoc.distanceSquaredTo(targetLoc));
-		Stream<MapLocation> filteredStream = Util.streamifyIterator(adjacentIterator)
+		Stream<MapLocation> filteredStream = UtilGeneral.streamifyIterator(adjacentIterator)
 			.filter(mapLoc -> mapLoc.distanceSquaredTo(targetLoc) < currDistSquared)
 			.filter(HandlerCommon.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc)));
 		Iterator<MapLocation> streamIterator = filteredStream.iterator();
 		if (streamIterator.hasNext()) {
-			MapLocation moveTo = Util.findLeastCostLinear(streamIterator, costFunc);
+			MapLocation moveTo = UtilGeneral.findLeastCostLinear(streamIterator, costFunc);
 			Direction dir = rc.getLocation().directionTo(moveTo);
 			if (rc.canMove(dir)) {
 				rc.move(dir);

@@ -1,4 +1,4 @@
-package player.handlers;
+package player.handlers.common;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,10 +14,10 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
-import player.util.Util;
-import player.util.UtilMath;
-import player.util.UtilMath.DoubleVec2D;
-import player.util.UtilMath.Line2D;
+import player.util.general.UtilGeneral;
+import player.util.math.DoubleVec2D;
+import player.util.math.Line2D;
+import player.util.math.UtilMath;
 
 public class LinearMoverHandler {
 	
@@ -42,11 +42,11 @@ public class LinearMoverHandler {
 	
 	private Set<MapLocation> getProgressMapLocs(MapLocation mapLoc, RobotController rc) throws GameActionException {
 		Iterator<MapLocation> adjacentMapLocIterator = HandlerCommon.getAdjacentIterator(mapLoc);
-		Stream<MapLocation> mapLocStream = Util.streamifyIterator(adjacentMapLocIterator);
+		Stream<MapLocation> mapLocStream = UtilGeneral.streamifyIterator(adjacentMapLocIterator);
 		
 		Predicate<MapLocation> pred =  HandlerCommon.<MapLocation>wrapGameActionPredicate(ll -> rc.onTheMap(ll));
 		
-		return Util.legalSetCollect(mapLocStream.filter(loc -> (
+		return UtilGeneral.legalSetCollect(mapLocStream.filter(loc -> (
 					// close enough to the path line?
 					(UtilMath.distanceFromLine(new DoubleVec2D(loc.x, loc.y), line) < LINE_DIST_THRESH) &&
 					// valid location on the map?
@@ -59,7 +59,7 @@ public class LinearMoverHandler {
 	private Optional<MapLocation> greedyNextLocation(Collection<MapLocation> progressMapLocs, RobotController rc) throws GameActionException {
 	    assert !progressMapLocs.isEmpty() : "TODO";
 		Predicate<MapLocation> pred = HandlerCommon.<MapLocation>wrapGameActionPredicate(ll -> !rc.isLocationOccupied(ll));
-		Set<MapLocation> mapLocsUnoccupied = Util.legalSetCollect(progressMapLocs.stream().filter(pred));
+		Set<MapLocation> mapLocsUnoccupied = UtilGeneral.legalSetCollect(progressMapLocs.stream().filter(pred));
 		MapLocation startLoc = rc.getLocation();
 		Function<MapLocation, Double> costFunc = new Function<MapLocation, Double>() {
 			public Double apply(MapLocation mapLoc) {
@@ -72,7 +72,7 @@ public class LinearMoverHandler {
 		if (mapLocsUnoccupied.isEmpty()) {
 			return Optional.empty();
 		}
-		return Optional.of(Util.findLeastCostLinear(mapLocsUnoccupied.iterator(), costFunc));
+		return Optional.of(UtilGeneral.findLeastCostLinear(mapLocsUnoccupied.iterator(), costFunc));
 	}
 	
 	public void reverse() {

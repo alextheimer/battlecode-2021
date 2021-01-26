@@ -1,12 +1,15 @@
 package util;
 
 import static org.junit.Assert.*;
-import static player.util.UtilMath.*;
+import static player.util.math.UtilMath.*;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+
+import player.util.math.DoubleVec2D;
+import player.util.math.Line2D;
 
 
 

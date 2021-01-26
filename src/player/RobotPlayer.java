@@ -7,11 +7,11 @@ import java.util.function.Supplier;
 
 import battlecode.common.*;
 import player.handlers.*;
-import player.handlers.EnlightenmentCenterHandler;
-import player.handlers.MuckrakerHandler;
-import player.handlers.PoliticianHandler;
-import player.handlers.SlandererHandler;
-import player.handlers.HandlerCommon.*;
+import player.handlers.common.HandlerCommon.*;
+import player.handlers.robots.EnlightenmentCenterHandler;
+import player.handlers.robots.MuckrakerHandler;
+import player.handlers.robots.PoliticianHandler;
+import player.handlers.robots.SlandererHandler;
 
 public strictfp class RobotPlayer {
 	

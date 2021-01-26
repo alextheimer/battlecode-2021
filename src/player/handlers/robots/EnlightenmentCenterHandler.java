@@ -1,14 +1,18 @@
-package player.handlers;
+package player.handlers.robots;
 
 import battlecode.common.*;
-import player.util.Util.PeekableIteratorWrapper;
-import player.util.UtilMath;
-import player.util.UtilMath.DoubleVec2D;
-import player.util.UtilMath.IntVec2D;
-import player.util.Flag;
-import player.util.Flag.*;
+import player.handlers.common.HandlerCommon;
+import player.handlers.common.HandlerCommon.AssignmentType;
+import player.handlers.common.HandlerCommon.IRobotHandler;
+import player.util.battlecode.Flag;
+import player.util.battlecode.Flag.*;
+import player.util.math.IntVec2D;
+import player.util.math.UtilMath;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+
+import static player.handlers.common.HandlerCommon.*;
+
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,8 +27,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
-
-import static player.handlers.HandlerCommon.*;
 
 class Target implements Comparable<Target> {
 	

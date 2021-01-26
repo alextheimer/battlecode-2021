@@ -1,8 +1,10 @@
-package player.handlers;
+package player.handlers.robots;
+
+import static player.handlers.common.HandlerCommon.*;
 
 import battlecode.common.*;
-
-import static player.handlers.HandlerCommon.*;
+import player.handlers.common.HandlerCommon;
+import player.handlers.common.HandlerCommon.IRobotHandler;
 
 public class MuckrakerHandler implements IRobotHandler {
 	

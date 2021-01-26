@@ -1,18 +1,19 @@
-package player.handlers;
+package player.handlers.robots;
 
 import battlecode.common.*;
-import player.util.Flag;
-import player.util.Flag.EnemySightedFlag;
-import player.util.Flag.OpCode;
-import player.util.Flag.PatrolAssignmentFlag;
-import player.util.Util;
-import player.util.UtilMath.DoubleVec2D;
-import player.util.UtilMath.Line2D;
-import player.util.UtilMath;
-
-import static player.handlers.HandlerCommon.*;
+import player.handlers.common.HandlerCommon;
+import player.handlers.common.HandlerCommon.IRobotHandler;
+import player.util.battlecode.Flag;
+import player.util.battlecode.Flag.EnemySightedFlag;
+import player.util.battlecode.Flag.OpCode;
+import player.util.battlecode.Flag.PatrolAssignmentFlag;
+import player.util.general.UtilGeneral;
+import player.util.math.UtilMath;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+
+import static player.handlers.common.HandlerCommon.*;
+
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -51,19 +52,19 @@ public class SlandererHandler implements IRobotHandler {
         if (nearestOpt.isPresent()) {
         	MapLocation enemyLoc = nearestOpt.get().getLocation();
         	Iterator<MapLocation> mapLocIter = HandlerCommon.getAdjacentIterator(rc.getLocation());
-        	Iterator<MapLocation> filteredMapLocIter = Util.streamifyIterator(mapLocIter)
+        	Iterator<MapLocation> filteredMapLocIter = UtilGeneral.streamifyIterator(mapLocIter)
         			.filter(HandlerCommon.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc))).iterator();
         	if (filteredMapLocIter.hasNext()) {
-        		MapLocation moveToLoc = Util.findLeastCostLinear(filteredMapLocIter, mapLoc -> (double)-mapLoc.distanceSquaredTo(enemyLoc));
+        		MapLocation moveToLoc = UtilGeneral.findLeastCostLinear(filteredMapLocIter, mapLoc -> (double)-mapLoc.distanceSquaredTo(enemyLoc));
         		HandlerCommon.attemptMove(rc, rc.getLocation().directionTo(moveToLoc));        		
         	}
         } else {
         	Iterator<MapLocation> mapLocIter = HandlerCommon.getAdjacentIterator(rc.getLocation());
-        	Iterator<MapLocation> filteredMapLocIter = Util.streamifyIterator(mapLocIter)
+        	Iterator<MapLocation> filteredMapLocIter = UtilGeneral.streamifyIterator(mapLocIter)
         			.filter(HandlerCommon.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc))).iterator();
         	if (filteredMapLocIter.hasNext()) {
         		
-        		MapLocation moveToLoc = Util.findLeastCostLinear(filteredMapLocIter, mapLoc -> (double)-mapLoc.distanceSquaredTo(this.origin));
+        		MapLocation moveToLoc = UtilGeneral.findLeastCostLinear(filteredMapLocIter, mapLoc -> (double)-mapLoc.distanceSquaredTo(this.origin));
         		HandlerCommon.attemptMove(rc, rc.getLocation().directionTo(moveToLoc));        		
         	}
         }

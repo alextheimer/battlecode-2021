@@ -1,9 +1,9 @@
-package player.util;
+package player.util.math;
 
 import java.util.Arrays;
-import java.util.Objects;
 
-import player.util.UtilMath.*;
+import player.util.math.UtilMath.*;
+
 import java.lang.Math.*;
 
 /**
@@ -14,158 +14,6 @@ public class UtilMath {
 	public static final double FLOAT_EPS = 1e-5;  // default epsilon for floating-point values
 	public static final int CIRCLE_DEGREES = 360;  // degrees in a circle
 	public static final DoubleVec2D ZERO_VEC = new DoubleVec2D(0.0, 0.0);
-	
-	public static class IntVec2D {
-		
-		public final int x;
-		public final int y;
-	
-		/**
-		 * Immutable struct-like class for storage of 2D integer (x, y) vector.
-		 */
-		public IntVec2D(final int x, final int y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		public IntVec2D add(IntVec2D other) {
-			return new IntVec2D(this.x + other.x, this.y + other.y);
-		}
-		
-		public boolean sameValue(final IntVec2D other) {
-			return (this.x == other.x) && (this.y == other.y);
-		}
-		
-		@Override
-		public boolean equals(final Object other) {
-			return (other instanceof IntVec2D) && (this.sameValue((IntVec2D)other));
-		}
-		
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.x, this.y);
-		}
-		
-		@Override
-		public String toString() {
-			return "(" + this.x + ", " + this.y + ")";
-		}
-	}
-	
-	public static class DoubleVec2D {
-		
-		public final double x;
-		public final double y;
-		
-		/**
-		 * Immutable struct-like class for storage of 2D double (x, y) vector.
-		 */
-		public DoubleVec2D(final double x, final double y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		/**
-		 * Returns a *new instance* with negated dimensions.
-		 */
-		public DoubleVec2D negate() {
-			return new DoubleVec2D(-this.x, -this.y);
-		}
-		
-		/**
-		 * Returns the vector dot product.
-		 */
-		public double dot(DoubleVec2D otherVec) {
-			return ((this.x * otherVec.x) + (this.y * otherVec.y));
-		}
-		
-		/**
-		 * Returns the magnitude of the vector.
-		 */
-		public double magnitude() {
-			return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
-		}
-		
-		/**
-		 * Returns true iff each dimension of this vector is zero (+/- FLOAT_EPS).
-		 * Note that this is faster and more accurate than checking the magnitude().
-		 */
-		public boolean isZero() {
-			return this.equals(ZERO_VEC);
-		}
-		
-		public boolean sameValue(final DoubleVec2D other) {
-			return (Math.abs(this.x - other.x) < FLOAT_EPS) && (Math.abs(this.y - other.y) < FLOAT_EPS);
-		}
-		
-		@Override
-		public boolean equals(final Object other) {
-			return (other instanceof DoubleVec2D) && (this.sameValue((DoubleVec2D)other));
-		}
-		
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.x, this.y);
-		}
-		
-		@Override
-		public String toString() {
-			return "(" + this.x + ", " + this.y + ")";
-		}
-	}
-	
-	public static class Line2D {
-		
-		// Each coefficient of ax + by + c = 0;
-		public final double a;
-		public final double b;
-		public final double c;
-		
-		/**
-		 * Immutable struct-like class for the storage of the coefficients in:
-		 *     ax + by + c = 0
-		 * (i.e. the equation of a line).
-		 * 
-		 * @throws RuntimeException if the arguments do not define a line.
-		 */
-		public Line2D(double a, double b, double c) {
-			if (doubleEquals(0.0, a) && doubleEquals(0.0, b)) {
-				throw new RuntimeException(String.format("arguments do not define a line: a:%f b:%f c:%f", a, b, b));
-			}
-			
-			this.a = a;
-			this.b = b;
-			this.c = c;
-		}
-		
-		/**
-		 * See {@link Line2D#Line2D(double, double, double)}
-		 * 
-		 * @param parallelTo the instantiated line will run parallel to this vector.
-		 *     Must have positive magnitude.
-		 * @param onLine any point on the line
-		 */
-		public Line2D(DoubleVec2D parallelTo, DoubleVec2D onLine) {
-			assert !parallelTo.isZero() : "parallelTo must have positive magnitude: " + parallelTo;
-			
-			// the below assignments follow from solving: y = mx + b
-			if (doubleEquals(0.0, parallelTo.x)) {
-				// prevents division by zero; parallelTo is vertical.
-				this.a = 1.0;
-				this.b = 0.0;
-				this.c = -onLine.x;
-			} else {
-				this.a = -(parallelTo.y / parallelTo.x);
-				this.b = 1;
-				this.c = (parallelTo.y * onLine.x / parallelTo.x) - onLine.y;
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return "(a:" + this.a + ", b:" + this.b + ", c:" + this.c + ")";
-		}
-	}
 	
 	/**
 	 * Returns the minimum distance between a coordinate and a line on the Euclidian plane.
@@ -287,7 +135,7 @@ public class UtilMath {
 	 * Example:
 	 * 
 	 *   L1                 L2                  L3
-	 * -----< >----------------------------> <------
+	 * -----< >---------------------------> <-------
 	 * |-----|-----------------------------|-------|
 	 * 0  valFrom                        valTo    mod
 	 * 

@@ -1,6 +1,7 @@
 package util;
 
 import static org.junit.Assert.*;
+import static player.util.math.UtilMath.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,8 +16,8 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 
+import player.util.math.IntVec2D;
 import player.util.search.AStar;
-import static player.util.UtilMath.*;
 
 public class SearchTest {
 

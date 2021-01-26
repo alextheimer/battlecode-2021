@@ -2,13 +2,11 @@ package util;
 
 import static org.junit.Assert.*;
 
-import player.util.Flag;
-import player.util.Flag.*;
-import player.util.UtilMath.IntVec2D;
-
 import org.junit.Test;
 
-import player.handlers.HandlerCommon.*;
+import player.handlers.common.HandlerCommon.*;
+import player.util.battlecode.Flag;
+import player.util.battlecode.Flag.*;
 
 public class FlagTest {
 	

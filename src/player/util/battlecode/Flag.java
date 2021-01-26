@@ -1,4 +1,4 @@
-package player.util;
+package player.util.battlecode;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
@@ -9,10 +9,12 @@ import java.util.Set;
 
 import battlecode.common.Direction;
 import battlecode.common.RobotType;
-import player.handlers.HandlerCommon.*;
-import player.util.Util.*;
-import player.util.FlagFields.*;
-import player.util.UtilMath.*;
+import player.util.math.IntVec2D;
+import player.util.math.UtilMath;
+import player.util.math.UtilMath.*;
+import player.handlers.common.HandlerCommon.*;
+import player.util.battlecode.FlagFields.*;
+import player.util.general.UtilGeneral.*;
 
 /**
  * Sequentially builds / reads (i.e. "walk") a flag.
