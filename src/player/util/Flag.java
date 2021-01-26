@@ -202,7 +202,7 @@ class FlagFields {
 	}
 	
 	public static class SquadTypeField {
-		public static final int NUM_BITS = UtilMath.numBits(AssignmentType.values().length);
+		public static final int NUM_BITS = UtilMath.log2Ceil(AssignmentType.values().length);
 		
 		private AssignmentType squadType;
 		
@@ -226,7 +226,7 @@ class FlagFields {
 	}
 	
 	public static class RobotTypeField {
-		public static final int NUM_BITS = UtilMath.numBits(RobotType.values().length);
+		public static final int NUM_BITS = UtilMath.log2Ceil(RobotType.values().length);
 		
 		private RobotType robotType;
 		
@@ -286,7 +286,7 @@ public class Flag {
 	}
 	
 	private static OpCode opCodeValues[] = OpCode.values();
-	private static int numOpCodeBits = UtilMath.numBits(opCodeValues.length);
+	private static int numOpCodeBits = UtilMath.log2Ceil(opCodeValues.length);
 	
 	public static OpCode getOpCode(int rawFlag) {
 		FlagWalker flagWalker = new FlagWalker(rawFlag);
