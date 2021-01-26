@@ -107,8 +107,8 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
     private int incrementDegrees() {
     	int nextDegrees = this.nextDegrees;
     	this.nextDegrees += 90;
-    	if (this.nextDegrees >= UtilMath.MAX_DEGREES) {
-    		this.nextDegrees -= UtilMath.MAX_DEGREES;
+    	if (this.nextDegrees >= UtilMath.CIRCLE_DEGREES) {
+    		this.nextDegrees -= UtilMath.CIRCLE_DEGREES;
     		this.nextDegrees += DEGREES_DELTA;
     	}
     	return nextDegrees;

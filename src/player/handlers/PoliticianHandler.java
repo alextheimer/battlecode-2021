@@ -84,7 +84,7 @@ public class PoliticianHandler implements IRobotHandler {
 		
 		private IAssignmentHandler makeDefaultHandler(RobotController rc) {
 			Random rand = new Random();
-			int degrees = rand.nextInt(UtilMath.MAX_DEGREES);
+			int degrees = rand.nextInt(UtilMath.CIRCLE_DEGREES);
 			MapLocation mapLoc = rc.getLocation();
 			DoubleVec2D vec = UtilMath.degreesToVec(degrees);
 			DoubleVec2D currCoord = new DoubleVec2D(mapLoc.x, mapLoc.y);

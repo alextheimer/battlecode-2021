@@ -6,68 +6,95 @@ import java.util.Objects;
 import player.util.UtilMath.*;
 import java.lang.Math.*;
 
+/**
+ * Stores math-related classes/functions.
+ */
 public class UtilMath {
-	public static final double FLOAT_EPS = 1e-5;
-	public static final int MAX_DEGREES = 360;
 	
-	/**
-	 * Immutable struct-like class for storage of 2D integer (x, y) vector.
-	 */
+	public static final double FLOAT_EPS = 1e-5;  // default epsilon for floating-point values
+	public static final int CIRCLE_DEGREES = 360;  // degrees in a circle
+	
 	public static class IntVec2D {
-		public final int x, y;
+		
+		public final int x;
+		public final int y;
+	
+		/**
+		 * Immutable struct-like class for storage of 2D integer (x, y) vector.
+		 */
 		public IntVec2D(final int x, final int y) {
 			this.x = x;
 			this.y = y;
 		}
+		
 		public IntVec2D add(IntVec2D other) {
 			return new IntVec2D(this.x + other.x, this.y + other.y);
 		}
+		
 		public boolean sameValue(final IntVec2D other) {
 			return (this.x == other.x) && (this.y == other.y);
 		}
+		
 		@Override
 		public boolean equals(final Object other) {
 			return (other instanceof IntVec2D) && (this.sameValue((IntVec2D)other));
 		}
+		
 		@Override
 		public int hashCode() {
 			return Objects.hash(this.x, this.y);
 		}
+		
 		@Override
 		public String toString() {
 			return "(" + this.x + ", " + this.y + ")";
 		}
 	}
 	
-	/**
-	 * Immutable struct-like class for storage of 2D double (x, y) vector.
-	 */
 	public static class DoubleVec2D {
-		public final double x, y;
+		
+		public final double x;
+		public final double y;
+		
+		/**
+		 * Immutable struct-like class for storage of 2D double (x, y) vector.
+		 */
 		public DoubleVec2D(final double x, final double y) {
 			this.x = x;
 			this.y = y;
 		}
+		
+		/**
+		 * Returns a *new instance* with negated dimensions.
+		 */
+		public DoubleVec2D negate() {
+			return new DoubleVec2D(-this.x, -this.y);
+		}
+		
+		/**
+		 * Returns the vector dot product.
+		 */
 		public double dot(DoubleVec2D otherVec) {
 			return ((this.x * otherVec.x) + (this.y * otherVec.y));
 		}
+		
 		public boolean sameValue(final DoubleVec2D other) {
 			return (Math.abs(this.x - other.x) < FLOAT_EPS) && (Math.abs(this.y - other.y) < FLOAT_EPS);
 		}
+		
 		@Override
 		public boolean equals(final Object other) {
 			return (other instanceof DoubleVec2D) && (this.sameValue((DoubleVec2D)other));
 		}
+		
 		@Override
 		public int hashCode() {
 			return Objects.hash(this.x, this.y);
 		}
+		
 		@Override
 		public String toString() {
 			return "(" + this.x + ", " + this.y + ")";
-		}
-		public DoubleVec2D negate() {
-			return new DoubleVec2D(-this.x, -this.y);
 		}
 	}
 	
