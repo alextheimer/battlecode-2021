@@ -1,11 +1,13 @@
 package player.handlers.robots;
 
 import battlecode.common.*;
+import player.RobotPlayer;
+import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
-import player.handlers.common.HandlerCommon.AssignmentType;
-import player.handlers.common.HandlerCommon.IRobotHandler;
 import player.util.battlecode.Flag;
 import player.util.battlecode.Flag.*;
+import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.UtilBattlecode.AssignmentType;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
@@ -61,14 +63,14 @@ class Target implements Comparable<Target> {
 
 class Blueprint {
 	public RobotType robotType;
-	public AssignmentType assignmentType;
-	public Blueprint(RobotType robotType, AssignmentType assignmentType) {
+	public UtilBattlecode.AssignmentType assignmentType;
+	public Blueprint(RobotType robotType, UtilBattlecode.AssignmentType assignmentType) {
 		this.robotType = robotType;
 		this.assignmentType = assignmentType;
 	}
 }
 
-public class EnlightenmentCenterHandler implements IRobotHandler {
+public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 	
 	private static final int FLAG_COOLDOWN_START = 1;
 	private static final int DEGREES_DELTA = 5;
@@ -84,7 +86,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
     private boolean attemptBuild(RobotController rc, Blueprint blueprint, IFlag assignmentFlag) throws GameActionException {
     	final int influence = rc.getInfluence() - 1;
     	boolean buildSuccess = false;
-    	for (Direction dir : HandlerCommon.directions) {
+    	for (Direction dir : UtilBattlecode.OFF_CENTER_DIRECTIONS) {
     		if (rc.canBuildRobot(blueprint.robotType, dir, influence)) {
     			rc.buildRobot(blueprint.robotType, dir, influence);
     			rc.setFlag(assignmentFlag.encode());
@@ -99,7 +101,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
     }
     
     private Blueprint makeBlueprint(Target target) {
-    	return new Blueprint(RobotType.POLITICIAN, AssignmentType.ATTACK_TARGET);
+    	return new Blueprint(RobotType.POLITICIAN, UtilBattlecode.AssignmentType.ATTACK_TARGET);
     }
     
     private boolean targetFilter(Target target, RobotController rc) {
@@ -117,7 +119,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
     }
     
 	@Override
-	public IRobotHandler handle(RobotController rc) throws GameActionException {
+	public RobotPlayer.IRobotHandler handle(RobotController rc) throws GameActionException {
 
 		if (this.flagCooldown > 0) {
 			// just built something; still need to keep its assignment flag up
@@ -177,7 +179,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 		
 		// select Target / Blueprint, build / deplay
 		if (this.buildNum % 2 == 1) {
-			if (this.attemptBuild(rc, new Blueprint(RobotType.SLANDERER, AssignmentType.PATROL), new PatrolAssignmentFlag(this.nextDegrees))) {
+			if (this.attemptBuild(rc, new Blueprint(RobotType.SLANDERER, UtilBattlecode.AssignmentType.PATROL), new PatrolAssignmentFlag(this.nextDegrees))) {
 				this.incrementDegrees();
 			}
 		}
@@ -189,7 +191,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 			Flag.AttackAssignmentFlag flag = new Flag.AttackAssignmentFlag(offset.x, offset.y);
 			this.attemptBuild(rc, blueprint, flag);
 		} else {
-			Blueprint blueprint = new Blueprint(RobotType.POLITICIAN, AssignmentType.PATROL);
+			Blueprint blueprint = new Blueprint(RobotType.POLITICIAN, UtilBattlecode.AssignmentType.PATROL);
 			Flag.PatrolAssignmentFlag flag = new Flag.PatrolAssignmentFlag(this.nextDegrees);
 			if (this.attemptBuild(rc, blueprint, flag)) {
 				this.incrementDegrees();

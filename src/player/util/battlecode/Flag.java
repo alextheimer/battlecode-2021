@@ -204,11 +204,11 @@ class FlagFields {
 	}
 	
 	public static class SquadTypeField {
-		public static final int NUM_BITS = UtilMath.log2Ceil(AssignmentType.values().length);
+		public static final int NUM_BITS = UtilMath.log2Ceil(UtilBattlecode.AssignmentType.values().length);
 		
-		private AssignmentType squadType;
+		private UtilBattlecode.AssignmentType squadType;
 		
-		public SquadTypeField(AssignmentType squadType) {
+		public SquadTypeField(UtilBattlecode.AssignmentType squadType) {
 			// TODO(theimer): assertions
 			this.squadType = squadType;
 		}
@@ -219,10 +219,10 @@ class FlagFields {
 		
 		public static SquadTypeField fromBits(int bits) {
 			// TODO(theimer): !!!!!!!!!!
-			return new SquadTypeField(AssignmentType.values()[bits]);
+			return new SquadTypeField(UtilBattlecode.AssignmentType.values()[bits]);
 		}
 		
-		public AssignmentType value() {
+		public UtilBattlecode.AssignmentType value() {
 			return this.squadType;
 		}
 	}

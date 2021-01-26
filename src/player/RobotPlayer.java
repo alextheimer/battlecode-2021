@@ -15,9 +15,13 @@ import player.handlers.robots.SlandererHandler;
 
 public strictfp class RobotPlayer {
 	
+	public interface IRobotHandler {
+		public IRobotHandler handle(RobotController rc) throws GameActionException;
+	}
+
 	private static final boolean RESIGN_ON_EXCEPTION = true;
 	
-	private static Map<RobotType, Supplier<IRobotHandler>> mapThing = new HashMap<>();
+	private static Map<RobotType, Supplier<RobotPlayer.IRobotHandler>> mapThing = new HashMap<>();
 	static {
 		mapThing.put(RobotType.POLITICIAN, () -> new PoliticianHandler());
 		mapThing.put(RobotType.MUCKRAKER, () -> new MuckrakerHandler());
@@ -37,7 +41,7 @@ public strictfp class RobotPlayer {
     	
     	RobotType currentType = rc.getType();
     	
-    	IRobotHandler typeHandler;
+    	RobotPlayer.IRobotHandler typeHandler;
     	
 //    	try {
     		typeHandler = mapThing.get(currentType).get();

@@ -14,6 +14,7 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import player.util.battlecode.UtilBattlecode;
 import player.util.general.UtilGeneral;
 import player.util.math.DoubleVec2D;
 import player.util.math.Line2D;
@@ -41,10 +42,10 @@ public class LinearMoverHandler {
 	}
 	
 	private Set<MapLocation> getProgressMapLocs(MapLocation mapLoc, RobotController rc) throws GameActionException {
-		Iterator<MapLocation> adjacentMapLocIterator = HandlerCommon.getAdjacentIterator(mapLoc);
+		Iterator<MapLocation> adjacentMapLocIterator = UtilBattlecode.makeAdjacentMapLocIterator(mapLoc);
 		Stream<MapLocation> mapLocStream = UtilGeneral.streamifyIterator(adjacentMapLocIterator);
 		
-		Predicate<MapLocation> pred =  HandlerCommon.<MapLocation>wrapGameActionPredicate(ll -> rc.onTheMap(ll));
+		Predicate<MapLocation> pred =  UtilBattlecode.<MapLocation>wrapGameActionPredicate(ll -> rc.onTheMap(ll));
 		
 		return UtilGeneral.legalSetCollect(mapLocStream.filter(loc -> (
 					// close enough to the path line?
@@ -58,7 +59,7 @@ public class LinearMoverHandler {
 	
 	private Optional<MapLocation> greedyNextLocation(Collection<MapLocation> progressMapLocs, RobotController rc) throws GameActionException {
 	    assert !progressMapLocs.isEmpty() : "TODO";
-		Predicate<MapLocation> pred = HandlerCommon.<MapLocation>wrapGameActionPredicate(ll -> !rc.isLocationOccupied(ll));
+		Predicate<MapLocation> pred = UtilBattlecode.<MapLocation>wrapGameActionPredicate(ll -> !rc.isLocationOccupied(ll));
 		Set<MapLocation> mapLocsUnoccupied = UtilGeneral.legalSetCollect(progressMapLocs.stream().filter(pred));
 		MapLocation startLoc = rc.getLocation();
 		Function<MapLocation, Double> costFunc = new Function<MapLocation, Double>() {

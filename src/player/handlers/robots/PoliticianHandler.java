@@ -1,9 +1,10 @@
 package player.handlers.robots;
 
 import battlecode.common.*;
+import player.RobotPlayer;
+import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.handlers.common.LinearMoverHandler;
-import player.handlers.common.HandlerCommon.IRobotHandler;
 import player.util.battlecode.Flag;
 import player.util.battlecode.Flag.AttackAssignmentFlag;
 import player.util.battlecode.Flag.EnemySightedFlag;
@@ -11,6 +12,7 @@ import player.util.battlecode.Flag.FollowerClaimFlag;
 import player.util.battlecode.Flag.OpCode;
 import player.util.battlecode.Flag.PatrolAssignmentFlag;
 import player.util.battlecode.Flag.TargetMissingFlag;
+import player.util.battlecode.UtilBattlecode;
 import player.util.general.UtilGeneral;
 import player.util.math.DoubleVec2D;
 import player.util.math.IntVec2D;
@@ -38,7 +40,7 @@ interface IAssignmentHandler {
 	public IAssignmentHandler handle(RobotController rc) throws GameActionException;
 }
 
-public class PoliticianHandler implements IRobotHandler {
+public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 	
 	IAssignmentHandler assignmentHandler = new UnassignedAssignmentHandler();
 	
@@ -47,7 +49,7 @@ public class PoliticianHandler implements IRobotHandler {
 		private Optional<Integer> findAssignmentFlag(RobotController rc) throws GameActionException {
 			Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOpt = HandlerCommon.findFirstMatchingTeamFlag(
 					rc,
-					rc.senseNearbyRobots(HandlerCommon.MAX_DIST_SQUARED_ADJACENT, rc.getTeam()),
+					rc.senseNearbyRobots(2, rc.getTeam()),  // TODO(theimer): constant!
 					(robotInfo, rawFlag) -> ((Flag.getOpCode(rawFlag) == OpCode.ASSIGN_PATROL) || (Flag.getOpCode(rawFlag) == OpCode.ASSIGN_ATTACK))
 			);
 			if (entryOpt.isPresent()) {
@@ -133,7 +135,7 @@ public class PoliticianHandler implements IRobotHandler {
 		
 		@Override
 		public IAssignmentHandler handle(RobotController rc) throws GameActionException {
-			final int mask = (2 * HandlerCommon.MAX_WORLD_WIDTH) - 1;
+			final int mask = (2 * UtilBattlecode.MAX_WORLD_WIDTH) - 1;
 			Optional<RobotInfo> calloutOpt = PoliticianHandler.this.senseHighestPriorityNonTeammate(rc);
 			if (calloutOpt.isPresent() && rc.canSetFlag(Flag.EMPTY_FLAG)) {
 				RobotInfo robotInfo = calloutOpt.get();
@@ -260,12 +262,12 @@ public class PoliticianHandler implements IRobotHandler {
 	}
 	
 	private boolean attemptMoveCloser(RobotController rc, MapLocation targetLoc) throws GameActionException {
-		Iterator<MapLocation> adjacentIterator = HandlerCommon.getAdjacentIterator(rc.getLocation());
+		Iterator<MapLocation> adjacentIterator = UtilBattlecode.makeAdjacentMapLocIterator(rc.getLocation());
 		int currDistSquared = targetLoc.distanceSquaredTo(rc.getLocation());
 		Function<MapLocation, Double> costFunc = wrapGameActionFunctionEmergency(mapLoc -> -rc.sensePassability(mapLoc)*100000 + mapLoc.distanceSquaredTo(targetLoc));
 		Stream<MapLocation> filteredStream = UtilGeneral.streamifyIterator(adjacentIterator)
 			.filter(mapLoc -> mapLoc.distanceSquaredTo(targetLoc) < currDistSquared)
-			.filter(HandlerCommon.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc)));
+			.filter(UtilBattlecode.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc)));
 		Iterator<MapLocation> streamIterator = filteredStream.iterator();
 		if (streamIterator.hasNext()) {
 			MapLocation moveTo = UtilGeneral.findLeastCostLinear(streamIterator, costFunc);
@@ -280,7 +282,7 @@ public class PoliticianHandler implements IRobotHandler {
 	
 	
 	@Override
-	public IRobotHandler handle(RobotController rc) throws GameActionException {
+	public RobotPlayer.IRobotHandler handle(RobotController rc) throws GameActionException {
 		this.assignmentHandler = this.assignmentHandler.handle(rc);
 		return this;
 	}
