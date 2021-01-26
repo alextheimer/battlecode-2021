@@ -77,6 +77,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 	private Set<Target> addedTargets = new HashSet<>();
 	private int nextDegrees = DEGREES_START;
 	private Set<Integer> idSet = new HashSet<>();
+	private int buildNum = 0;
 	
     private boolean attemptBuild(RobotController rc, Blueprint blueprint, IFlag assignmentFlag) throws GameActionException {
     	final int influence = rc.getInfluence() - 1;
@@ -87,6 +88,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
     			rc.setFlag(assignmentFlag.encode());
     			this.flagCooldown = FLAG_COOLDOWN_START;
     			buildSuccess = true;
+    			buildNum++;
     			break;
     		}
     	}
@@ -172,7 +174,12 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 		}
 		
 		// select Target / Blueprint, build / deplay
-		if (this.targetQueue.size() > 0) {
+		if (this.buildNum % 2 == 1) {
+			if (this.attemptBuild(rc, new Blueprint(RobotType.SLANDERER, AssignmentType.PATROL), new PatrolAssignmentFlag(this.nextDegrees))) {
+				this.incrementDegrees();
+			}
+		}
+		else if (this.targetQueue.size() > 0) {
 			System.out.println("HAS TARGET");
 			Target target = this.targetQueue.peek();
 			Blueprint blueprint = this.makeBlueprint(target);
