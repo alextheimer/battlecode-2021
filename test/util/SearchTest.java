@@ -132,7 +132,7 @@ public class SearchTest {
 		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, allFilter);
 		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
 		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec2D> result = AStar.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final List<IntVec2D> result = AStar.aStarSearch(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
 		assertEquals(
 		    String.format(
@@ -161,7 +161,7 @@ public class SearchTest {
 		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, upRightFilter);
 		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
 		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec2D> result = AStar.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final List<IntVec2D> result = AStar.aStarSearch(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
 		assertEquals(
 		    String.format(
@@ -190,7 +190,7 @@ public class SearchTest {
 		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, lineObstacleFilter);
 		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
 		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec2D> result = AStar.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final List<IntVec2D> result = AStar.aStarSearch(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertEquals(result, Collections.emptyList());  // TODO(theimer): messages
 	}
 
@@ -211,7 +211,7 @@ public class SearchTest {
 		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, allFilter);
 		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
 		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec2D> result = AStar.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final List<IntVec2D> result = AStar.aStarSearch(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertEquals(startCoord, goalCoord);  // sanity check
 		assertEquals(result, Arrays.asList(startCoord));
 	}
@@ -234,7 +234,7 @@ public class SearchTest {
 		final Function<IntVec2D, Set<IntVec2D>> expand = makeExpandFunc(xMin, xMax, yMin, yMax, edgeFilter);
 		final BiFunction<IntVec2D, IntVec2D, Double> cost = SearchTest::cost;
 		final Function<IntVec2D, Double> heuristic = makeHeuristicFunc(goalCoord);
-		final List<IntVec2D> result = AStar.aStar(startCoord, isEndgameCheck, expand, cost, heuristic);
+		final List<IntVec2D> result = AStar.aStarSearch(startCoord, isEndgameCheck, expand, cost, heuristic);
 		assertTrue(result.size() > 1);
 		assertEquals(
 		    String.format(
