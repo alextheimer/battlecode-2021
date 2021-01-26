@@ -79,7 +79,7 @@ public class EnlightenmentCenterHandler implements IRobotHandler {
 	private Set<Integer> idSet = new HashSet<>();
 	
     private boolean attemptBuild(RobotController rc, Blueprint blueprint, IFlag assignmentFlag) throws GameActionException {
-    	final int influence = 50;
+    	final int influence = rc.getInfluence() - 1;
     	boolean buildSuccess = false;
     	for (Direction dir : HandlerCommon.directions) {
     		if (rc.canBuildRobot(blueprint.robotType, dir, influence)) {
