@@ -267,7 +267,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		Function<MapLocation, Double> costFunc = wrapGameActionFunctionEmergency(mapLoc -> -rc.sensePassability(mapLoc)*100000 + mapLoc.distanceSquaredTo(targetLoc));
 		Stream<MapLocation> filteredStream = UtilGeneral.streamifyIterator(adjacentIterator)
 			.filter(mapLoc -> mapLoc.distanceSquaredTo(targetLoc) < currDistSquared)
-			.filter(UtilBattlecode.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc)));
+			.filter(UtilBattlecode.silenceGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc)));
 		Iterator<MapLocation> streamIterator = filteredStream.iterator();
 		if (streamIterator.hasNext()) {
 			MapLocation moveTo = UtilGeneral.findLeastCostLinear(streamIterator, costFunc);

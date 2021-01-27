@@ -55,7 +55,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
         	MapLocation enemyLoc = nearestOpt.get().getLocation();
         	Iterator<MapLocation> mapLocIter = UtilBattlecode.makeAdjacentMapLocIterator(rc.getLocation());
         	Iterator<MapLocation> filteredMapLocIter = UtilGeneral.streamifyIterator(mapLocIter)
-        			.filter(UtilBattlecode.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc))).iterator();
+        			.filter(UtilBattlecode.silenceGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc))).iterator();
         	if (filteredMapLocIter.hasNext()) {
         		MapLocation moveToLoc = UtilGeneral.findLeastCostLinear(filteredMapLocIter, mapLoc -> (double)-mapLoc.distanceSquaredTo(enemyLoc));
         		HandlerCommon.attemptMove(rc, rc.getLocation().directionTo(moveToLoc));        		
@@ -63,7 +63,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
         } else {
         	Iterator<MapLocation> mapLocIter = UtilBattlecode.makeAdjacentMapLocIterator(rc.getLocation());
         	Iterator<MapLocation> filteredMapLocIter = UtilGeneral.streamifyIterator(mapLocIter)
-        			.filter(UtilBattlecode.wrapGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc))).iterator();
+        			.filter(UtilBattlecode.silenceGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc))).iterator();
         	if (filteredMapLocIter.hasNext()) {
         		
         		MapLocation moveToLoc = UtilGeneral.findLeastCostLinear(filteredMapLocIter, mapLoc -> (double)-mapLoc.distanceSquaredTo(this.origin));
