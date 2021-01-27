@@ -1,36 +1,39 @@
 package player.util.battlecode.flag.types;
 
+import java.util.Arrays;
+import java.util.List;
+
 import player.util.battlecode.flag.fields.CoordField;
 import player.util.battlecode.flag.fields.DegreesField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.IFlag;
+import player.util.battlecode.flag.util.UtilFlag.IFlagField;
+import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
 import player.util.battlecode.flag.util.UtilFlag.OpCode;
 import player.util.math.IntVec2D;
 
-public class AttackAssignmentFlag implements UtilFlag.IFlag {
+public class AttackAssignmentFlag extends BaseFlag {
+	
+	private static OpCode opCode = OpCode.ASSIGN_ATTACK;
+	
+	private static List<IFlagFieldFactory> fieldFactories = Arrays.asList(
+			CoordField.getFactory()
+	);
+	
 	private CoordField coord;
 	
 	public AttackAssignmentFlag(int x, int y) {
 		this.coord = new CoordField(x, y);
 	}
 	
-	private AttackAssignmentFlag(CoordField coord) {
-		this.coord = coord;
+	private AttackAssignmentFlag(List<IFlagField> flagFields) {
+		this.coord = (CoordField)flagFields.get(0);
 	}
 	
 	public static AttackAssignmentFlag decode(int rawFlag) {
-		FlagWalker flagWalker = new FlagWalker(rawFlag);
-		flagWalker.readBits(UtilFlag.numOpCodeBits);
-		int coordBits = flagWalker.readBits(CoordField.NUM_BITS);
-		CoordField coord = CoordField.fromBits(coordBits);
-		return new AttackAssignmentFlag(coord);	
-	}
-	public int encode() {
-		FlagWalker flagWalker = new FlagWalker(UtilFlag.EMPTY_FLAG);
-		flagWalker.writeBits(UtilFlag.numOpCodeBits, UtilFlag.OpCode.ASSIGN_ATTACK.ordinal());
-		flagWalker.writeBits(DegreesField.NUM_BITS, this.coord.toBits());
-		return flagWalker.getAllBits();
+		List<IFlagField> fields = BaseFlag.decodeFields(rawFlag, fieldFactories);
+		return new AttackAssignmentFlag(fields);
 	}
 	
 	public IntVec2D getCoord() {
@@ -39,6 +42,11 @@ public class AttackAssignmentFlag implements UtilFlag.IFlag {
 
 	@Override
 	public UtilFlag.OpCode getOpCode() {
-		return UtilFlag.OpCode.ASSIGN_ATTACK;
+		return opCode;
+	}
+
+	@Override
+	protected List<IFlagField> getOrderedFlagFieldList() {
+		return Arrays.asList(this.coord);
 	}
 }

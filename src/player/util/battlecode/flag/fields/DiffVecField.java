@@ -1,9 +1,11 @@
 package player.util.battlecode.flag.fields;
 
 import player.util.battlecode.flag.util.FlagWalker;
+import player.util.battlecode.flag.util.UtilFlag.IFlagField;
+import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
 import player.util.math.IntVec2D;
 
-public class DiffVecField {
+public class DiffVecField implements IFlagField {
 	public static final int NUM_BITS = 8;
 	
 	private static final int numBitsPerDim = 4;
@@ -16,13 +18,6 @@ public class DiffVecField {
 		this.vec = new IntVec2D(x, y);
 	}
 	
-	public int toBits() {
-		FlagWalker flagWalker = new FlagWalker(0);
-		flagWalker.writeBits(numBitsPerDim, this.vec.x + offset);
-		flagWalker.writeBits(numBitsPerDim, this.vec.y + offset);
-		return flagWalker.getAllBits();
-	}
-	
 	public static DiffVecField fromBits(int bits) {
 		FlagWalker flagWalker = new FlagWalker(bits);
 		int x = flagWalker.readBits(numBitsPerDim) - offset;
@@ -32,5 +27,34 @@ public class DiffVecField {
 	
 	public IntVec2D value() {
 		return this.vec;
+	}
+
+	@Override
+	public int encode() {
+		FlagWalker flagWalker = new FlagWalker(0);
+		flagWalker.writeBits(numBitsPerDim, this.vec.x + offset);
+		flagWalker.writeBits(numBitsPerDim, this.vec.y + offset);
+		return flagWalker.getAllBits();
+	}
+
+	@Override
+	public int numBits() {
+		return NUM_BITS;
+	}
+	
+	public static IFlagFieldFactory getFactory() {
+		return new IFlagFieldFactory() {
+
+			@Override
+			public IFlagField decode(int bits) {
+				return DiffVecField.fromBits(bits);
+			}
+
+			@Override
+			public int numBits() {
+				return NUM_BITS;
+			}
+			
+		};
 	}
 }

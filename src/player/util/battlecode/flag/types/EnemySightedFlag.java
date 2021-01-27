@@ -1,15 +1,30 @@
 package player.util.battlecode.flag.types;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.BaseStream;
+
 import battlecode.common.RobotType;
 import player.util.battlecode.flag.fields.CoordField;
 import player.util.battlecode.flag.fields.RobotTypeField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.IFlag;
+import player.util.battlecode.flag.util.UtilFlag.IFlagField;
+import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
 import player.util.battlecode.flag.util.UtilFlag.OpCode;
 import player.util.math.IntVec2D;
 
-public class EnemySightedFlag implements UtilFlag.IFlag {
+public class EnemySightedFlag extends BaseFlag {
+	
+	public static OpCode opCode = OpCode.ENEMY_SIGHTED;
+	public static List<IFlagFieldFactory> fieldFactories = Arrays.asList(
+			RobotTypeField.getFactory(),
+			CoordField.getFactory()
+	);
+	
+	private static enum Field { RobotType, Coord }
+	
 	private RobotTypeField robotType;
 	private CoordField coord;
 	
@@ -18,26 +33,9 @@ public class EnemySightedFlag implements UtilFlag.IFlag {
 		this.coord = new CoordField(x, y);
 	}
 	
-	private EnemySightedFlag(RobotTypeField robotType, CoordField coordField) {
-		this.robotType = robotType;
-		this.coord = coordField;
-	}
-	
-	public static EnemySightedFlag decode(int rawFlag) {
-		FlagWalker flagWalker = new FlagWalker(rawFlag);
-		flagWalker.readBits(UtilFlag.numOpCodeBits);
-		int robotTypeBits = flagWalker.readBits(RobotTypeField.NUM_BITS);
-		int coordBits = flagWalker.readBits(CoordField.NUM_BITS);
-		RobotTypeField robotType = RobotTypeField.fromBits(robotTypeBits);
-		CoordField coord = CoordField.fromBits(coordBits);
-		return new EnemySightedFlag(robotType, coord);	
-	}
-	public int encode() {
-		FlagWalker flagWalker = new FlagWalker(UtilFlag.EMPTY_FLAG);
-		flagWalker.writeBits(UtilFlag.numOpCodeBits, UtilFlag.OpCode.ENEMY_SIGHTED.ordinal());
-		flagWalker.writeBits(RobotTypeField.NUM_BITS, this.robotType.toBits());
-		flagWalker.writeBits(CoordField.NUM_BITS, this.coord.toBits());
-		return flagWalker.getAllBits();
+	private EnemySightedFlag(List<IFlagField> fieldList) {
+		this.robotType = (RobotTypeField)fieldList.get(Field.RobotType.ordinal());
+		this.coord = (CoordField)fieldList.get(Field.Coord.ordinal());
 	}
 	
 	public IntVec2D getCoord() {
@@ -49,7 +47,17 @@ public class EnemySightedFlag implements UtilFlag.IFlag {
 	}
 
 	@Override
-	public UtilFlag.OpCode getOpCode() {
-		return UtilFlag.OpCode.ENEMY_SIGHTED;
+	protected List<IFlagField> getOrderedFlagFieldList() {
+		return Arrays.asList(this.robotType, this.coord);
+	}
+	
+	public static EnemySightedFlag decode(int rawFlag) {
+		List<IFlagField> fields = BaseFlag.decodeFields(rawFlag, EnemySightedFlag.fieldFactories);
+		return new EnemySightedFlag(fields);	
+	}
+
+	@Override
+	public OpCode getOpCode() {
+		return opCode;
 	}
 }
