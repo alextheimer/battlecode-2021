@@ -5,8 +5,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import player.handlers.common.HandlerCommon.*;
-import player.util.battlecode.flag.Flag;
-import player.util.battlecode.flag.Flag.*;
 
 public class FlagTest {
 	

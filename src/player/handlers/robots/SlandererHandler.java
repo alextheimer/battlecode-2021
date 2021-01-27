@@ -5,10 +5,10 @@ import player.RobotPlayer;
 import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.util.battlecode.UtilBattlecode;
-import player.util.battlecode.flag.Flag;
-import player.util.battlecode.flag.Flag.EnemySightedFlag;
-import player.util.battlecode.flag.Flag.OpCode;
-import player.util.battlecode.flag.Flag.PatrolAssignmentFlag;
+import player.util.battlecode.flag.types.EnemySightedFlag;
+import player.util.battlecode.flag.types.PatrolAssignmentFlag;
+import player.util.battlecode.flag.util.UtilFlag;
+import player.util.battlecode.flag.util.UtilFlag.OpCode;
 import player.util.general.UtilGeneral;
 import player.util.math.UtilMath;
 
@@ -28,7 +28,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
 	
 	private Optional<PatrolAssignmentFlag> findAssignmentFlag(RobotController rc) throws GameActionException {
 		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entry = HandlerCommon.findFirstMatchingTeamFlag(rc, rc.senseNearbyRobots(), 
-				(robotInfo, rawFlag) -> Flag.getOpCode(rawFlag) == OpCode.ASSIGN_PATROL);
+				(robotInfo, rawFlag) -> UtilFlag.getOpCode(rawFlag) == UtilFlag.OpCode.ASSIGN_PATROL);
 		return entry.isPresent() ? Optional.of(PatrolAssignmentFlag.decode(entry.get().getValue())) : Optional.empty();
 	}
 	

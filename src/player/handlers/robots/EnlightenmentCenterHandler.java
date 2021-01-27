@@ -5,8 +5,11 @@ import player.RobotPlayer;
 import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.util.battlecode.UtilBattlecode;
-import player.util.battlecode.flag.Flag;
-import player.util.battlecode.flag.Flag.*;
+import player.util.battlecode.flag.types.AttackAssignmentFlag;
+import player.util.battlecode.flag.types.EnemySightedFlag;
+import player.util.battlecode.flag.types.PatrolAssignmentFlag;
+import player.util.battlecode.flag.types.TargetMissingFlag;
+import player.util.battlecode.flag.util.UtilFlag;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
@@ -87,7 +90,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 	private Set<Integer> idSet = new HashSet<>();
 	private int buildNum = 0;
 	
-    private boolean attemptBuild(RobotController rc, Blueprint blueprint, IFlag assignmentFlag) throws GameActionException {
+    private boolean attemptBuild(RobotController rc, Blueprint blueprint, UtilFlag.IFlag assignmentFlag) throws GameActionException {
     	final int influence = rc.getInfluence() - 1;
     	boolean buildSuccess = false;
     	for (Direction dir : UtilBattlecode.OFF_CENTER_DIRECTIONS) {
@@ -157,7 +160,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 			int id = idIterator.next();
 			if (rc.canGetFlag(id)) {
 				int rawFlag = rc.getFlag(id);
-				if (Flag.getOpCode(rawFlag) == OpCode.ENEMY_SIGHTED) {
+				if (UtilFlag.getOpCode(rawFlag) == UtilFlag.OpCode.ENEMY_SIGHTED) {
 					EnemySightedFlag flag = EnemySightedFlag.decode(rawFlag);
 					RobotType robotType = flag.getRobotType();
 					IntVec2D flagOffset = flag.getCoord();
@@ -168,7 +171,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 						this.addedTargets.add(target);
 						UtilBattlecode.log("Added target @ " + target.mapLoc);
 					}					
-				} else if ((this.targetQueue.size() > 0) && Flag.getOpCode(rawFlag) == OpCode.TARGET_MISSING) {
+				} else if ((this.targetQueue.size() > 0) && UtilFlag.getOpCode(rawFlag) == UtilFlag.OpCode.TARGET_MISSING) {
 					TargetMissingFlag flag = TargetMissingFlag.decode(rawFlag);
 					IntVec2D offset = flag.getCoord();
 					MapLocation mapLoc = HandlerCommon.offsetToMapLocation(offset, rc.getLocation());
@@ -192,11 +195,11 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 			Target target = this.targetQueue.peek();
 			Blueprint blueprint = this.makeBlueprint(target);
 			IntVec2D offset = HandlerCommon.mapLocationToOffset(target.mapLoc);
-			Flag.AttackAssignmentFlag flag = new Flag.AttackAssignmentFlag(offset.x, offset.y);
+			AttackAssignmentFlag flag = new AttackAssignmentFlag(offset.x, offset.y);
 			this.attemptBuild(rc, blueprint, flag);
 		} else {
 			Blueprint blueprint = new Blueprint(RobotType.POLITICIAN, Assignment.PATROL);
-			Flag.PatrolAssignmentFlag flag = new Flag.PatrolAssignmentFlag(this.nextDegrees);
+			PatrolAssignmentFlag flag = new PatrolAssignmentFlag(this.nextDegrees);
 			if (this.attemptBuild(rc, blueprint, flag)) {
 				this.incrementDegrees();
 			}

@@ -6,13 +6,12 @@ import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.handlers.common.LinearMoverHandler;
 import player.util.battlecode.UtilBattlecode;
-import player.util.battlecode.flag.Flag;
-import player.util.battlecode.flag.Flag.AttackAssignmentFlag;
-import player.util.battlecode.flag.Flag.EnemySightedFlag;
-import player.util.battlecode.flag.Flag.FollowerClaimFlag;
-import player.util.battlecode.flag.Flag.OpCode;
-import player.util.battlecode.flag.Flag.PatrolAssignmentFlag;
-import player.util.battlecode.flag.Flag.TargetMissingFlag;
+import player.util.battlecode.flag.types.AttackAssignmentFlag;
+import player.util.battlecode.flag.types.EnemySightedFlag;
+import player.util.battlecode.flag.types.PatrolAssignmentFlag;
+import player.util.battlecode.flag.types.TargetMissingFlag;
+import player.util.battlecode.flag.util.UtilFlag;
+import player.util.battlecode.flag.util.UtilFlag.OpCode;
 import player.util.general.UtilGeneral;
 import player.util.math.DoubleVec2D;
 import player.util.math.IntVec2D;
@@ -50,7 +49,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 			Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOpt = HandlerCommon.findFirstMatchingTeamFlag(
 					rc,
 					rc.senseNearbyRobots(2, rc.getTeam()),  // TODO(theimer): constant!
-					(robotInfo, rawFlag) -> ((Flag.getOpCode(rawFlag) == OpCode.ASSIGN_PATROL) || (Flag.getOpCode(rawFlag) == OpCode.ASSIGN_ATTACK))
+					(robotInfo, rawFlag) -> ((UtilFlag.getOpCode(rawFlag) == UtilFlag.OpCode.ASSIGN_PATROL) || (UtilFlag.getOpCode(rawFlag) == UtilFlag.OpCode.ASSIGN_ATTACK))
 			);
 			if (entryOpt.isPresent()) {
 				return Optional.of(entryOpt.get().getValue());
@@ -61,7 +60,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		
 		private IAssignmentHandler makeAssignedHandler(RobotController rc, int rawFlag) {
 			IAssignmentHandler handler;
-			OpCode opCode = Flag.getOpCode(rawFlag);
+			UtilFlag.OpCode opCode = UtilFlag.getOpCode(rawFlag);
 			switch(opCode) {
 			case ASSIGN_PATROL:
 				{
@@ -137,7 +136,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		public IAssignmentHandler handle(RobotController rc) throws GameActionException {
 			final int mask = (2 * UtilBattlecode.MAX_WORLD_WIDTH) - 1;
 			Optional<RobotInfo> calloutOpt = PoliticianHandler.this.senseHighestPriorityNonTeammate(rc);
-			if (calloutOpt.isPresent() && rc.canSetFlag(Flag.EMPTY_FLAG)) {
+			if (calloutOpt.isPresent() && rc.canSetFlag(UtilFlag.EMPTY_FLAG)) {
 				RobotInfo robotInfo = calloutOpt.get();
 				MapLocation mapLoc = robotInfo.getLocation(); 
 				EnemySightedFlag flag = new EnemySightedFlag(robotInfo.getType(), mapLoc.x & mask, mapLoc.y & mask);
