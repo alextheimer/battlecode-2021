@@ -11,14 +11,11 @@ public class Line2D {
 	 * Immutable struct-like class for the storage of the coefficients in:
 	 *     ax + by + c = 0
 	 * (i.e. the equation of a line).
-	 * 
-	 * @throws RuntimeException if the arguments do not define a line.
 	 */
 	public Line2D(double a, double b, double c) {
-		if (UtilMath.doubleEquals(0.0, a) && UtilMath.doubleEquals(0.0, b)) {
-			throw new RuntimeException(String.format("arguments do not define a line: a:%f b:%f c:%f", a, b, b));
-		}
-		
+		// make sure a and b aren't both zero
+		assert !(UtilMath.doubleEquals(0.0, a) && UtilMath.doubleEquals(0.0, b)) :
+			String.format("arguments do not define a line: a:%f b:%f c:%f", a, b, b);
 		this.a = a;
 		this.b = b;
 		this.c = c;
