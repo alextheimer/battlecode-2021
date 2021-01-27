@@ -4,9 +4,9 @@ import battlecode.common.*;
 import player.RobotPlayer;
 import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
-import player.util.battlecode.Flag;
-import player.util.battlecode.Flag.*;
 import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.flag.Flag;
+import player.util.battlecode.flag.Flag.*;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 

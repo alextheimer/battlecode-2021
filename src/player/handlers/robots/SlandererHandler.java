@@ -4,11 +4,11 @@ import battlecode.common.*;
 import player.RobotPlayer;
 import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
-import player.util.battlecode.Flag;
-import player.util.battlecode.Flag.EnemySightedFlag;
-import player.util.battlecode.Flag.OpCode;
-import player.util.battlecode.Flag.PatrolAssignmentFlag;
 import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.flag.Flag;
+import player.util.battlecode.flag.Flag.EnemySightedFlag;
+import player.util.battlecode.flag.Flag.OpCode;
+import player.util.battlecode.flag.Flag.PatrolAssignmentFlag;
 import player.util.general.UtilGeneral;
 import player.util.math.UtilMath;
 

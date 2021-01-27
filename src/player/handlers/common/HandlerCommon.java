@@ -16,9 +16,9 @@ import java.util.stream.Stream;
 
 import battlecode.common.*;
 import player.handlers.common.HandlerCommon;
-import player.util.battlecode.Flag;
-import player.util.battlecode.Flag.OpCode;
 import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.flag.Flag;
+import player.util.battlecode.flag.Flag.OpCode;
 import player.util.general.UtilGeneral;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
