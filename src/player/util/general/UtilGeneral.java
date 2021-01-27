@@ -11,12 +11,20 @@ import java.util.stream.Stream;
 import battlecode.common.*;
 
 import java.util.Queue;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayDeque;
 
 /**
  * Contains utility functions/classes.
  */
 public class UtilGeneral {
+	
+	public static String stringifyStackTrace(Throwable throwable) {
+		StringWriter stringWriter = new StringWriter();
+		throwable.printStackTrace(new PrintWriter(stringWriter));
+		return stringWriter.toString();	
+	}
 	
 	public static <T> T findLeastCostLinear(Iterator<T> iterator, Function<T, Double> costFunc) {
 		assert iterator.hasNext();
