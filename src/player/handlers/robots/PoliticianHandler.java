@@ -102,10 +102,10 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 			Optional<Integer> flagOpt = this.findAssignmentFlag(rc);
 			if (flagOpt.isPresent()) {
 				assignedHandler = this.makeAssignedHandler(rc, flagOpt.get());
-				System.out.println("initialized via flag");
+				UtilBattlecode.log("initialized via flag");
 			} else {
 				assignedHandler = this.makeDefaultHandler(rc);
-				System.out.println("initialized via self");
+				UtilBattlecode.log("initialized via self");
 			}
 			assignedHandler.handle(rc);
 			return assignedHandler;
@@ -175,7 +175,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 				}
 				
 				if (!sensedTarget) {
-					System.out.println("no target sensed; unassigned handler");
+					UtilBattlecode.log("no target sensed; unassigned handler");
 					IntVec2D offset = HandlerCommon.mapLocationToOffset(targetMapLoc);
 					TargetMissingFlag flag = new TargetMissingFlag(offset.x, offset.y);
 					rc.setFlag(flag.encode());
@@ -204,7 +204,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		} else {
 			empowerSuccessful = false;
 		}
-		System.out.println("empower attempt: " + empowerSuccessful);
+		UtilBattlecode.log("empower attempt: " + empowerSuccessful);
 		return empowerSuccessful;
 	}
 		

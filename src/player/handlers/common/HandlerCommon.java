@@ -24,17 +24,19 @@ import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 import player.util.math.UtilMath.*;
 
-
+/**
+ * Contains functions common among handlers.
+ */
 public class HandlerCommon {
 	
 	public static boolean attemptMove(RobotController rc, Direction dir) throws GameActionException {
-		System.out.println("Want to move: " + dir);
+		UtilBattlecode.log("Want to move: " + dir);
 		if (rc.canMove(dir)) {
 			rc.move(dir);
-			System.out.println("Move successful!");
+			UtilBattlecode.log("Move successful!");
 			return true;
 		} else {
-			System.out.println("Move failed!");
+			UtilBattlecode.log("Move failed!");
 			return false;
 		}
 	}

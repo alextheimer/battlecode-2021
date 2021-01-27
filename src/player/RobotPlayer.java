@@ -12,6 +12,7 @@ import player.handlers.robots.EnlightenmentCenterHandler;
 import player.handlers.robots.MuckrakerHandler;
 import player.handlers.robots.PoliticianHandler;
 import player.handlers.robots.SlandererHandler;
+import player.util.battlecode.UtilBattlecode;
 
 public strictfp class RobotPlayer {
 	
@@ -46,13 +47,13 @@ public strictfp class RobotPlayer {
 //    	try {
     		typeHandler = mapThing.get(currentType).get();
 //    	} catch (GameActionException e) {
-//    		System.out.println(rc.getType() + " GameActionException at instantiation!");
+//    		UtilBattlecode.log(rc.getType() + " GameActionException at instantiation!");
 //    		return;
 //    	}
     	
-        System.out.println("I'm a " + rc.getType() + " and I just got created!");
+        UtilBattlecode.log("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
-        	System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
+        	UtilBattlecode.log("I'm a " + rc.getType() + "! Location " + rc.getLocation());
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
@@ -61,7 +62,7 @@ public strictfp class RobotPlayer {
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
             } catch (GameActionException e) {
-                System.out.println(rc.getType() + " GameActionException");
+                UtilBattlecode.log(rc.getType() + " GameActionException");
                 e.printStackTrace();
 	        	if (RESIGN_ON_EXCEPTION) {
 	        		rc.resign();	        		

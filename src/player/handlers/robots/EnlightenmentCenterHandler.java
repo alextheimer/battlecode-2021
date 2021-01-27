@@ -100,7 +100,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
     			break;
     		}
     	}
-    	System.out.println("Build attempted; success: " + buildSuccess);
+    	UtilBattlecode.log("Build attempted; success: " + buildSuccess);
     	return buildSuccess;
     }
     
@@ -166,7 +166,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 					if (this.targetFilter(target, rc)) {
 						this.targetQueue.add(target);
 						this.addedTargets.add(target);
-						System.out.println("Added target @ " + target.mapLoc);
+						UtilBattlecode.log("Added target @ " + target.mapLoc);
 					}					
 				} else if ((this.targetQueue.size() > 0) && Flag.getOpCode(rawFlag) == OpCode.TARGET_MISSING) {
 					TargetMissingFlag flag = TargetMissingFlag.decode(rawFlag);
@@ -188,7 +188,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 			}
 		}
 		else if (this.targetQueue.size() > 0) {
-			System.out.println("HAS TARGET");
+			UtilBattlecode.log("HAS TARGET");
 			Target target = this.targetQueue.peek();
 			Blueprint blueprint = this.makeBlueprint(target);
 			IntVec2D offset = HandlerCommon.mapLocationToOffset(target.mapLoc);

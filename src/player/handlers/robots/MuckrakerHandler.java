@@ -21,14 +21,14 @@ public class MuckrakerHandler implements RobotPlayer.IRobotHandler {
 //            if (robot.type.canBeExposed()) {
 //                // It's a slanderer... go get them!
 //                if (rc.canExpose(robot.location)) {
-//                    System.out.println("e x p o s e d");
+//                    UtilBattlecode.log("e x p o s e d");
 //                    rc.expose(robot.location);
 //                    return this;
 //                }
 //            }
 //        }
 //        if(attemptMove(rc, randomDirection()))
-//            System.out.println("I moved!");
+//            UtilBattlecode.log("I moved!");
         return this;
 	}
 
