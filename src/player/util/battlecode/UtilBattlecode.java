@@ -1,5 +1,6 @@
 package player.util.battlecode;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -29,6 +30,9 @@ public class UtilBattlecode {
 			Direction.WEST,
 			Direction.NORTHWEST
 	};
+	
+	// Battlecode default: System.out is the log.
+	private static final PrintStream LOG_STREAM = System.out;
 	
 	@FunctionalInterface
 	public static interface GameActionPredicate<T> {
@@ -88,6 +92,15 @@ public class UtilBattlecode {
 			}
 			
 		};
+	}
+	
+	/**
+	 * Writes a String to the log.
+	 * A newline is automatically appended to the end of the String.
+	 */
+	public static void log(String logString) {
+		// TODO(theimer): make this more nuanced?
+		LOG_STREAM.println(logString);
 	}
 
 }
