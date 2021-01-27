@@ -68,7 +68,7 @@ public class UtilBattlecode {
 	
 	/**
 	 * ***WARNING***
-	 * This should only ever be used when 100% certain a GameActionPredicate will not be thrown.
+	 * This should only ever be used when 100% certain a GameActionException will not be thrown.
 	 * ***WARNING***
 	 * 
 	 * Wraps a GameActionPredicate in an anonymous Predicate that does not throw a GameActionException.
