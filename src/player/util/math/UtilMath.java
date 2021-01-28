@@ -146,7 +146,7 @@ public class UtilMath {
 		assert (valTo >= 0) && (valTo < mod) :
 			String.format("valTo must lie on [0, mod): valTo:%d, mod:%d", valTo, mod);
 		assert (valFrom >= 0) && (valFrom < mod) :
-			String.format("valFrom must lie on [0, mod): valTo:%d, mod:%d", valFrom, mod);
+			String.format("valFrom must lie on [0, mod): valFrom:%d, mod:%d", valFrom, mod);
 		
 		int directDiff = valTo - valFrom;
 		// Note that this will always have the opposite sign of directDiff.
