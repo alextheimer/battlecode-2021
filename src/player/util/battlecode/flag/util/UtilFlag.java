@@ -10,9 +10,15 @@ import player.util.battlecode.flag.fields.RobotTypeField;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.math.UtilMath;
 
+
 public class UtilFlag {
 
-	public static enum OpCode { EMPTY, ASSIGN_PATROL, TARGET_MISSING, FOLLOWER_CLAIM, ENEMY_SIGHTED, ASSIGN_ATTACK, BASE_SIGHTED }
+	public static enum OpCode { EMPTY, ASSIGN_PATROL, TARGET_MISSING, ENEMY_SIGHTED, ASSIGN_ATTACK }
+	public static int EMPTY_FLAG = 0;
+	public static int NUM_BITS = 24;
+	public static OpCode opCodeValues[] = OpCode.values();
+	public static int numOpCodeBits = UtilMath.log2Ceil(opCodeValues.length);
+	
 	
 	public static interface IFlag {
 		public int encode();
@@ -27,11 +33,6 @@ public class UtilFlag {
 		public int encode();
 		public int numBits();
 	}
-
-	public static int EMPTY_FLAG = 0;
-	public static int NUM_BITS = 24;
-	public static OpCode opCodeValues[] = OpCode.values();
-	public static int numOpCodeBits = UtilMath.log2Ceil(opCodeValues.length);
 	
 	public static OpCode getOpCode(int rawFlag) {
 		FlagWalker flagWalker = new FlagWalker(rawFlag);
