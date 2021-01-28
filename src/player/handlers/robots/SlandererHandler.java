@@ -10,6 +10,7 @@ import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.OpCode;
 import player.util.general.UtilGeneral;
+import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -46,7 +47,8 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
         		.filter(robotInfo -> robotInfo.getType() == RobotType.ENLIGHTENMENT_CENTER).findAny();
         if(sensedEnlightenmentCenterOpt.isPresent()) {
         	RobotInfo enlightenmentCenterInfo = sensedEnlightenmentCenterOpt.get();
-        	EnemySightedFlag flag = new EnemySightedFlag(RobotType.ENLIGHTENMENT_CENTER, enlightenmentCenterInfo.getLocation().x, enlightenmentCenterInfo.getLocation().y);
+        	IntVec2D offset = HandlerCommon.mapLocationToOffset(enlightenmentCenterInfo.getLocation());
+        	EnemySightedFlag flag = new EnemySightedFlag(RobotType.ENLIGHTENMENT_CENTER, offset.x, offset.y);
         	rc.setFlag(flag.encode());
         }
         
