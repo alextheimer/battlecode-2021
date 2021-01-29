@@ -11,7 +11,7 @@ import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
-import player.util.battlecode.flag.types.base.fields.CoordField;
+import player.util.battlecode.flag.types.base.fields.MapLocField;
 import player.util.battlecode.flag.types.base.fields.RobotTypeField;
 import player.util.math.UtilMath;
 

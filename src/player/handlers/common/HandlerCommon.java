@@ -113,24 +113,4 @@ public class HandlerCommon {
 			return Optional.empty();
 		}
 	}
-	
-	public static MapLocation offsetToMapLocation(IntVec2D offset, MapLocation validMapLocation) {
-		assert UtilMath.isPow2(UtilBattlecode.MAX_WORLD_WIDTH);
-		assert (offset.x >= 0) && (offset.x < 2 * UtilBattlecode.MAX_WORLD_WIDTH) : "" + offset.x;
-		assert (offset.y >= 0) && (offset.y < 2 * UtilBattlecode.MAX_WORLD_WIDTH) : "" + offset.y;
-		
-		final int modVal = 2 * UtilBattlecode.MAX_WORLD_WIDTH;
-		final int mask = modVal - 1;
-		int xValidOffset = validMapLocation.x & mask;
-		int yValidOffset = validMapLocation.y & mask;
-		int xDiff = UtilMath.diffMod(offset.x, xValidOffset, modVal);
-		int yDiff = UtilMath.diffMod(offset.y, yValidOffset, modVal);
-		return new MapLocation(validMapLocation.x + xDiff, validMapLocation.y + yDiff);
-	}
-	
-	public static IntVec2D mapLocationToOffset(MapLocation mapLocation) {
-		final int modVal = 2 * UtilBattlecode.MAX_WORLD_WIDTH;
-		final int mask = modVal - 1;
-		return new IntVec2D(mapLocation.x & mask, mapLocation.y & mask);
-	}
 }

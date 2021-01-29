@@ -41,8 +41,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
         		.filter(robotInfo -> robotInfo.getType() == RobotType.ENLIGHTENMENT_CENTER).findAny();
         if(sensedEnlightenmentCenterOpt.isPresent()) {
         	RobotInfo enlightenmentCenterInfo = sensedEnlightenmentCenterOpt.get();
-        	IntVec2D offset = HandlerCommon.mapLocationToOffset(enlightenmentCenterInfo.getLocation());
-        	EnemySightedFlag flag = new EnemySightedFlag(RobotType.ENLIGHTENMENT_CENTER, offset.x, offset.y);
+        	EnemySightedFlag flag = new EnemySightedFlag(RobotType.ENLIGHTENMENT_CENTER, enlightenmentCenterInfo.getLocation());
         	rc.setFlag(Flag.encode(flag));
         }
         

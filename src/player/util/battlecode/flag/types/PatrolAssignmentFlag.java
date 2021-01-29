@@ -8,7 +8,7 @@ import player.util.battlecode.flag.Flag.IFlag;
 import player.util.battlecode.flag.types.base.BaseFlag;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
-import player.util.battlecode.flag.types.base.fields.CoordField;
+import player.util.battlecode.flag.types.base.fields.MapLocField;
 import player.util.battlecode.flag.types.base.fields.DegreesField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;

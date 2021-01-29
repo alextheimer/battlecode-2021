@@ -57,7 +57,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 					handler = new PatrolAssignmentHandler(line, vec);
 			} else if (flag instanceof AttackAssignmentFlag) {
 					AttackAssignmentFlag attackAssignmentFlag = AttackAssignmentFlag.decode(rawFlag);
-					MapLocation targetMapLoc = HandlerCommon.offsetToMapLocation(attackAssignmentFlag.getCoord(), rc.getLocation());
+					MapLocation targetMapLoc = attackAssignmentFlag.getMapLoc(rc.getLocation());
 					handler = new AttackAssignmentHandler(targetMapLoc);
 			} else {
 				throw new RuntimeException("illegal flag type: " + flag.getClass());
@@ -121,7 +121,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 			if (calloutOpt.isPresent() && rc.canSetFlag(Flag.EMPTY_FLAG)) {
 				RobotInfo robotInfo = calloutOpt.get();
 				MapLocation mapLoc = robotInfo.getLocation(); 
-				EnemySightedFlag flag = new EnemySightedFlag(robotInfo.getType(), mapLoc.x & mask, mapLoc.y & mask);
+				EnemySightedFlag flag = new EnemySightedFlag(robotInfo.getType(), mapLoc);
 				rc.setFlag(Flag.encode(flag));
 			}
 			if (!PoliticianHandler.this.attemptEmpowerNearestEnemy(rc)) {
@@ -157,8 +157,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 				
 				if (!sensedTarget) {
 					UtilBattlecode.log("no target sensed; unassigned handler");
-					IntVec2D offset = HandlerCommon.mapLocationToOffset(targetMapLoc);
-					TargetMissingFlag flag = new TargetMissingFlag(offset.x, offset.y);
+					TargetMissingFlag flag = new TargetMissingFlag(targetMapLoc);
 					rc.setFlag(Flag.encode(flag));
 					Clock.yield();
 					Clock.yield();

@@ -4,13 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.BaseStream;
 
+import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 import player.util.battlecode.flag.Flag;
 import player.util.battlecode.flag.Flag.IFlag;
 import player.util.battlecode.flag.types.base.BaseFlag;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
-import player.util.battlecode.flag.types.base.fields.CoordField;
+import player.util.battlecode.flag.types.base.fields.MapLocField;
 import player.util.battlecode.flag.types.base.fields.RobotTypeField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
@@ -22,7 +23,7 @@ public class EnemySightedFlag extends BaseFlag {
 	
 	public static List<BaseFlag.IFlagFieldFactory> fieldFactories = Arrays.asList(
 			RobotTypeField.getFactory(),
-			CoordField.getFactory()
+			MapLocField.getFactory()
 	);
 	
 	private static int NUM_BITS = fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
@@ -30,20 +31,20 @@ public class EnemySightedFlag extends BaseFlag {
 	private static enum Field { RobotType, Coord }
 	
 	private RobotTypeField robotType;
-	private CoordField coord;
+	private MapLocField coord;
 	
-	public EnemySightedFlag(RobotType robotType, int x, int y) {
+	public EnemySightedFlag(RobotType robotType, MapLocation mapLoc) {
 		this.robotType = new RobotTypeField(robotType);
-		this.coord = new CoordField(x, y);
+		this.coord = new MapLocField(mapLoc);
 	}
 	
 	private EnemySightedFlag(List<BaseFlag.IFlagField> fieldList) {
 		this.robotType = (RobotTypeField)fieldList.get(Field.RobotType.ordinal());
-		this.coord = (CoordField)fieldList.get(Field.Coord.ordinal());
+		this.coord = (MapLocField)fieldList.get(Field.Coord.ordinal());
 	}
 	
-	public IntVec2D getCoord() {
-		return this.coord.value();
+	public MapLocation getMapLoc(MapLocation referenceMapLoc) {
+		return this.coord.getMapLocation(referenceMapLoc);
 	}
 	
 	public RobotType getRobotType() {
