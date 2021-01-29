@@ -5,12 +5,12 @@ import player.RobotPlayer;
 import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.flag.Flag;
+import player.util.battlecode.flag.Flag.IFlag;
 import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
-import player.util.battlecode.flag.util.UtilFlag;
-import player.util.battlecode.flag.util.UtilFlag.IFlag;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
@@ -91,13 +91,13 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 	private Set<Integer> idSet = new HashSet<>();
 	private int buildNum = 0;
 	
-    private boolean attemptBuild(RobotController rc, Blueprint blueprint, UtilFlag.IFlag assignmentFlag) throws GameActionException {
+    private boolean attemptBuild(RobotController rc, Blueprint blueprint, Flag.IFlag assignmentFlag) throws GameActionException {
     	final int influence = rc.getInfluence() - 1;
     	boolean buildSuccess = false;
     	for (Direction dir : UtilBattlecode.OFF_CENTER_DIRECTIONS) {
     		if (rc.canBuildRobot(blueprint.robotType, dir, influence)) {
     			rc.buildRobot(blueprint.robotType, dir, influence);
-    			rc.setFlag(UtilFlag.encode(assignmentFlag));
+    			rc.setFlag(Flag.encode(assignmentFlag));
     			this.flagCooldown = FLAG_COOLDOWN_START;
     			buildSuccess = true;
     			buildNum++;
@@ -161,7 +161,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 			int id = idIterator.next();
 			if (rc.canGetFlag(id)) {
 				int rawFlag = rc.getFlag(id);
-				IFlag flag = UtilFlag.decode(rawFlag);
+				Flag.IFlag flag = Flag.decode(rawFlag);
 				if (flag instanceof EnemySightedFlag) {
 					EnemySightedFlag enemySightedflag = (EnemySightedFlag)flag;
 					RobotType robotType = enemySightedflag.getRobotType();

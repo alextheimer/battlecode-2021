@@ -18,11 +18,11 @@ import java.util.stream.Stream;
 import battlecode.common.*;
 import player.handlers.common.HandlerCommon;
 import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.flag.Flag;
+import player.util.battlecode.flag.Flag.IFlag;
 import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
-import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
-import player.util.battlecode.flag.util.UtilFlag.IFlag;
 import player.util.general.UtilGeneral;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
@@ -92,10 +92,10 @@ public class HandlerCommon {
 		final int maxAdjacentDistanceSquared = 2;
 		
 		BiPredicate<RobotInfo, Integer> isAssignmentFlag = new BiPredicate<RobotInfo, Integer>() {
-			Set<Class<? extends IFlag>> assignmentClasses = new HashSet<>(Arrays.asList(AttackAssignmentFlag.class, PatrolAssignmentFlag.class));
+			Set<Class<? extends Flag.IFlag>> assignmentClasses = new HashSet<>(Arrays.asList(AttackAssignmentFlag.class, PatrolAssignmentFlag.class));
 			@Override
 			public boolean test(RobotInfo robotInfo, Integer rawFlag) {
-				IFlag flag = UtilFlag.decode(rawFlag);
+				Flag.IFlag flag = Flag.decode(rawFlag);
 				return assignmentClasses.contains(flag.getClass());
 			}
 			

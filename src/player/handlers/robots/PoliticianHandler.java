@@ -6,13 +6,13 @@ import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.handlers.common.LinearMoverHandler;
 import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.flag.Flag;
+import player.util.battlecode.flag.Flag.IFlag;
 import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
-import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
-import player.util.battlecode.flag.util.UtilFlag.IFlag;
 import player.util.general.UtilGeneral;
 import player.util.math.DoubleVec2D;
 import player.util.math.IntVec2D;
@@ -48,7 +48,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		
 		private IAssignmentHandler makeAssignedHandler(RobotController rc, int rawFlag) {
 			IAssignmentHandler handler;
-			IFlag flag = UtilFlag.decode(rawFlag);
+			Flag.IFlag flag = Flag.decode(rawFlag);
 			if (flag instanceof PatrolAssignmentFlag) {
 					PatrolAssignmentFlag patrolAssignmentFlag = PatrolAssignmentFlag.decode(rawFlag);
 					DoubleVec2D vec = UtilMath.degreesToVec(patrolAssignmentFlag.getOutboundDegrees());
@@ -118,11 +118,11 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		public IAssignmentHandler handle(RobotController rc) throws GameActionException {
 			final int mask = (2 * UtilBattlecode.MAX_WORLD_WIDTH) - 1;
 			Optional<RobotInfo> calloutOpt = PoliticianHandler.this.senseHighestPriorityNonTeammate(rc);
-			if (calloutOpt.isPresent() && rc.canSetFlag(UtilFlag.EMPTY_FLAG)) {
+			if (calloutOpt.isPresent() && rc.canSetFlag(Flag.EMPTY_FLAG)) {
 				RobotInfo robotInfo = calloutOpt.get();
 				MapLocation mapLoc = robotInfo.getLocation(); 
 				EnemySightedFlag flag = new EnemySightedFlag(robotInfo.getType(), mapLoc.x & mask, mapLoc.y & mask);
-				rc.setFlag(UtilFlag.encode(flag));
+				rc.setFlag(Flag.encode(flag));
 			}
 			if (!PoliticianHandler.this.attemptEmpowerNearestEnemy(rc)) {
 				this.patrolStep(rc);
@@ -159,7 +159,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 					UtilBattlecode.log("no target sensed; unassigned handler");
 					IntVec2D offset = HandlerCommon.mapLocationToOffset(targetMapLoc);
 					TargetMissingFlag flag = new TargetMissingFlag(offset.x, offset.y);
-					rc.setFlag(UtilFlag.encode(flag));
+					rc.setFlag(Flag.encode(flag));
 					Clock.yield();
 					Clock.yield();
 					IAssignmentHandler nextHandler = new UnassignedAssignmentHandler();

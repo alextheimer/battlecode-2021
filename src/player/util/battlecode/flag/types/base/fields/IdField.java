@@ -1,9 +1,10 @@
-package player.util.battlecode.flag.fields;
+package player.util.battlecode.flag.types.base.fields;
 
-import player.util.battlecode.flag.util.UtilFlag.IFlagField;
-import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
+import player.util.battlecode.flag.types.base.BaseFlag;
+import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
+import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
 
-public class IdField implements IFlagField {
+public class IdField implements BaseFlag.IFlagField {
 	public static final int NUM_BITS = 15;
 	
 	private int id;
@@ -32,11 +33,11 @@ public class IdField implements IFlagField {
 		return NUM_BITS;
 	}
 	
-	public static IFlagFieldFactory getFactory() {
-		return new IFlagFieldFactory() {
+	public static BaseFlag.IFlagFieldFactory getFactory() {
+		return new BaseFlag.IFlagFieldFactory() {
 
 			@Override
-			public IFlagField decode(int bits) {
+			public BaseFlag.IFlagField decode(int bits) {
 				return IdField.fromBits(bits);
 			}
 

@@ -1,3 +1,4 @@
+package player.util.battlecode.flag.types.base.fields;
 //package player.util.battlecode.flag.fields;
 //
 //import java.util.Arrays;

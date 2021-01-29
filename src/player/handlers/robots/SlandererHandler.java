@@ -5,9 +5,9 @@ import player.RobotPlayer;
 import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.flag.Flag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
-import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 import player.util.general.UtilGeneral;
 import player.util.math.IntVec2D;
@@ -43,7 +43,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
         	RobotInfo enlightenmentCenterInfo = sensedEnlightenmentCenterOpt.get();
         	IntVec2D offset = HandlerCommon.mapLocationToOffset(enlightenmentCenterInfo.getLocation());
         	EnemySightedFlag flag = new EnemySightedFlag(RobotType.ENLIGHTENMENT_CENTER, offset.x, offset.y);
-        	rc.setFlag(UtilFlag.encode(flag));
+        	rc.setFlag(Flag.encode(flag));
         }
         
         Optional<RobotInfo> nearestOpt = HandlerCommon.senseNearestNonTeam(rc, rc.senseNearbyRobots());

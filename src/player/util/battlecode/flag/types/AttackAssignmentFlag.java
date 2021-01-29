@@ -3,20 +3,22 @@ package player.util.battlecode.flag.types;
 import java.util.Arrays;
 import java.util.List;
 
-import player.util.battlecode.flag.fields.CoordField;
-import player.util.battlecode.flag.fields.DegreesField;
+import player.util.battlecode.flag.Flag;
+import player.util.battlecode.flag.Flag.IFlag;
+import player.util.battlecode.flag.types.base.BaseFlag;
+import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
+import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
+import player.util.battlecode.flag.types.base.fields.CoordField;
+import player.util.battlecode.flag.types.base.fields.DegreesField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
-import player.util.battlecode.flag.util.UtilFlag.IFlag;
 import player.util.battlecode.flag.util.UtilFlag.IFlagFactory;
-import player.util.battlecode.flag.util.UtilFlag.IFlagField;
-import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
 import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 import player.util.math.IntVec2D;
 
 public class AttackAssignmentFlag extends BaseFlag {
 	
-	private static List<IFlagFieldFactory> fieldFactories = Arrays.asList(
+	private static List<BaseFlag.IFlagFieldFactory> fieldFactories = Arrays.asList(
 			CoordField.getFactory()
 	);
 	private static int NUM_BITS = fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
@@ -27,12 +29,12 @@ public class AttackAssignmentFlag extends BaseFlag {
 		this.coord = new CoordField(x, y);
 	}
 	
-	private AttackAssignmentFlag(List<IFlagField> flagFields) {
+	private AttackAssignmentFlag(List<BaseFlag.IFlagField> flagFields) {
 		this.coord = (CoordField)flagFields.get(0);
 	}
 	
 	public static AttackAssignmentFlag decode(int rawFlag) {
-		List<IFlagField> fields = BaseFlag.decodeFields(rawFlag, fieldFactories);
+		List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(rawFlag, fieldFactories);
 		return new AttackAssignmentFlag(fields);
 	}
 	
@@ -41,7 +43,7 @@ public class AttackAssignmentFlag extends BaseFlag {
 	}
 
 	@Override
-	protected List<IFlagField> getOrderedFlagFieldList() {
+	protected List<BaseFlag.IFlagField> getOrderedFlagFieldList() {
 		return Arrays.asList(this.coord);
 	}
 	
@@ -49,7 +51,7 @@ public class AttackAssignmentFlag extends BaseFlag {
 		return new IFlagFactory() {
 
 			@Override
-			public IFlag decode(int bits) {
+			public Flag.IFlag decode(int bits) {
 				return AttackAssignmentFlag.decode(bits);
 			}
 

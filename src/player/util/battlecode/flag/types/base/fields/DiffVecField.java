@@ -1,11 +1,12 @@
-package player.util.battlecode.flag.fields;
+package player.util.battlecode.flag.types.base.fields;
 
+import player.util.battlecode.flag.types.base.BaseFlag;
+import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
+import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
 import player.util.battlecode.flag.util.FlagWalker;
-import player.util.battlecode.flag.util.UtilFlag.IFlagField;
-import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
 import player.util.math.IntVec2D;
 
-public class DiffVecField implements IFlagField {
+public class DiffVecField implements BaseFlag.IFlagField {
 	public static final int NUM_BITS = 8;
 	
 	private static final int numBitsPerDim = 4;
@@ -42,11 +43,11 @@ public class DiffVecField implements IFlagField {
 		return NUM_BITS;
 	}
 	
-	public static IFlagFieldFactory getFactory() {
-		return new IFlagFieldFactory() {
+	public static BaseFlag.IFlagFieldFactory getFactory() {
+		return new BaseFlag.IFlagFieldFactory() {
 
 			@Override
-			public IFlagField decode(int bits) {
+			public BaseFlag.IFlagField decode(int bits) {
 				return DiffVecField.fromBits(bits);
 			}
 

@@ -1,11 +1,12 @@
-package player.util.battlecode.flag.fields;
+package player.util.battlecode.flag.types.base.fields;
 
 import battlecode.common.RobotType;
-import player.util.battlecode.flag.util.UtilFlag.IFlagField;
-import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
+import player.util.battlecode.flag.types.base.BaseFlag;
+import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
+import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
 import player.util.math.UtilMath;
 
-public class RobotTypeField implements IFlagField {
+public class RobotTypeField implements BaseFlag.IFlagField {
 	
 	public static final int NUM_BITS = UtilMath.log2Ceil(RobotType.values().length);
 	
@@ -35,11 +36,11 @@ public class RobotTypeField implements IFlagField {
 		return NUM_BITS;
 	}
 	
-	public static IFlagFieldFactory getFactory() {
-		return new IFlagFieldFactory() {
+	public static BaseFlag.IFlagFieldFactory getFactory() {
+		return new BaseFlag.IFlagFieldFactory() {
 
 			@Override
-			public IFlagField decode(int bits) {
+			public BaseFlag.IFlagField decode(int bits) {
 				return RobotTypeField.fromBits(bits);
 			}
 
