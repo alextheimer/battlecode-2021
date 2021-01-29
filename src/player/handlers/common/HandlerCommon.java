@@ -12,12 +12,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import battlecode.common.*;
 import player.handlers.common.HandlerCommon;
 import player.util.battlecode.UtilBattlecode;
+import player.util.battlecode.flag.types.AttackAssignmentFlag;
+import player.util.battlecode.flag.types.PatrolAssignmentFlag;
+import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
+import player.util.battlecode.flag.util.UtilFlag.IFlag;
 import player.util.general.UtilGeneral;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
@@ -81,6 +86,32 @@ public class HandlerCommon {
 	
 	public static Set<RobotInfo> senseAllTeam(RobotController rc) {
 		return UtilGeneral.legalSetCollect(Arrays.stream(rc.senseNearbyRobots()).filter(robotInfo -> robotInfo.getTeam() == rc.getTeam()));
+	}
+	
+	public static Optional<Integer> findFirstAdjacentAssignmentFlag(RobotController rc) throws GameActionException {
+		final int maxAdjacentDistanceSquared = 2;
+		
+		BiPredicate<RobotInfo, Integer> isAssignmentFlag = new BiPredicate<RobotInfo, Integer>() {
+			Set<Class<? extends IFlag>> assignmentClasses = new HashSet<>(Arrays.asList(AttackAssignmentFlag.class, PatrolAssignmentFlag.class));
+			@Override
+			public boolean test(RobotInfo robotInfo, Integer rawFlag) {
+				IFlag flag = UtilFlag.decode(rawFlag);
+				return assignmentClasses.contains(flag.getClass());
+			}
+			
+		};
+		
+		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOpt = HandlerCommon.findFirstMatchingTeamFlag(
+				rc,
+				rc.senseNearbyRobots(maxAdjacentDistanceSquared, rc.getTeam()),  // TODO(theimer): constant!
+				isAssignmentFlag
+		);
+		
+		if (entryOpt.isPresent()) {
+			return Optional.of(entryOpt.get().getValue());
+		} else {
+			return Optional.empty();
+		}
 	}
 	
 	public static MapLocation offsetToMapLocation(IntVec2D offset, MapLocation validMapLocation) {

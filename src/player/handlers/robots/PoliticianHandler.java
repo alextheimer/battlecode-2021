@@ -46,19 +46,6 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 	
 	class UnassignedAssignmentHandler implements IAssignmentHandler {
 		
-		private Optional<Integer> findAssignmentFlag(RobotController rc) throws GameActionException {
-			Optional<SimpleImmutableEntry<RobotInfo, Integer>> entryOpt = HandlerCommon.findFirstMatchingTeamFlag(
-					rc,
-					rc.senseNearbyRobots(2, rc.getTeam()),  // TODO(theimer): constant!
-					(robotInfo, rawFlag) -> ((UtilFlag.getOpCode(rawFlag) == UtilFlag.FlagOpCode.ASSIGN_PATROL) || (UtilFlag.getOpCode(rawFlag) == UtilFlag.FlagOpCode.ASSIGN_ATTACK))
-			);
-			if (entryOpt.isPresent()) {
-				return Optional.of(entryOpt.get().getValue());
-			} else {
-				return Optional.empty();
-			}
-		}
-		
 		private IAssignmentHandler makeAssignedHandler(RobotController rc, int rawFlag) {
 			IAssignmentHandler handler;
 			IFlag flag = UtilFlag.decode(rawFlag);
@@ -93,7 +80,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		@Override
 		public IAssignmentHandler handle(RobotController rc) throws GameActionException {
 			IAssignmentHandler assignedHandler;
-			Optional<Integer> flagOpt = this.findAssignmentFlag(rc);
+			Optional<Integer> flagOpt = HandlerCommon.findFirstAdjacentAssignmentFlag(rc);
 			if (flagOpt.isPresent()) {
 				assignedHandler = this.makeAssignedHandler(rc, flagOpt.get());
 				UtilBattlecode.log("initialized via flag");

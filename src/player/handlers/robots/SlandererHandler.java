@@ -27,12 +27,6 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
 	public SlandererHandler() {
 	}
 	
-	private Optional<PatrolAssignmentFlag> findAssignmentFlag(RobotController rc) throws GameActionException {
-		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entry = HandlerCommon.findFirstMatchingTeamFlag(rc, rc.senseNearbyRobots(), 
-				(robotInfo, rawFlag) -> UtilFlag.getOpCode(rawFlag) == UtilFlag.FlagOpCode.ASSIGN_PATROL);
-		return entry.isPresent() ? Optional.of(PatrolAssignmentFlag.decode(entry.get().getValue())) : Optional.empty();
-	}
-	
 	@Override
 	public RobotPlayer.IRobotHandler handle(RobotController rc) throws GameActionException {
 		if (rc.getType() != RobotType.SLANDERER) {
