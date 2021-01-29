@@ -7,17 +7,19 @@ import player.util.battlecode.flag.fields.CoordField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.IFlag;
+import player.util.battlecode.flag.util.UtilFlag.IFlagFactory;
 import player.util.battlecode.flag.util.UtilFlag.IFlagField;
 import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
-import player.util.battlecode.flag.util.UtilFlag.OpCode;
+import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 import player.util.math.IntVec2D;
 
 public class TargetMissingFlag extends BaseFlag {
 	
-	public static OpCode opCode = OpCode.TARGET_MISSING;
 	private static List<IFlagFieldFactory> fieldFactories = Arrays.asList(
 			CoordField.getFactory()
 	);
+	
+	private static int NUM_BITS = fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
 	
 	private CoordField coord;
 	
@@ -35,12 +37,29 @@ public class TargetMissingFlag extends BaseFlag {
 	public IntVec2D getCoord() {
 		return this.coord.value();
 	}
-	@Override
-	public UtilFlag.OpCode getOpCode() {
-		return opCode;
-	}
+	
 	@Override
 	protected List<IFlagField> getOrderedFlagFieldList() {
 		return Arrays.asList(this.coord);
+	}
+	public static IFlagFactory getFactory() {
+		return new IFlagFactory() {
+
+			@Override
+			public IFlag decode(int bits) {
+				return TargetMissingFlag.decode(bits);
+			}
+
+			@Override
+			public int numBits() {
+				return NUM_BITS;
+			}
+			
+		};	
+	}
+	
+	@Override
+	public int numBits() {
+		return NUM_BITS;
 	}
 }

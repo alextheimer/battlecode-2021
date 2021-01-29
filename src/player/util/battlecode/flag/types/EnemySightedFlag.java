@@ -10,18 +10,20 @@ import player.util.battlecode.flag.fields.RobotTypeField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.IFlag;
+import player.util.battlecode.flag.util.UtilFlag.IFlagFactory;
 import player.util.battlecode.flag.util.UtilFlag.IFlagField;
 import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
-import player.util.battlecode.flag.util.UtilFlag.OpCode;
+import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 import player.util.math.IntVec2D;
 
 public class EnemySightedFlag extends BaseFlag {
 	
-	public static OpCode opCode = OpCode.ENEMY_SIGHTED;
 	public static List<IFlagFieldFactory> fieldFactories = Arrays.asList(
 			RobotTypeField.getFactory(),
 			CoordField.getFactory()
 	);
+	
+	private static int NUM_BITS = fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
 	
 	private static enum Field { RobotType, Coord }
 	
@@ -55,9 +57,25 @@ public class EnemySightedFlag extends BaseFlag {
 		List<IFlagField> fields = BaseFlag.decodeFields(rawFlag, EnemySightedFlag.fieldFactories);
 		return new EnemySightedFlag(fields);	
 	}
+	
+	public static IFlagFactory getFactory() {
+		return new IFlagFactory() {
+
+			@Override
+			public IFlag decode(int bits) {
+				return EnemySightedFlag.decode(bits);
+			}
+
+			@Override
+			public int numBits() {
+				return NUM_BITS;
+			}
+			
+		};	
+	}
 
 	@Override
-	public OpCode getOpCode() {
-		return opCode;
+	public int numBits() {
+		return NUM_BITS;
 	}
 }

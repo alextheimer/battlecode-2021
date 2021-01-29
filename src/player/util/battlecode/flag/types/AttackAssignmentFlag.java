@@ -8,18 +8,18 @@ import player.util.battlecode.flag.fields.DegreesField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.IFlag;
+import player.util.battlecode.flag.util.UtilFlag.IFlagFactory;
 import player.util.battlecode.flag.util.UtilFlag.IFlagField;
 import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
-import player.util.battlecode.flag.util.UtilFlag.OpCode;
+import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 import player.util.math.IntVec2D;
 
 public class AttackAssignmentFlag extends BaseFlag {
 	
-	private static OpCode opCode = OpCode.ASSIGN_ATTACK;
-	
 	private static List<IFlagFieldFactory> fieldFactories = Arrays.asList(
 			CoordField.getFactory()
 	);
+	private static int NUM_BITS = fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
 	
 	private CoordField coord;
 	
@@ -41,12 +41,28 @@ public class AttackAssignmentFlag extends BaseFlag {
 	}
 
 	@Override
-	public UtilFlag.OpCode getOpCode() {
-		return opCode;
+	protected List<IFlagField> getOrderedFlagFieldList() {
+		return Arrays.asList(this.coord);
+	}
+	
+	public static IFlagFactory getFactory() {
+		return new IFlagFactory() {
+
+			@Override
+			public IFlag decode(int bits) {
+				return AttackAssignmentFlag.decode(bits);
+			}
+
+			@Override
+			public int numBits() {
+				return NUM_BITS;
+			}
+			
+		};	
 	}
 
 	@Override
-	protected List<IFlagField> getOrderedFlagFieldList() {
-		return Arrays.asList(this.coord);
+	public int numBits() {
+		return NUM_BITS;
 	}
 }

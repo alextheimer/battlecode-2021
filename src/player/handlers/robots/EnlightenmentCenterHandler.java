@@ -10,6 +10,7 @@ import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
 import player.util.battlecode.flag.util.UtilFlag;
+import player.util.battlecode.flag.util.UtilFlag.IFlag;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
@@ -96,7 +97,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
     	for (Direction dir : UtilBattlecode.OFF_CENTER_DIRECTIONS) {
     		if (rc.canBuildRobot(blueprint.robotType, dir, influence)) {
     			rc.buildRobot(blueprint.robotType, dir, influence);
-    			rc.setFlag(assignmentFlag.encode());
+    			rc.setFlag(UtilFlag.encode(assignmentFlag));
     			this.flagCooldown = FLAG_COOLDOWN_START;
     			buildSuccess = true;
     			buildNum++;
@@ -160,20 +161,21 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 			int id = idIterator.next();
 			if (rc.canGetFlag(id)) {
 				int rawFlag = rc.getFlag(id);
-				if (UtilFlag.getOpCode(rawFlag) == UtilFlag.OpCode.ENEMY_SIGHTED) {
-					EnemySightedFlag flag = EnemySightedFlag.decode(rawFlag);
-					RobotType robotType = flag.getRobotType();
-					IntVec2D flagOffset = flag.getCoord();
+				IFlag flag = UtilFlag.decode(rawFlag);
+				if (flag instanceof EnemySightedFlag) {
+					EnemySightedFlag enemySightedflag = (EnemySightedFlag)flag;
+					RobotType robotType = enemySightedflag.getRobotType();
+					IntVec2D flagOffset = enemySightedflag.getCoord();
 					MapLocation mapLoc = HandlerCommon.offsetToMapLocation(flagOffset, rc.getLocation());
 					Target target = new Target(robotType, mapLoc);
 					if (this.targetFilter(target, rc)) {
 						this.targetQueue.add(target);
 						this.addedTargets.add(target);
 						UtilBattlecode.log("Added target @ " + target.mapLoc);
-					}					
-				} else if ((this.targetQueue.size() > 0) && UtilFlag.getOpCode(rawFlag) == UtilFlag.OpCode.TARGET_MISSING) {
-					TargetMissingFlag flag = TargetMissingFlag.decode(rawFlag);
-					IntVec2D offset = flag.getCoord();
+					}
+				} else if ((this.targetQueue.size() > 0) && flag instanceof TargetMissingFlag) {
+					TargetMissingFlag targetMissingFlag = (TargetMissingFlag)flag;
+					IntVec2D offset = targetMissingFlag.getCoord();
 					MapLocation mapLoc = HandlerCommon.offsetToMapLocation(offset, rc.getLocation());
 					if (mapLoc.equals(this.targetQueue.peek().mapLoc)) {
 						this.targetQueue.remove();

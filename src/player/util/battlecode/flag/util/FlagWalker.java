@@ -17,7 +17,7 @@ public class FlagWalker {
 	 */
 	public FlagWalker(int flagBits) {
 		assert flagBits >= 0 : "flagBits must be non-negative: " + flagBits;
-		assert flagBits < (1 << UtilFlag.NUM_BITS) : "flagBits must be less than 2**MAX_NUM_BITS: " + flagBits;
+		assert flagBits < (1 << UtilFlag.MAX_NUM_BITS) : "flagBits must be less than 2**MAX_NUM_BITS: " + flagBits;
 		
 		this.flagBits = flagBits;
 		this.nextBitIndex = 0;  
@@ -27,7 +27,7 @@ public class FlagWalker {
 	 * Returns the number of flag bits remaining to be written/read.
 	 */
 	public int numRemainingBits() {
-		return UtilFlag.NUM_BITS - this.nextBitIndex;
+		return UtilFlag.MAX_NUM_BITS - this.nextBitIndex;
 	}
 	
 	/**

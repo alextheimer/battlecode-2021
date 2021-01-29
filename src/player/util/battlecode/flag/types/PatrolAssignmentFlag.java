@@ -8,16 +8,18 @@ import player.util.battlecode.flag.fields.DegreesField;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
 import player.util.battlecode.flag.util.UtilFlag.IFlag;
+import player.util.battlecode.flag.util.UtilFlag.IFlagFactory;
 import player.util.battlecode.flag.util.UtilFlag.IFlagField;
 import player.util.battlecode.flag.util.UtilFlag.IFlagFieldFactory;
-import player.util.battlecode.flag.util.UtilFlag.OpCode;
+import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 
 public class PatrolAssignmentFlag extends BaseFlag {
 	
-	private static OpCode opCode = OpCode.ASSIGN_PATROL;
 	private static List<IFlagFieldFactory> fieldFactories = Arrays.asList(
 			DegreesField.getFactory()
 	);
+	
+	private static int NUM_BITS = fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
 	
 	private DegreesField outboundDegrees;
 	
@@ -39,12 +41,27 @@ public class PatrolAssignmentFlag extends BaseFlag {
 	}
 
 	@Override
-	public UtilFlag.OpCode getOpCode() {
-		return opCode;
+	protected List<IFlagField> getOrderedFlagFieldList() {
+		return Arrays.asList(this.outboundDegrees);
+	}
+	
+	public static IFlagFactory getFactory() {
+		return new IFlagFactory() {
+
+			@Override
+			public IFlag decode(int bits) {
+				return PatrolAssignmentFlag.decode(bits);
+			}
+
+			@Override
+			public int numBits() {
+				return NUM_BITS;
+			}
+		};	
 	}
 
 	@Override
-	protected List<IFlagField> getOrderedFlagFieldList() {
-		return Arrays.asList(this.outboundDegrees);
+	public int numBits() {
+		return NUM_BITS;
 	}
 }

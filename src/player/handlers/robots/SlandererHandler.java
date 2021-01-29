@@ -8,7 +8,7 @@ import player.util.battlecode.UtilBattlecode;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.util.UtilFlag;
-import player.util.battlecode.flag.util.UtilFlag.OpCode;
+import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 import player.util.general.UtilGeneral;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
@@ -29,7 +29,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
 	
 	private Optional<PatrolAssignmentFlag> findAssignmentFlag(RobotController rc) throws GameActionException {
 		Optional<SimpleImmutableEntry<RobotInfo, Integer>> entry = HandlerCommon.findFirstMatchingTeamFlag(rc, rc.senseNearbyRobots(), 
-				(robotInfo, rawFlag) -> UtilFlag.getOpCode(rawFlag) == UtilFlag.OpCode.ASSIGN_PATROL);
+				(robotInfo, rawFlag) -> UtilFlag.getOpCode(rawFlag) == UtilFlag.FlagOpCode.ASSIGN_PATROL);
 		return entry.isPresent() ? Optional.of(PatrolAssignmentFlag.decode(entry.get().getValue())) : Optional.empty();
 	}
 	
@@ -49,7 +49,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
         	RobotInfo enlightenmentCenterInfo = sensedEnlightenmentCenterOpt.get();
         	IntVec2D offset = HandlerCommon.mapLocationToOffset(enlightenmentCenterInfo.getLocation());
         	EnemySightedFlag flag = new EnemySightedFlag(RobotType.ENLIGHTENMENT_CENTER, offset.x, offset.y);
-        	rc.setFlag(flag.encode());
+        	rc.setFlag(UtilFlag.encode(flag));
         }
         
         Optional<RobotInfo> nearestOpt = HandlerCommon.senseNearestNonTeam(rc, rc.senseNearbyRobots());
