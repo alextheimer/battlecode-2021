@@ -16,6 +16,10 @@ import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
  */
 public abstract class BaseFlag implements Flag.IFlag {
 	
+	/* TODO(theimer): there are a number of common methods (decode, numBits, etc)
+	 * that would DRY things out if they were implemented here (at the expense of should-be-static
+	 * variables becoming non-static.*/
+	
 	/**
 	 * Field of a BaseFlag-derived class.
 	 */
