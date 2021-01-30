@@ -8,26 +8,31 @@ import player.util.math.UtilMath;
 
 public class RobotTypeField implements BaseFlag.IFlagField {
 	
+	// number of bits needed to represent all RobotType.values().length values
 	public static final int NUM_BITS = UtilMath.log2Ceil(RobotType.values().length);
+	private static final RobotType[] ROBOT_TYPE_ARRAY = RobotType.values();
 	
 	private RobotType robotType;
 	
+	/**
+	 * Stores/encodes/decodes a RobotType.
+	 */
 	public RobotTypeField(RobotType robotType) {
-		// TODO(theimer): assertions
 		this.robotType = robotType;
 	}
 	
-	public static RobotTypeField fromBits(int bits) {
-		// TODO(theimer): !!!!!!!!!!
-		return new RobotTypeField(RobotType.values()[bits]);
+	public static RobotTypeField decode(int bits) {
+		assert (bits >= 0) && (bits < ROBOT_TYPE_ARRAY.length) : "bits: " + bits;
+		return new RobotTypeField(ROBOT_TYPE_ARRAY[bits]);
 	}
 	
-	public RobotType value() {
+	public RobotType getRobotType() {
 		return this.robotType;
 	}
 
 	@Override
 	public int encode() {
+		// TODO(theimer): worth changing this?
 		return this.robotType.ordinal();
 	}
 
@@ -41,7 +46,7 @@ public class RobotTypeField implements BaseFlag.IFlagField {
 
 			@Override
 			public BaseFlag.IFlagField decode(int bits) {
-				return RobotTypeField.fromBits(bits);
+				return RobotTypeField.decode(bits);
 			}
 
 			@Override

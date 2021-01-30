@@ -48,7 +48,7 @@ public class EnemySightedFlag extends BaseFlag {
 	}
 	
 	public RobotType getRobotType() {
-		return this.robotType.value();
+		return this.robotType.getRobotType();
 	}
 
 	@Override
