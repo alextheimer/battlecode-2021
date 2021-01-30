@@ -39,7 +39,7 @@ public class PatrolAssignmentFlag extends BaseFlag {
 	}
 	
 	public int getOutboundDegrees() {
-		return this.outboundDegrees.value();
+		return this.outboundDegrees.getDegrees();
 	}
 
 	@Override
