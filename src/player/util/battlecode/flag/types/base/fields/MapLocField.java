@@ -6,13 +6,13 @@ import player.util.battlecode.flag.types.base.BaseFlag;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
 import player.util.battlecode.flag.util.FlagWalker;
+import player.util.battlecode.flag.util.UtilFlag;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
 public class MapLocField implements BaseFlag.IFlagField {
 	
-	/**
-	 * =======================================
+	/* =======================================
 	 * Justification for NUM_BITS_PER_DIM
 	 * =======================================
 	 * 
@@ -91,16 +91,6 @@ public class MapLocField implements BaseFlag.IFlagField {
 	}
 	
 	/**
-	 * Decodes the bits of an encoded MapLocField into a MapLocField.
-	 */
-	public static MapLocField decode(int bits) {
-		FlagWalker flagWalker = new FlagWalker(bits);
-		int xSuffixBits = flagWalker.readBits(NUM_BITS_PER_DIM);
-		int ySuffixBits = flagWalker.readBits(NUM_BITS_PER_DIM);
-		return new MapLocField(xSuffixBits, ySuffixBits);
-	}
-	
-	/**
 	 * Returns the stored MapLocation.
 	 * 
 	 * @param referenceMapLoc must be a valid mapLocation (on the map).
@@ -145,7 +135,11 @@ public class MapLocField implements BaseFlag.IFlagField {
 
 			@Override
 			public BaseFlag.IFlagField decode(int bits) {
-				return MapLocField.decode(bits);
+				assert UtilFlag.validBits(NUM_BITS, bits) : "" + bits;
+				FlagWalker flagWalker = new FlagWalker(bits);
+				int xSuffixBits = flagWalker.readBits(NUM_BITS_PER_DIM);
+				int ySuffixBits = flagWalker.readBits(NUM_BITS_PER_DIM);
+				return new MapLocField(xSuffixBits, ySuffixBits);
 			}
 
 			@Override

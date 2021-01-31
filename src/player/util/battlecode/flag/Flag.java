@@ -35,10 +35,10 @@ public class Flag {
 	 * @return an instance of IFlag as described by the IFlag encoded within the argument bits.
 	 */
 	public static Flag.IFlag decode(int rawFlag) {
-		assert (rawFlag >= 0) && (rawFlag < (1 << Flag.MAX_NUM_BITS)) : "rawFlag: " + rawFlag;
+		assert UtilFlag.validBits(MAX_NUM_BITS, rawFlag) : "rawFlag: " + rawFlag;
 		FlagWalker flagWalker = new FlagWalker(rawFlag);
 		// get the FlagOpCode
-		int opCodeBits = flagWalker.readBits(UtilFlag.numOpCodeBits);
+		int opCodeBits = flagWalker.readBits(UtilFlag.NUM_OP_CODE_BITS);
 		UtilFlag.FlagOpCode opCode = UtilFlag.getOpCodeFromBits(opCodeBits);
 		// use the FlagOpCode to get the correct factory object
 		UtilFlag.IFlagFactory factory = UtilFlag.opCodeToFactoryMap.get(opCode);
@@ -54,7 +54,7 @@ public class Flag {
 		int opCodeBits = UtilFlag.getBitsFromOpCode(opCode);
 		FlagWalker flagWalker = new FlagWalker(EMPTY_FLAG);
 		// write the FlagOpCode to facilitate later decoding
-		flagWalker.writeBits(UtilFlag.numOpCodeBits, opCodeBits);
+		flagWalker.writeBits(UtilFlag.NUM_OP_CODE_BITS, opCodeBits);
 		// write the bits of the encoded flag
 		flagWalker.writeBits(flag.numBits(), flag.encode());
 		return flagWalker.getAllBits();

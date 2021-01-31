@@ -3,6 +3,7 @@ package player.util.battlecode.flag.types.base.fields;
 import player.util.battlecode.flag.types.base.BaseFlag;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
+import player.util.battlecode.flag.util.UtilFlag;
 import player.util.math.UtilMath;
 
 public class DegreesField implements BaseFlag.IFlagField {
@@ -20,10 +21,6 @@ public class DegreesField implements BaseFlag.IFlagField {
 	public DegreesField(int degrees) {
 		assert (degrees >= 0) && (degrees < UtilMath.CIRCLE_DEGREES) : "degrees: " + degrees;
 		this.degrees = degrees;
-	}
-	
-	public static DegreesField decode(int bits) {
-		return new DegreesField(bits);
 	}
 	
 	public int getDegrees() {
@@ -45,7 +42,8 @@ public class DegreesField implements BaseFlag.IFlagField {
 
 			@Override
 			public BaseFlag.IFlagField decode(int bits) {
-				return DegreesField.decode(bits);
+				assert UtilFlag.validBits(NUM_BITS, bits) : "" + bits;
+				return new DegreesField(bits);
 			}
 
 			@Override

@@ -55,19 +55,6 @@ public class PatrolAssignmentFlag extends BaseFlag {
 		this.outboundDegrees = (DegreesField)fieldList.get(0);
 	}
 	
-	/**
-	 * Decodes the bits of an encoded PatrolAssignmentFlag into a PatrolAssignmentFlag instance.
-	 * 
-	 * @param rawFlag must lie on [0, 2**MAX_NUM_BITS)
-	 * @return an instance of PatrolAssignmentFlag as described by the PatrolAssignmentFlag
-	 *     encoded within the argument bits.
-	 */
-	public static PatrolAssignmentFlag decode(int rawFlag) {
-		assert (rawFlag >= 0) && (rawFlag < (1 << Flag.MAX_NUM_BITS)) : "rawFlag: " + rawFlag;
-		List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(rawFlag, fieldFactories);
-		return new PatrolAssignmentFlag(fields);
-	}
-	
 	public int getOutboundDegrees() {
 		return this.outboundDegrees.getDegrees();
 	}
@@ -82,7 +69,9 @@ public class PatrolAssignmentFlag extends BaseFlag {
 
 			@Override
 			public Flag.IFlag decode(int bits) {
-				return PatrolAssignmentFlag.decode(bits);
+				assert UtilFlag.validBits(NUM_BITS, bits) : "bits: " + bits;
+				List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(bits, fieldFactories);
+				return new PatrolAssignmentFlag(fields);
 			}
 
 			@Override

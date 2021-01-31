@@ -50,13 +50,13 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 			IAssignmentHandler handler;
 			Flag.IFlag flag = Flag.decode(rawFlag);
 			if (flag instanceof PatrolAssignmentFlag) {
-					PatrolAssignmentFlag patrolAssignmentFlag = PatrolAssignmentFlag.decode(rawFlag);
+					PatrolAssignmentFlag patrolAssignmentFlag = (PatrolAssignmentFlag)flag;
 					DoubleVec2D vec = UtilMath.degreesToVec(patrolAssignmentFlag.getOutboundDegrees());
 					DoubleVec2D origin = new DoubleVec2D(rc.getLocation().x, rc.getLocation().y);
 					Line2D line = new Line2D(vec, origin);
 					handler = new PatrolAssignmentHandler(line, vec);
 			} else if (flag instanceof AttackAssignmentFlag) {
-					AttackAssignmentFlag attackAssignmentFlag = AttackAssignmentFlag.decode(rawFlag);
+					AttackAssignmentFlag attackAssignmentFlag = (AttackAssignmentFlag)flag;
 					MapLocation targetMapLoc = attackAssignmentFlag.getMapLoc(rc.getLocation());
 					handler = new AttackAssignmentHandler(targetMapLoc);
 			} else {

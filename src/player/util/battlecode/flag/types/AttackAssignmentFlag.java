@@ -50,19 +50,6 @@ public class AttackAssignmentFlag extends BaseFlag {
 	}
 	
 	/**
-	 * Decodes the bits of an encoded AttackAssignmentFlag into an AttackAssignmentFlag instance.
-	 * 
-	 * @param rawFlag must lie on [0, 2**MAX_NUM_BITS)
-	 * @return an instance of AttackAssignmentFlag as described by the AttackAssignmentFlag
-	 *     encoded within the argument bits.
-	 */
-	public static AttackAssignmentFlag decode(int rawFlag) {
-		assert (rawFlag >= 0) && (rawFlag < (1 << Flag.MAX_NUM_BITS)) : "rawFlag: " + rawFlag;
-		List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(rawFlag, fieldFactories);
-		return new AttackAssignmentFlag(fields);
-	}
-	
-	/**
 	 * Returns the MapLocation indicated by the flag.
 	 * 
 	 * @param referenceMapLoc *any* valid (i.e. on the map) MapLocation.
@@ -81,7 +68,9 @@ public class AttackAssignmentFlag extends BaseFlag {
 
 			@Override
 			public Flag.IFlag decode(int bits) {
-				return AttackAssignmentFlag.decode(bits);
+				assert UtilFlag.validBits(NUM_BITS, bits) : "" + bits;
+				List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(bits, fieldFactories);
+				return new AttackAssignmentFlag(fields);
 			}
 
 			@Override

@@ -39,7 +39,8 @@ public abstract class BaseFlag implements Flag.IFlag {
 	 */
 	public interface IFlagFieldFactory {
 		/**
-		 * Returns an IFlagField instance from an IFlagField encoded as a sequence of bits.
+		 * Returns an IFlagField instance as encoded within the argument bits.
+		 * @param bits must be non-negative and representable by no more than than numBits() bits.
 		 */
 		public BaseFlag.IFlagField decode(int bits);
 		/**

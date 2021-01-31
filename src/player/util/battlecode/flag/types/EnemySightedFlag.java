@@ -78,25 +78,14 @@ public class EnemySightedFlag extends BaseFlag {
 		return Arrays.asList(this.robotTypeField, this.mapLocField);
 	}
 	
-	/**
-	 * Decodes the bits of an encoded EnemySightedFlag into an EnemySightedFlag instance.
-	 * 
-	 * @param rawFlag must lie on [0, 2**MAX_NUM_BITS)
-	 * @return an instance of EnemySightedFlag as described by the EnemySightedFlag
-	 *     encoded within the argument bits.
-	 */
-	public static EnemySightedFlag decode(int rawFlag) {
-		assert (rawFlag >= 0) && (rawFlag < (1 << Flag.MAX_NUM_BITS)) : "rawFlag: " + rawFlag;
-		List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(rawFlag, EnemySightedFlag.fieldFactories);
-		return new EnemySightedFlag(fields);	
-	}
-	
 	public static IFlagFactory getFactory() {
 		return new IFlagFactory() {
 
 			@Override
 			public Flag.IFlag decode(int bits) {
-				return EnemySightedFlag.decode(bits);
+				assert UtilFlag.validBits(NUM_BITS, bits) : "" + bits;
+				List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(bits, EnemySightedFlag.fieldFactories);
+				return new EnemySightedFlag(fields);	
 			}
 
 			@Override

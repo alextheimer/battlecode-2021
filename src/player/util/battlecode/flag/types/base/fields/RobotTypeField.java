@@ -4,6 +4,7 @@ import battlecode.common.RobotType;
 import player.util.battlecode.flag.types.base.BaseFlag;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
 import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
+import player.util.battlecode.flag.util.UtilFlag;
 import player.util.math.UtilMath;
 
 public class RobotTypeField implements BaseFlag.IFlagField {
@@ -19,11 +20,6 @@ public class RobotTypeField implements BaseFlag.IFlagField {
 	 */
 	public RobotTypeField(RobotType robotType) {
 		this.robotType = robotType;
-	}
-	
-	public static RobotTypeField decode(int bits) {
-		assert (bits >= 0) && (bits < ROBOT_TYPE_ARRAY.length) : "bits: " + bits;
-		return new RobotTypeField(ROBOT_TYPE_ARRAY[bits]);
 	}
 	
 	public RobotType getRobotType() {
@@ -46,7 +42,8 @@ public class RobotTypeField implements BaseFlag.IFlagField {
 
 			@Override
 			public BaseFlag.IFlagField decode(int bits) {
-				return RobotTypeField.decode(bits);
+				assert UtilFlag.validBits(NUM_BITS, bits) : "" + bits;
+				return new RobotTypeField(ROBOT_TYPE_ARRAY[bits]);
 			}
 
 			@Override

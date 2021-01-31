@@ -48,19 +48,6 @@ public class TargetMissingFlag extends BaseFlag {
 	public TargetMissingFlag(List<BaseFlag.IFlagField> fields) {
 		this.mapLocField = (MapLocField)fields.get(0);
 	}
-	
-	/**
-	 * Decodes the bits of an encoded TargetMissingFlag into a TargetMissingFlag instance.
-	 * 
-	 * @param rawFlag must lie on [0, 2**MAX_NUM_BITS)
-	 * @return an instance of TargetMissingFlag as described by the TargetMissingFlag
-	 *     encoded within the argument bits.
-	 */
-	public static TargetMissingFlag decode(int rawFlag) {
-		assert (rawFlag >= 0) && (rawFlag < (1 << Flag.MAX_NUM_BITS)) : "rawFlag: " + rawFlag;
-		List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(rawFlag, fieldFactories);
-		return new TargetMissingFlag(fields);
-	}
 
 	/**
 	 * Returns the MapLocation indicated by the flag.
@@ -80,7 +67,9 @@ public class TargetMissingFlag extends BaseFlag {
 
 			@Override
 			public Flag.IFlag decode(int bits) {
-				return TargetMissingFlag.decode(bits);
+				assert UtilFlag.validBits(NUM_BITS, bits) : "bits: " + bits;
+				List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(bits, fieldFactories);
+				return new TargetMissingFlag(fields);
 			}
 
 			@Override
