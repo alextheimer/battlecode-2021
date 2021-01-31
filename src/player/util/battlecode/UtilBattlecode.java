@@ -70,6 +70,12 @@ public class UtilBattlecode {
 		};
 	}
 	
+	public static String getWrappedGameActionExceptionString(GameActionException e) {
+		return "A GameActionException occurred inside a 'silenced' wrapper.\n" +
+			   "Note: Use of this wrapper implies this should never happen!\n" +
+               "Begin GameActionException stack trace:\n" + UtilGeneral.stringifyStackTrace(e);
+	}
+	
 	/**
 	 * ***WARNING***
 	 * This should only ever be used when 100% certain a GameActionException will not be thrown.
@@ -85,9 +91,7 @@ public class UtilBattlecode {
 				try {
 					return pred.test(t);
 				} catch (GameActionException e) {
-					throw new RuntimeException("A GameActionException occurred inside a silenced GameActionPredicate.\n" +
-											   "Note: Use of this wrapper implies this should never happen!\n" +
-							                   "Begin GameActionException stack trace:\n" + UtilGeneral.stringifyStackTrace(e));
+					throw new RuntimeException(UtilBattlecode.getWrappedGameActionExceptionString(e));
 				}
 			}
 			

@@ -37,7 +37,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
 			this.origin = rc.getLocation();
 		}
 		
-        Optional<RobotInfo> sensedEnlightenmentCenterOpt = HandlerCommon.senseAllNonTeam(rc).stream()
+        Optional<RobotInfo> sensedEnlightenmentCenterOpt = HandlerCommon.getRobotsNotOnTeamStream(rc.getTeam(), rc.senseNearbyRobots())
         		.filter(robotInfo -> robotInfo.getType() == RobotType.ENLIGHTENMENT_CENTER).findAny();
         if(sensedEnlightenmentCenterOpt.isPresent()) {
         	RobotInfo enlightenmentCenterInfo = sensedEnlightenmentCenterOpt.get();
@@ -45,7 +45,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
         	rc.setFlag(Flag.encode(flag));
         }
         
-        Optional<RobotInfo> nearestOpt = HandlerCommon.senseNearestNonTeam(rc, rc.senseNearbyRobots());
+        Optional<RobotInfo> nearestOpt = HandlerCommon.getNearestNonTeamRobot(rc, rc.senseNearbyRobots());
         if (nearestOpt.isPresent()) {
         	MapLocation enemyLoc = nearestOpt.get().getLocation();
         	Iterator<MapLocation> mapLocIter = UtilBattlecode.makeAdjacentMapLocIterator(rc.getLocation());

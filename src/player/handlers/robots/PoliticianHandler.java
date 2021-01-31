@@ -22,6 +22,7 @@ import player.util.math.UtilMath;
 import static player.handlers.common.HandlerCommon.*;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -46,9 +47,8 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 	
 	class UnassignedAssignmentHandler implements IAssignmentHandler {
 		
-		private IAssignmentHandler makeAssignedHandler(RobotController rc, int rawFlag) {
+		private IAssignmentHandler makeAssignedHandler(RobotController rc, IFlag flag) {
 			IAssignmentHandler handler;
-			Flag.IFlag flag = Flag.decode(rawFlag);
 			if (flag instanceof PatrolAssignmentFlag) {
 					PatrolAssignmentFlag patrolAssignmentFlag = (PatrolAssignmentFlag)flag;
 					DoubleVec2D vec = UtilMath.degreesToVec(patrolAssignmentFlag.getOutboundDegrees());
@@ -80,9 +80,9 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		@Override
 		public IAssignmentHandler handle(RobotController rc) throws GameActionException {
 			IAssignmentHandler assignedHandler;
-			Optional<Integer> flagOpt = HandlerCommon.findFirstAdjacentAssignmentFlag(rc);
+			Optional<SimpleImmutableEntry<RobotInfo, IFlag>> flagOpt = HandlerCommon.getAnyAdjacentAssignmentFlag(rc, rc.senseNearbyRobots());
 			if (flagOpt.isPresent()) {
-				assignedHandler = this.makeAssignedHandler(rc, flagOpt.get());
+				assignedHandler = this.makeAssignedHandler(rc, flagOpt.get().getValue());
 				UtilBattlecode.log("initialized via flag");
 			} else {
 				assignedHandler = this.makeDefaultHandler(rc);
@@ -189,7 +189,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 	}
 		
 	private boolean attemptEmpowerNearestEnemy(RobotController rc) throws GameActionException {
-		Optional<RobotInfo> enemyInfoOpt = HandlerCommon.senseNearestNonTeam(rc, rc.senseNearbyRobots());
+		Optional<RobotInfo> enemyInfoOpt = HandlerCommon.getNearestNonTeamRobot(rc, rc.senseNearbyRobots());
 		if (enemyInfoOpt.isPresent()) {
 			RobotInfo enemyInfo = enemyInfoOpt.get();
 			int enemyDistSquared = rc.getLocation().distanceSquaredTo(enemyInfo.getLocation());
@@ -215,11 +215,13 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 			}
 		};
 		
-		Collection<RobotInfo> sensedNonTeammates = HandlerCommon.senseAllNonTeam(rc);
-		if (sensedNonTeammates.isEmpty()) {
+		Iterator<RobotInfo> sensedNonTeammateIterator = HandlerCommon.getRobotsNotOnTeamStream(rc.getTeam(), rc.senseNearbyRobots()).iterator();
+		if (sensedNonTeammateIterator.hasNext()) {
+			return Optional.of(UtilGeneral.findLeastCostLinear(sensedNonTeammateIterator, costFunc));
+		} else {
 			return Optional.empty();
 		}
-		return Optional.of(UtilGeneral.findLeastCostLinear(sensedNonTeammates.iterator(), costFunc));
+		
 	}
 	
 	@FunctionalInterface

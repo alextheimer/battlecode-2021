@@ -11,6 +11,7 @@ import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
+import player.util.general.UtilGeneral;
 import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
@@ -139,7 +140,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 		RobotInfo[] sensedRobots = rc.senseNearbyRobots();
 		
 		// update our known ID's
-		Set<RobotInfo> teamSet = HandlerCommon.senseAllTeam(rc);
+		Set<RobotInfo> teamSet = UtilGeneral.legalSetCollect(HandlerCommon.getRobotsOnTeamStream(rc.getTeam(), sensedRobots));
 		for (RobotInfo robotInfo : teamSet) {
 			if (!this.idSet.contains(robotInfo.getID())) {
 				this.idSet.add(robotInfo.getID());
@@ -147,7 +148,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 		}
 		
 		// check if we need to call for help
-		Optional<RobotInfo> nearestNonTeam = HandlerCommon.senseNearestNonTeam(rc, sensedRobots);
+		Optional<RobotInfo> nearestNonTeam = HandlerCommon.getNearestNonTeamRobot(rc, sensedRobots);
 		if (nearestNonTeam.isPresent()) {
 			// TODO(theimer): call for help!
 		}
