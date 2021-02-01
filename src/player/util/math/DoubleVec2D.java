@@ -37,6 +37,13 @@ public class DoubleVec2D {
 	}
 	
 	/**
+	 * Returns the angle (in radians) between two vectors.
+	 */
+	public double angle(DoubleVec2D other) {
+		return Math.acos(this.dot(other) / (this.magnitude() * other.magnitude()));
+	}
+	
+	/**
 	 * Returns true iff each dimension of this vector is zero (+/- FLOAT_EPS).
 	 * Note that this is faster and more accurate than checking the magnitude().
 	 */
