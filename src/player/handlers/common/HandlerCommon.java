@@ -42,6 +42,7 @@ public class HandlerCommon {
 	/**
 	 * Attempts to move the robot into the adjacent space as specified by the argument Direction.
 	 * 
+	 * @param rc the RobotController for the current round.
 	 * @return true iff the move completes successfully; else false.
 	 */
 	public static boolean attemptMove(RobotController rc, Direction dir) {
@@ -62,18 +63,35 @@ public class HandlerCommon {
 		return moveSuccessful;
 	}
 	
+	/**
+	 * Returns a Stream of RobotInfos on the specified Team.
+	 * 
+	 * @param sensedRobots RobotInfos sensed by the RobotController for the current round.
+	 */
 	public static Stream<RobotInfo> getRobotsOnTeamStream(Team team, RobotInfo[] sensedRobots) {
 		return Arrays.stream(sensedRobots)
 				.filter(robotInfo -> robotInfo.getTeam() == team);
 	}
 	
+	/**
+	 * Returns a Stream of RobotInfos ***NOT*** on the specified Team.
+	 * 
+	 * @param sensedRobots RobotInfos sensed by the RobotController for the current round.
+	 */
 	public static Stream<RobotInfo> getRobotsNotOnTeamStream(Team notThisTeam, RobotInfo[] sensedRobots) {
 		return Arrays.stream(sensedRobots)
 				.filter(robotInfo -> robotInfo.getTeam() != notThisTeam);
 	}
 	
-	public static Stream<SimpleImmutableEntry<RobotInfo, IFlag>> getMatchingTeamFlagsStream(RobotController rc,
-			RobotInfo[] sensedRobots, BiPredicate<RobotInfo, IFlag> predicate) throws GameActionException  {
+	/**
+	 * Returns a stream of RobotInfo/IFlag pairs such that each RobotInfo
+	 * robot is on the same Team as the RobotController robot.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 * @param sensedRobots RobotInfos sensed by the RobotController for the current round.
+	 */
+	public static Stream<SimpleImmutableEntry<RobotInfo, IFlag>> getMatchingTeamFlagsStream(RobotController rc, 
+			                                                                                RobotInfo[] sensedRobots) {
 		return getRobotsOnTeamStream(rc.getTeam(), sensedRobots)
 		    // map to RobotInfo/IFlag pairs
 		    .map(new Function<RobotInfo, SimpleImmutableEntry<RobotInfo, IFlag>>() {
@@ -84,17 +102,23 @@ public class HandlerCommon {
 					try {
 						rawFlag = rc.getFlag(robotInfo.getID());
 					} catch (GameActionException e) {
-						// This should never happen-- sensedRobots must be sensable.
+						// This should never happen-- sensedRobots must be sensable at the current round.
 						throw new UtilBattlecode.IllegalGameActionException(e);
 					}
 					return new SimpleImmutableEntry<RobotInfo, IFlag>(robotInfo, Flag.decode(rawFlag));
 				}
-		    	
-		    })
-		    // filter out the pairs we don't want
-		    .filter(entry -> predicate.test(entry.getKey(), entry.getValue()));
+			});
 	}
 	
+	
+	/**
+	 * Returns the robot nearest to the RobotController robot that is ***NOT*** on the same team.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 * @param sensedRobots RobotInfos sensed by the RobotController for the current round.
+	 * @return an occupied Optional iff sensedRobots contains at least one non-team RobotInfo;
+	 *     else returns an empty Optional.
+	 */
 	public static Optional<RobotInfo> getNearestNonTeamRobot(RobotController rc, RobotInfo[] sensedRobots) {
 		Iterator<RobotInfo> nonTeamRobotIterator = getRobotsNotOnTeamStream(rc.getTeam(), sensedRobots).iterator();
 		Optional<RobotInfo> result;
@@ -107,10 +131,22 @@ public class HandlerCommon {
 		return result;
 	}
 	
+	
+	/**
+	 * Returns some robot/flag pair such that:
+	 *     (1) the robot is immediately adjacent to the RobotController robot, and
+	 *     (2) the robot is on the same Team as the RobotController robot, and
+	 *     (3) the flag is an "assignment" flag.  // TODO(theimer): make this definition more clear/concrete
+	 * 
+	 * @param rc the RobotController for the current round.
+	 * @param sensedRobots RobotInfos sensed by the RobotController for the current round.
+	 * @return an occupied Optional iff a RobotInfo in `sensedRobots` has posted a flag, and the
+	 *     RobotInfo/IFlag pair meets the above three criteria.
+	 */
 	public static Optional<SimpleImmutableEntry<RobotInfo, IFlag>> getAnyAdjacentAssignmentFlag(RobotController rc,
-			RobotInfo[] sensedRobots) throws GameActionException {
-		
-		final int maxAdjacentDistanceSquared = 3;
+			                                                                                    RobotInfo[] sensedRobots) {
+		// max distance squared between two adjacent MapLocations
+		final int maxAdjacentDistanceSquared = 2;
 		
 		BiPredicate<RobotInfo, IFlag> predicate = new BiPredicate<RobotInfo, IFlag>() {
 
@@ -118,13 +154,15 @@ public class HandlerCommon {
 			public boolean test(RobotInfo robotInfo, IFlag flag) {
 				return
 						// adjacent to the RobotController robot
-						(rc.getLocation().distanceSquaredTo(robotInfo.getLocation()) < maxAdjacentDistanceSquared) &&
+						(rc.getLocation().distanceSquaredTo(robotInfo.getLocation()) <= maxAdjacentDistanceSquared) &&
 						// is an assignment flag
 						(flag instanceof PatrolAssignmentFlag || flag instanceof AttackAssignmentFlag);
 			}
 			
 		};
 		
-		return getMatchingTeamFlagsStream(rc, sensedRobots, predicate).findAny();
+		return getMatchingTeamFlagsStream(rc, sensedRobots)
+				.filter(entry -> predicate.test(entry.getKey(), entry.getValue()))
+				.findAny();
 	}
 }
