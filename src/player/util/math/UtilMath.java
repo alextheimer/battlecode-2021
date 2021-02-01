@@ -30,6 +30,17 @@ public class UtilMath {
 	}
 	
 	/**
+	 * Returns true iff the vector is parallel to the line.
+	 * @param vec must have magnitude > 0.
+	 */
+	public static boolean vecParallelToLine(DoubleVec2D vec, Line2D line) {
+		assert !vec.isZero() : "vec must have positive magnitude: " + vec;
+		DoubleVec2D lineSlopeVec = new DoubleVec2D(line.b, -line.a);
+		double angle = lineSlopeVec.angle(vec);
+		return UtilMath.doubleEquals(0.0, angle) || UtilMath.doubleEquals(Math.PI, angle);
+	}
+	
+	/**
 	 * Returns the floor of log2 on a positive integer argument.
 	 * @param val must be greater than zero
 	 */
