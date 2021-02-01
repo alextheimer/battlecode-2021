@@ -229,6 +229,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		public R apply(T arg0) throws GameActionException;
 	}
 	
+	// TODO(theimer): move this time-crunch artifact
 	private static <T, R> Function<T, R> wrapGameActionFunctionEmergency(GameActionFunction<T, R> gafunc) {
 		return new Function<T, R>() {
 			@Override

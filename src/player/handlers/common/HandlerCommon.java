@@ -32,14 +32,28 @@ import player.util.math.UtilMath.*;
 
 /**
  * Contains functions common among handlers.
+ * 
+ * Note: all "attempt" functions check that a game action is possible before performing the action.
+ *     If it's possible, it executes; otherwise, it does not. The functions returns true
+ *     iff the action executes.
  */
 public class HandlerCommon {
 	
-	public static boolean attemptMove(RobotController rc, Direction dir) throws GameActionException {
+	/**
+	 * Attempts to move the robot into the adjacent space as specified by the argument Direction.
+	 * 
+	 * @return true iff the move completes successfully; else false.
+	 */
+	public static boolean attemptMove(RobotController rc, Direction dir) {
 		UtilBattlecode.log("Attempting to move Direction: " + dir);
 		boolean moveSuccessful;
 		if (rc.canMove(dir)) {
-			rc.move(dir);
+			try {
+				rc.move(dir);				
+			} catch (GameActionException e) {
+				// rc::canMove is a precondition of the try-catch.
+				throw new UtilBattlecode.IllegalGameActionException(e);
+			}
 			moveSuccessful = true;
 		} else {
 			moveSuccessful = false;
@@ -71,7 +85,7 @@ public class HandlerCommon {
 						rawFlag = rc.getFlag(robotInfo.getID());
 					} catch (GameActionException e) {
 						// This should never happen-- sensedRobots must be sensable.
-						throw new RuntimeException(UtilBattlecode.getWrappedGameActionExceptionString(e));
+						throw new UtilBattlecode.IllegalGameActionException(e);
 					}
 					return new SimpleImmutableEntry<RobotInfo, IFlag>(robotInfo, Flag.decode(rawFlag));
 				}

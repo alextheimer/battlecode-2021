@@ -97,7 +97,7 @@ public class UtilBattlecode {
 	 * ***WARNING***
 	 * 
 	 * Wraps a GameActionPredicate in an anonymous Predicate that does not throw a GameActionException.
-	 * The anonymous Predicate will throw a RuntimeException if the wrapped Predicate throws a GameActionException.
+	 * @throws IllegalGameActionException if the wrapped Predicate throws a GameActionException.
 	 */
 	public static <T> Predicate<T> silenceGameActionPredicate(GameActionPredicate<T> pred) {
 		return new Predicate<T>() {
@@ -106,7 +106,7 @@ public class UtilBattlecode {
 				try {
 					return pred.test(t);
 				} catch (GameActionException e) {
-					throw new RuntimeException(UtilBattlecode.getWrappedGameActionExceptionString(e));
+					throw new UtilBattlecode.IllegalGameActionException(e);
 				}
 			}
 			
