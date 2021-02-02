@@ -107,11 +107,11 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		}
 		
 		private boolean patrolStep(RobotController rc) throws GameActionException {
-			if (this.moveHandler.atEndOfLine() || this.moveHandler.blocked()) {
+			if (this.moveHandler.endOfLine() || this.moveHandler.blocked()) {
 				this.moveHandler.reverse();
 				this.reverseCount++;
 			}
-			return this.moveHandler.step(rc);
+			return this.moveHandler.attemptStep(rc);
 		}
 		
 		@Override

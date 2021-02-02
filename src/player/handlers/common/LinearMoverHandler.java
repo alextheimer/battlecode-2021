@@ -1,11 +1,15 @@
 package player.handlers.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -22,95 +26,195 @@ import player.util.math.UtilMath;
 
 public class LinearMoverHandler {
 	
-	private static final double LINE_DIST_THRESH = 2.0;  // TODO(theimer)
+	// the maximum distance the robot is allowed to move from the line.
+	public static final double MAX_LINE_DIST = 2.0;
 	
+	// the line to move the robot along.
 	private Line2D line;
+	// The direction to move the robot along the line (parallel to `line`).
 	private DoubleVec2D vec;
-	private boolean endOfLine;
+	// true iff the most recent move attempt failed because no valid locations exist (including occupied / 
+	// temporarily blocked locations) further along `line` in the direction of `vec`.
+	private boolean atEndOfLine;
+	// true iff !atEndOfLine but no traversable locations exist (i.e. they are occupied).
 	private boolean isBlocked;
 	
+	private void assertRepCheck() {
+		assert !(atEndOfLine && isBlocked) :
+			String.format("can't be blocked at the end of the line; endOfLine: %b; isBlocked: %b", atEndOfLine, isBlocked);
+		assert UtilMath.vecParallelToLine(vec, line) : 
+			"vec must be parallel to line; vec: " + vec + ", line: " + line;
+	}
+	
+	/**
+	 * Handles robot movement along a linear path.
+	 * 
+	 * @param line the line along which the robot is moved.
+	 * @param vec the direction in which the robot should move along the line.
+	 *     Must be parallel to `line`.
+	 */
 	public LinearMoverHandler(Line2D line, DoubleVec2D vec) {
+		assert UtilMath.vecParallelToLine(vec, line) : 
+			"vec must be parallel to line; vec: " + vec + ", line: " + line;
 		this.line = line;
 		this.vec = vec;
-		this.endOfLine = false;
-		isBlocked = false;
+		this.atEndOfLine = false;
+		this.isBlocked = false;
+		assertRepCheck();
 	}
 	
-	private boolean canStep(RobotController rc) {
-		DoubleVec2D mapLocVec = new DoubleVec2D(rc.getLocation().x, rc.getLocation().y);
-		return (!this.endOfLine) && (UtilMath.distanceFromLine(mapLocVec, line) < LINE_DIST_THRESH);
-	}
-	
-	private Set<MapLocation> getProgressMapLocs(MapLocation mapLoc, RobotController rc) throws GameActionException {
-		Iterator<MapLocation> adjacentMapLocIterator = UtilBattlecode.makeAdjacentMapLocIterator(mapLoc);
-		Stream<MapLocation> mapLocStream = UtilGeneral.streamifyIterator(adjacentMapLocIterator);
+	/**
+	 * Returns a Stream of all locations that the RobotController can move into such that each:
+	 *     (1) is adjacent to the robot's current location, and
+	 *     (2) is on the map, and
+	 *     (3) would progress the robot along this.line in the direction of this.vec, and
+	 *     (4) is within MAX_LINE_DIST of the this.line.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 *     Must have a current location within distance MAX_LINE_DIST of this.line.
+	 */
+	private Stream<MapLocation> getProgressiveMapLocStream(RobotController rc) {
+		MapLocation currentMapLoc = rc.getLocation();
 		
-		Predicate<MapLocation> pred =  UtilBattlecode.<MapLocation>silenceGameActionPredicate(ll -> rc.onTheMap(ll));
+		assert UtilMath.distanceFromLine(new DoubleVec2D(currentMapLoc.x, currentMapLoc.y), line) < MAX_LINE_DIST : 
+			"the robot's current MapLocation must lie less than MAX_LINE_DIST distance from the line: location:\n" +
+		    rc.getLocation() + ", line: " + this.line;
 		
-		return UtilGeneral.legalSetCollect(mapLocStream.filter(loc -> (
-					// close enough to the path line?
-					(UtilMath.distanceFromLine(new DoubleVec2D(loc.x, loc.y), line) < LINE_DIST_THRESH) &&
-					// valid location on the map?
-				    pred.test(loc) &&
-				    // heading in the right direction?
-					(vec.dot(new DoubleVec2D(loc.x - mapLoc.x, loc.y - mapLoc.y)) > 0)
-		)));
+		// get a stream of adjacent locations that lie on the map.
+		Stream<MapLocation> validAdjacentMapLocStream = HandlerCommon.makeValidAdjacentMapLocStream(rc);
+		
+		// is the dot product of the movement diff and this.vec > 0?
+		Predicate<MapLocation> progressivePredicate =
+				mapLoc -> vec.dot(new DoubleVec2D(mapLoc.x - currentMapLoc.x, mapLoc.y - currentMapLoc.y)) > 0;
+		// is the next MapLocation close enough to the line?
+		Predicate<MapLocation> nearLinePredicate =
+				mapLoc -> UtilMath.distanceFromLine(new DoubleVec2D(mapLoc.x, mapLoc.y), line) < MAX_LINE_DIST;
+		
+		return validAdjacentMapLocStream
+				// heading in the right direction?
+				.filter(progressivePredicate)
+				// acceptable distance from the line?
+				.filter(nearLinePredicate);
 	}
 	
-	private Optional<MapLocation> greedyNextLocation(Collection<MapLocation> progressMapLocs, RobotController rc) throws GameActionException {
-	    assert !progressMapLocs.isEmpty() : "TODO";
-		Predicate<MapLocation> pred = UtilBattlecode.<MapLocation>silenceGameActionPredicate(ll -> !rc.isLocationOccupied(ll));
-		Set<MapLocation> mapLocsUnoccupied = UtilGeneral.legalSetCollect(progressMapLocs.stream().filter(pred));
-		MapLocation startLoc = rc.getLocation();
-		Function<MapLocation, Double> costFunc = new Function<MapLocation, Double>() {
+	/**
+	 * Selects the robot's "best" next MapLocation from a stream of available MapLocations.
+	 * TODO(theimer): make "best" concrete.
+	 * 
+	 * @param candidateStream a non-empty stream of MapLocations such that each is:
+	 *     (1) on the map, and
+	 *     (2) within MAX_LINE_DIST of this.line.
+	 * @param rc the RobotController for the current round.
+	 * @return the "best" MapLocation that the robot should next move into to make progress along this.line.
+	 */
+	private MapLocation selectCandidateMoveMapLocation(Stream<MapLocation> candidateStream, RobotController rc) {
+		MapLocation currentMapLoc = rc.getLocation();
+		Function<MapLocation, Double> progressCostFunc = new Function<MapLocation, Double>() {
 			public Double apply(MapLocation mapLoc) {
-				DoubleVec2D mapLocVec = new DoubleVec2D(mapLoc.x, mapLoc.y);
-				DoubleVec2D diffVec = new DoubleVec2D(mapLoc.x - startLoc.x,
-						                              mapLoc.y - startLoc.y);
+				// TODO(theimer): assert the validity of the MapLocation (near line, on the map)
+				DoubleVec2D diffVec = new DoubleVec2D(mapLoc.x - currentMapLoc.x,
+						                              mapLoc.y - currentMapLoc.y);
 				return -diffVec.dot(vec);  // negated for least cost
 			}
 		};
-		if (mapLocsUnoccupied.isEmpty()) {
-			return Optional.empty();
-		}
-		return Optional.of(UtilGeneral.findLeastCostLinear(mapLocsUnoccupied.iterator(), costFunc));
+		return UtilGeneral.findLeastCostLinear(candidateStream.iterator(), progressCostFunc);
 	}
 	
+	/**
+	 * Reverses the direction the handler moves the robot along its line.
+	 * 
+	 * Note: blocked() and endOfLine() are reset when this is called (they will return false
+	 * until a call to attemptStep() warrants otherwise).
+	 */
 	public void reverse() {
-		this.endOfLine = false;
+		this.atEndOfLine = false;
 		this.isBlocked = false;
 		this.vec = vec.negate();
+		assertRepCheck();
 	}
 	
+	/**
+	 * Returns true if step() was attempted and failed because:
+	 *     (1) candidate move() MapLocations existed, but
+	 *     (2) all were occupied.
+	 *     
+	 * Note: this is reset when this reverse() called (it returns false
+	 * until a call to attemptStep() warrants otherwise).
+	 */
 	public boolean blocked() {
 		return this.isBlocked;
 	}
 	
-	public boolean atEndOfLine() {
-		return this.endOfLine;
+	/**
+	 * Returns true if step() was attempted and failed because
+	 * no candidate move() MapLocations existed.
+	 * 
+	 * Note: this is reset when this reverse() called (it returns false
+	 * until a call to attemptStep() warrants otherwise).
+	 */
+	public boolean endOfLine() {
+		return this.atEndOfLine;
 	}
 	
-	public boolean step(RobotController rc) throws GameActionException {
-		assert this.canStep(rc) : "Illegal step (endOfLine:" + this.endOfLine + ")";
-		Set<MapLocation> progressMapLocSet = this.getProgressMapLocs(rc.getLocation(), rc);
-		boolean stepAttempt;
-		if (progressMapLocSet.isEmpty()) {
-			this.endOfLine = true;
-			stepAttempt = false;
-		} else {
-			Optional<MapLocation> nextMapLocOptional = greedyNextLocation(progressMapLocSet, rc);
-			if (nextMapLocOptional.isPresent()) {
-				MapLocation nextLoc = nextMapLocOptional.get();
-				Direction dir = rc.getLocation().directionTo(nextLoc);
-				HandlerCommon.attemptMove(rc, dir);
-				stepAttempt = true;
-				this.isBlocked = false;
+	/**
+	 * Attempts to step the robot into an adjacent, unoccupied MapLocation result_step_location such that:
+	 *     (1) the location is within MAX_LINE_DIST distance of the line.
+	 *     (2) the dot product of the current movement vector and the difference vector
+	 *         (result_step_location - rc.getLocation()) is positive.
+	 * 
+	 * Preconditions:
+	 * 	   - !blocked()
+	 *     - !atEndOfLine()
+	 * 
+	 * @param rc the RobotController for the current round.
+	 * @return true iff a step is attempted (Note: not necessarily completed)
+	 */
+	public boolean attemptStep(RobotController rc) {
+		assert !(this.isBlocked || this.atEndOfLine) : "the robot must not be ";
+		
+		// arbitrarily assume no step is attempted
+		boolean stepAttempted = false;
+		
+		// get only the MapLocations that satisfy constraint (2)
+		Iterator<MapLocation> progressiveMapLocIterator = this.getProgressiveMapLocStream(rc).iterator();
+		
+		//lazily check the existence of any of these "progressive" locations
+		if (progressiveMapLocIterator.hasNext()) {
+			
+			// collect all progressive locations that are unoccupied
+			List<MapLocation> candidateList = new ArrayList<>();
+			// TODO(theimer): use this pattern elsewhere
+			progressiveMapLocIterator.forEachRemaining(new Consumer<MapLocation>() {
+				
+				// see below: this won't ever throw a GameActionException because it will only ever
+				// be called on adjacent (i.e. senseable) MapLocations.
+				Predicate<MapLocation> unoccupiedPredicate =
+						UtilBattlecode.<MapLocation>silenceGameActionPredicate(mapLoc -> !rc.isLocationOccupied(mapLoc));
+
+				@Override
+				public void accept(MapLocation t) {
+					if (unoccupiedPredicate.test(t)) {
+						candidateList.add(t);
+					}
+				}
+			});
+			
+			if (candidateList.size() > 0) {
+				// unoccupied/progressive locations exist!
+				// pick the best and attempt a move.
+				MapLocation moveLoc = selectCandidateMoveMapLocation(candidateList.stream(), rc);
+				HandlerCommon.attemptMove(rc, rc.getLocation().directionTo(moveLoc));
+				stepAttempted = true;
 			} else {
+				// progressive locations exist, but unoccupied locations don't
 				this.isBlocked = true;
-				stepAttempt = false;
 			}
+		} else {
+			// no progressive locations exist
+			this.atEndOfLine = true;
 		}
-		return stepAttempt;
+		assertRepCheck();
+		return stepAttempted;
 	}
 	
 }

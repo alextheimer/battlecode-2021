@@ -165,4 +165,23 @@ public class HandlerCommon {
 				.filter(entry -> predicate.test(entry.getKey(), entry.getValue()))
 				.findAny();
 	}
+	
+	
+	/**
+	 * Returns a Stream of all locations that the RobotController can move into such that each:
+	 *     (1) is adjacent to the robot's current location, and
+	 *     (2) is on the map.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 */
+	public static Stream<MapLocation> makeValidAdjacentMapLocStream(RobotController rc) {
+		MapLocation currentMapLoc = rc.getLocation();
+		
+		Stream<MapLocation> adjacentMapLocStream = UtilBattlecode.makeAllAdjacentMapLocStream(rc.getLocation());
+		
+		// Note: GameActionException will not be thrown; adjacent MapLocations are always in sensor range.
+		Predicate<MapLocation> onTheMapPredicate = UtilBattlecode.<MapLocation>silenceGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc));
+		
+		return adjacentMapLocStream.filter(onTheMapPredicate);
+	}
 }

@@ -3,8 +3,10 @@ package player.util.battlecode;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -66,29 +68,13 @@ public class UtilBattlecode {
 	}
 
 	/**
-	 * Returns an Iterator that iterates through *all* (on the board,
+	 * Returns a Stream that iterates through *all* (on the board,
 	 * off the board, occupied, etc) adjacent MapLocations.
 	 * 
 	 * @param mapLoc the location around which the Iterator will return adjacent locations.
 	 */
-	public static Iterator<MapLocation> makeAdjacentMapLocIterator(MapLocation mapLoc) {
-		// TODO(theimer): worth giving this its own class?
-		return new Iterator<MapLocation>() {
-			
-			private int dirIndex = 0;
-			
-			@Override
-			public boolean hasNext() {
-				return (dirIndex < OFF_CENTER_DIRECTIONS.length);
-			}
-	
-			@Override
-			public MapLocation next() {
-				Direction dir = OFF_CENTER_DIRECTIONS[dirIndex];
-				this.dirIndex++;
-				return mapLoc.add(dir);
-			}
-		};
+	public static Stream<MapLocation> makeAllAdjacentMapLocStream(MapLocation mapLoc) {
+		return Arrays.stream(OFF_CENTER_DIRECTIONS).map(dir -> mapLoc.add(dir));
 	}
 	
 	/**
@@ -97,6 +83,7 @@ public class UtilBattlecode {
 	 * ***WARNING***
 	 * 
 	 * Wraps a GameActionPredicate in an anonymous Predicate that does not throw a GameActionException.
+	 * 
 	 * @throws IllegalGameActionException if the wrapped Predicate throws a GameActionException.
 	 */
 	public static <T> Predicate<T> silenceGameActionPredicate(GameActionPredicate<T> pred) {

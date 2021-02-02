@@ -3,17 +3,24 @@ package player.util.general;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import battlecode.common.*;
 
 import java.util.Queue;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 /**
  * Contains utility functions/classes.
@@ -41,14 +48,7 @@ public class UtilGeneral {
 		return leastCostElt;
 	}
 	
-	public static <T> Stream<T> streamifyIterator(Iterator<T> iterator) {
-		Stream.Builder<T> builder = Stream.builder();
-		while (iterator.hasNext()) {
-			builder.accept(iterator.next());
-		}
-		return builder.build();
-	}
-	
+	@Deprecated
 	public static <T> Set<T> legalSetCollect(Stream<T> stream) {
 		Iterator<T> iterator = stream.iterator();
 		Set<T> resultSet = new HashSet<>();
@@ -56,6 +56,13 @@ public class UtilGeneral {
 			resultSet.add(iterator.next());
 		}
 		return resultSet;
+	}
+	
+	public static <C extends Collection<T>, T> void legalCollect(Stream<T> stream, C collection) {
+		Iterator<T> iterator = stream.iterator();
+		while (iterator.hasNext()) {
+			collection.add(iterator.next());
+		}
 	}
 	
 	public static <T> Set<T> removeMatching(Iterable<T> iterable, Predicate<T> predicate) {
