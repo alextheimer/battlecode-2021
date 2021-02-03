@@ -33,16 +33,17 @@ public class UtilGeneral {
 		return stringWriter.toString();	
 	}
 	
-	public static <T> T findLeastCostLinear(Iterator<T> iterator, Function<T, Double> costFunc) {
+	// TODO(theimer): this should accept an Iterable.
+	public static <T> T getLeastCostLinear(Iterable<T> iterable, Function<T, Double> costFunc) {
+		Iterator<T> iterator = iterable.iterator();
 		assert iterator.hasNext();
 		T leastCostElt = iterator.next();
 		double leastCost = costFunc.apply(leastCostElt);
-		while (iterator.hasNext()) {
-			T nextElt = iterator.next();
-			double nextEltCost = costFunc.apply(nextElt);
-			if (nextEltCost < leastCost) {
-				leastCostElt = nextElt;
-				leastCost = nextEltCost;
+		for (T elt : iterable) {
+			double eltCost = costFunc.apply(elt);
+			if (eltCost < leastCost) {
+				leastCostElt = elt;
+				leastCost = eltCost;
 			}
 		}
 		return leastCostElt;
@@ -52,19 +53,16 @@ public class UtilGeneral {
 	public static <T> Set<T> legalSetCollect(Stream<T> stream) {
 		Iterator<T> iterator = stream.iterator();
 		Set<T> resultSet = new HashSet<>();
-		while (iterator.hasNext()) {
-			resultSet.add(iterator.next());
-		}
+		iterator.forEachRemaining(resultSet::add);
 		return resultSet;
 	}
 	
 	public static <C extends Collection<T>, T> void legalCollect(Stream<T> stream, C collection) {
 		Iterator<T> iterator = stream.iterator();
-		while (iterator.hasNext()) {
-			collection.add(iterator.next());
-		}
+		iterator.forEachRemaining(collection::add);
 	}
 	
+	@Deprecated
 	public static <T> Set<T> removeMatching(Iterable<T> iterable, Predicate<T> predicate) {
 		Set<T> removedSet = new HashSet<>();
 		Iterator<T> iterator = iterable.iterator();
