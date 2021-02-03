@@ -80,9 +80,6 @@ public class LinearMoverHandler {
 			"the robot's current MapLocation must lie less than MAX_LINE_DIST distance from the line: location:\n" +
 		    rc.getLocation() + ", line: " + this.line;
 		
-		// get a stream of adjacent locations that lie on the map.
-		Stream<MapLocation> validAdjacentMapLocStream = HandlerCommon.makeValidAdjacentMapLocStream(rc);
-		
 		// is the dot product of the movement diff and this.vec > 0?
 		Predicate<MapLocation> progressivePredicate =
 				mapLoc -> vec.dot(new DoubleVec2D(mapLoc.x - currentMapLoc.x, mapLoc.y - currentMapLoc.y)) > 0;
@@ -90,7 +87,11 @@ public class LinearMoverHandler {
 		Predicate<MapLocation> nearLinePredicate =
 				mapLoc -> UtilMath.distanceFromLine(new DoubleVec2D(mapLoc.x, mapLoc.y), line) < MAX_LINE_DIST;
 		
-		return validAdjacentMapLocStream
+		return UtilBattlecode.makeAllAdjacentMapLocStream(currentMapLoc)
+				// on the map?
+				// note: this will never throw GameActionExceptions because the MapLocations
+				//     are adjacent (i.e. senseable).
+				.filter(PredicateFactories.mapLocOnMapSilenced(rc))
 				// heading in the right direction?
 				.filter(progressivePredicate)
 				// acceptable distance from the line?
@@ -101,13 +102,14 @@ public class LinearMoverHandler {
 	 * Selects the robot's "best" next MapLocation from a stream of available MapLocations.
 	 * TODO(theimer): make "best" concrete.
 	 * 
-	 * @param candidateStream a non-empty stream of MapLocations such that each is:
+	 * @param candidateCOllection a non-empty collection of MapLocations such that each is:
 	 *     (1) on the map, and
 	 *     (2) within MAX_LINE_DIST of this.line.
 	 * @param rc the RobotController for the current round.
 	 * @return the "best" MapLocation that the robot should next move into to make progress along this.line.
 	 */
-	private MapLocation selectCandidateMoveMapLocation(Stream<MapLocation> candidateStream, RobotController rc) {
+	private MapLocation selectCandidateMoveMapLocation(Collection<MapLocation> candidateCollection, RobotController rc) {
+		assert candidateCollection.size() > 0 : "collection size must be positive; size: " + candidateCollection.size();
 		MapLocation currentMapLoc = rc.getLocation();
 		Function<MapLocation, Double> progressCostFunc = new Function<MapLocation, Double>() {
 			public Double apply(MapLocation mapLoc) {
@@ -117,7 +119,7 @@ public class LinearMoverHandler {
 				return -diffVec.dot(vec);  // negated for least cost
 			}
 		};
-		return UtilGeneral.findLeastCostLinear(candidateStream.iterator(), progressCostFunc);
+		return UtilGeneral.getLeastCostLinear(candidateCollection, progressCostFunc);
 	}
 	
 	/**
@@ -174,23 +176,21 @@ public class LinearMoverHandler {
 		
 		// arbitrarily assume no step is attempted
 		boolean stepAttempted = false;
-		
-		// get only the MapLocations that satisfy constraint (2)
+
+		// get only the adjacent/unoccupied/on-the-map MapLocations that satisfy both constraints
 		Iterator<MapLocation> progressiveMapLocIterator = this.getProgressiveMapLocStream(rc).iterator();
-		
+			
 		//lazily check the existence of any of these "progressive" locations
 		if (progressiveMapLocIterator.hasNext()) {
 			
 			// collect all progressive locations that are unoccupied
 			List<MapLocation> candidateList = new ArrayList<>();
-			// TODO(theimer): use this pattern elsewhere
 			progressiveMapLocIterator.forEachRemaining(new Consumer<MapLocation>() {
 				
 				// see below: this won't ever throw a GameActionException because it will only ever
 				// be called on adjacent (i.e. senseable) MapLocations.
-				Predicate<MapLocation> unoccupiedPredicate =
-						UtilBattlecode.<MapLocation>silenceGameActionPredicate(mapLoc -> !rc.isLocationOccupied(mapLoc));
-
+				Predicate<MapLocation> unoccupiedPredicate = PredicateFactories.mapLocOnMapSilenced(rc);
+				
 				@Override
 				public void accept(MapLocation t) {
 					if (unoccupiedPredicate.test(t)) {
@@ -202,7 +202,7 @@ public class LinearMoverHandler {
 			if (candidateList.size() > 0) {
 				// unoccupied/progressive locations exist!
 				// pick the best and attempt a move.
-				MapLocation moveLoc = selectCandidateMoveMapLocation(candidateList.stream(), rc);
+				MapLocation moveLoc = selectCandidateMoveMapLocation(candidateList, rc);
 				HandlerCommon.attemptMove(rc, rc.getLocation().directionTo(moveLoc));
 				stepAttempted = true;
 			} else {
