@@ -33,11 +33,11 @@ public class PredicateFactories {
 		return robotInfo -> robotInfo.getTeam() == opponent;
 	}
 	
-	public static Predicate<MapLocation> mapLocOnMap(RobotController rc) {
+	public static Predicate<MapLocation> mapLocOnMapSilenced(RobotController rc) {
 		return UtilBattlecode.silenceGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc));
 	}
 	
-	public static Predicate<MapLocation> mapLocUnoccupied(RobotController rc) {
+	public static Predicate<MapLocation> mapLocUnoccupiedSilenced(RobotController rc) {
 		return UtilBattlecode.silenceGameActionPredicate(mapLoc -> !rc.isLocationOccupied(mapLoc));
 	}
 	
