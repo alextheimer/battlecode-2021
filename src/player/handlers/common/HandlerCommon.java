@@ -201,9 +201,11 @@ public class HandlerCommon {
 		boolean flagSet = false;
 		
 		// get all non-teammate robots
-		Stream<RobotInfo> nonTeamRobotStream = robotCollection.stream().filter(PredicateFactories.robotNonTeam(rc.getTeam()));
 		List<RobotInfo> nonTeamRobotList = new ArrayList<>();
-		UtilGeneral.legalCollect(nonTeamRobotStream, nonTeamRobotList);
+		{
+			Stream<RobotInfo> nonTeamRobotStream = robotCollection.stream().filter(PredicateFactories.robotNonTeam(rc.getTeam()));
+			UtilGeneral.legalCollect(nonTeamRobotStream, nonTeamRobotList);			
+		}
 		
 		if (nonTeamRobotList.size() > 0) {
 			// find the one of highest priority
@@ -229,16 +231,16 @@ public class HandlerCommon {
 	 */
 	public static Optional<Direction> getLeastCostMoveDirection(RobotController rc, Function<MapLocation, Double> costFunc) {
 		// get all adjacent/on-the-map/unoccupied MapLocations.
-		Stream<MapLocation> validAdjacentStream =
-				UtilBattlecode.makeAllAdjacentMapLocStream(rc.getLocation())
-				// note: silenced predicates will never throw GameActionExceptions because the MapLocations
-				//     are adjacent (i.e. senseable).
-				.filter(PredicateFactories.mapLocOnMapSilenced(rc))
-				.filter(PredicateFactories.mapLocUnoccupiedSilenced(rc));
-		
-		// collect the stream into a list
 		List<MapLocation> validAdjacentList = new ArrayList<>();
-		UtilGeneral.legalCollect(validAdjacentStream, validAdjacentList);
+		{
+			Stream<MapLocation> validAdjacentStream =
+					UtilBattlecode.makeAllAdjacentMapLocStream(rc.getLocation())
+					// note: silenced predicates will never throw GameActionExceptions because the MapLocations
+					//     are adjacent (i.e. senseable).
+					.filter(PredicateFactories.mapLocOnMapSilenced(rc))
+					.filter(PredicateFactories.mapLocUnoccupiedSilenced(rc));
+			UtilGeneral.legalCollect(validAdjacentStream, validAdjacentList);
+		}
 		
 		Optional<Direction> result;
 		if (validAdjacentList.size() > 0) {
