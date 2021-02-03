@@ -33,6 +33,17 @@ import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 import player.util.math.UtilMath.*;
 
+/*
+ * TODO(theimer):
+ *     None of these functions are constrained to operate on specific collections of robots
+ *     i.e. "only teammates" or "only adjacent", and hence much filtering will be redundant
+ *     across separate calls to these functions.
+ *     
+ *     If the Battlecode bytecode limits are reached, constraints should be imposed on
+ *     these collections such that the specific RobotType handlers are forced to
+ *     filter them (and hence these functions can be called again without additional filtering).
+ */
+
 /**
  * Contains functions common among handlers.
  * 
