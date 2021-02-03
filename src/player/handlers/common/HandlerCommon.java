@@ -220,8 +220,10 @@ public class HandlerCommon {
 		// get all adjacent/on-the-map/unoccupied MapLocations.
 		Stream<MapLocation> validAdjacentStream =
 				UtilBattlecode.makeAllAdjacentMapLocStream(rc.getLocation())
-				.filter(PredicateFactories.mapLocOnMap(rc))
-				.filter(PredicateFactories.mapLocUnoccupied(rc));
+				// note: silenced predicates will never throw GameActionExceptions because the MapLocations
+				//     are adjacent (i.e. senseable).
+				.filter(PredicateFactories.mapLocOnMapSilenced(rc))
+				.filter(PredicateFactories.mapLocUnoccupiedSilenced(rc));
 		
 		// collect the stream into a list
 		List<MapLocation> validAdjacentList = new ArrayList<>();
