@@ -27,13 +27,22 @@ import java.util.ArrayList;
  */
 public class UtilGeneral {
 	
+	/**
+	 * Returns the throwable's stack trace as a String.
+	 */
 	public static String stringifyStackTrace(Throwable throwable) {
 		StringWriter stringWriter = new StringWriter();
 		throwable.printStackTrace(new PrintWriter(stringWriter));
 		return stringWriter.toString();	
 	}
 	
-	// TODO(theimer): this should accept an Iterable.
+	/**
+	 * Returns the element of least cost.
+	 * 
+	 * @param iterable must have size > 0
+	 * @param costFunc maps each T to a value.
+	 * @return the element that returned the smallest value from costFunc.
+	 */
 	public static <T> T getLeastCostLinear(Iterable<T> iterable, Function<T, Double> costFunc) {
 		Iterator<T> iterator = iterable.iterator();
 		assert iterator.hasNext();
@@ -49,31 +58,15 @@ public class UtilGeneral {
 		return leastCostElt;
 	}
 	
-	@Deprecated
-	public static <T> Set<T> legalSetCollect(Stream<T> stream) {
-		Iterator<T> iterator = stream.iterator();
-		Set<T> resultSet = new HashSet<>();
-		iterator.forEachRemaining(resultSet::add);
-		return resultSet;
-	}
-	
+	/**
+	 * Collects a stream into an existing Collection instance.
+	 * 
+	 * Note:
+	 *     The Battlecode backend does not support Collectors,
+	 *     so this acts as a substitute.
+	 */
 	public static <C extends Collection<T>, T> void legalCollect(Stream<T> stream, C collection) {
 		Iterator<T> iterator = stream.iterator();
 		iterator.forEachRemaining(collection::add);
-	}
-	
-	@Deprecated
-	public static <T> Set<T> removeMatching(Iterable<T> iterable, Predicate<T> predicate) {
-		Set<T> removedSet = new HashSet<>();
-		Iterator<T> iterator = iterable.iterator();
-		while (iterator.hasNext()) {
-			// Note: must call next() before remove()
-			T element = iterator.next();
-			if (predicate.test(element)) {
-				removedSet.add(element);
-				iterator.remove();
-			}
-		}
-		return removedSet;
 	}
 }
