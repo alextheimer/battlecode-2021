@@ -3,8 +3,10 @@ package player.handlers.robots;
 import battlecode.common.*;
 import player.RobotPlayer;
 import player.RobotPlayer.IRobotHandler;
+import player.handlers.common.FlagPoster;
 import player.handlers.common.HandlerCommon;
 import player.handlers.common.LinearMoverHandler;
+import player.handlers.common.PredicateFactories;
 import player.util.battlecode.UtilBattlecode;
 import player.util.battlecode.flag.Flag;
 import player.util.battlecode.flag.Flag.IFlag;
@@ -22,6 +24,7 @@ import player.util.math.UtilMath;
 import static player.handlers.common.HandlerCommon.*;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,52 +40,78 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * State / method requirements are different for each of the Politician's different assignments,
+ * so each unique set of state/methods are handled by one of these.
+ */
 interface IAssignmentHandler {
-	public IAssignmentHandler handle(RobotController rc) throws GameActionException;
+	/**
+	 * Handles one of the Politician's assignments.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 */
+	public IAssignmentHandler handle(RobotController rc);
 }
 
 public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 	
+	// assignment handler for the Politician's current Enlightenment-Center-given assignment
 	IAssignmentHandler assignmentHandler = new UnassignedAssignmentHandler();
 	
-	class UnassignedAssignmentHandler implements IAssignmentHandler {
+	/**
+	 * The 'default' handler for Politicians that have yet to receive an assignment
+	 * from an Enlightenment Center.
+	 */
+	private class UnassignedAssignmentHandler implements IAssignmentHandler {
 		
-		private IAssignmentHandler makeAssignedHandler(RobotController rc, IFlag flag) {
+		/**
+		 * Returns an IAssignmentHandler according to the assignment flag.
+		 * 
+		 * @param rc the RobotController for the current round.
+		 * @param flag must be an assignment flag.
+		 */
+		private IAssignmentHandler makeHandlerFromAssignmentFlag(RobotController rc, IFlag flag) {
 			IAssignmentHandler handler;
 			if (flag instanceof PatrolAssignmentFlag) {
 					PatrolAssignmentFlag patrolAssignmentFlag = (PatrolAssignmentFlag)flag;
-					DoubleVec2D vec = UtilMath.degreesToVec(patrolAssignmentFlag.getOutboundDegrees());
-					DoubleVec2D origin = new DoubleVec2D(rc.getLocation().x, rc.getLocation().y);
-					Line2D line = new Line2D(vec, origin);
-					handler = new PatrolAssignmentHandler(line, vec);
+					// build the patrol line and initial direction vector
+					DoubleVec2D outboundVec = UtilMath.degreesToVec(patrolAssignmentFlag.getOutboundDegrees());
+					DoubleVec2D pointOnLine = UtilBattlecode.mapLocToVec(rc.getLocation());
+					Line2D patrolLine = new Line2D(outboundVec, pointOnLine);
+					handler = new PatrolAssignmentHandler(patrolLine, outboundVec);
 			} else if (flag instanceof AttackAssignmentFlag) {
 					AttackAssignmentFlag attackAssignmentFlag = (AttackAssignmentFlag)flag;
 					MapLocation targetMapLoc = attackAssignmentFlag.getMapLoc(rc.getLocation());
 					handler = new AttackAssignmentHandler(targetMapLoc);
 			} else {
-				throw new RuntimeException("illegal flag type: " + flag.getClass());
+				// TODO(theimer): change all RuntimeExceptions to something more appropriate.
+				throw new RuntimeException("unrecognized flag type: " + flag.getClass());
 			}
-
 			return handler;
-			
 		}
 		
+		/**
+		 * Returns the IAssignmentHandler to use when no assignment flag is detected.
+		 * Used when Slanderers change into Politicians after 300 rounds.
+		 * 
+		 * @param rc the RobotController for the current round.
+		 */
 		private IAssignmentHandler makeDefaultHandler(RobotController rc) {
-			Random rand = new Random();
-			int degrees = rand.nextInt(UtilMath.CIRCLE_DEGREES);
-			MapLocation mapLoc = rc.getLocation();
-			DoubleVec2D vec = UtilMath.degreesToVec(degrees);
-			DoubleVec2D currCoord = new DoubleVec2D(mapLoc.x, mapLoc.y);
-			Line2D line = new Line2D(vec, currCoord);
-			return new PatrolAssignmentHandler(line, vec);
+			// just pick a random direction to patrol
+			return new PatrolAssignmentHandler(LinearMoverHandler.randomThruMapLocation(rc.getLocation()));
 		}
 		
 		@Override
-		public IAssignmentHandler handle(RobotController rc) throws GameActionException {
+		public IAssignmentHandler handle(RobotController rc) {
+			
+			// immediately build an assignment-appropriate handler and call its handle().
+			
 			IAssignmentHandler assignedHandler;
-			Optional<SimpleImmutableEntry<RobotInfo, IFlag>> flagOpt = HandlerCommon.getAnyAdjacentAssignmentFlag(rc, rc.senseNearbyRobots());
-			if (flagOpt.isPresent()) {
-				assignedHandler = this.makeAssignedHandler(rc, flagOpt.get().getValue());
+			List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
+			// get the assigning robot/flag pair (if one is senseable)
+			Optional<SimpleImmutableEntry<RobotInfo, IFlag>> flagEntryOpt = HandlerCommon.getAnyAdjacentAssignmentFlag(rc, sensedRobots);
+			if (flagEntryOpt.isPresent()) {
+				assignedHandler = this.makeHandlerFromAssignmentFlag(rc, flagEntryOpt.get().getValue());
 				UtilBattlecode.log("initialized via flag");
 			} else {
 				assignedHandler = this.makeDefaultHandler(rc);
@@ -94,175 +123,267 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 		
 	}
 
-	class PatrolAssignmentHandler implements IAssignmentHandler {
+	private class PatrolAssignmentHandler implements IAssignmentHandler {
 
+		// the maximum number of reverse() calls the Politician can make on
+		// moverHandler before a new moverHandler is instantiated.
 		private static final int MAX_REVERSE_COUNT = 3;
 		
-		LinearMoverHandler moveHandler;
+		// handles the Politician's movement (back-and-forth along a line)
+		LinearMoverHandler moverHandler;
+		// the number of reverse() calls made on moverHandler
 		int reverseCount;
 		
-		public PatrolAssignmentHandler(Line2D line, DoubleVec2D vec) {
-			this.moveHandler = new LinearMoverHandler(line, vec);
-			this.reverseCount = 0;
+		/**
+		 * Moves the robot back-and-forth along a line.
+		 * The robot attemtps to empower a non-teammate as soon as one is in-range.
+		 * 
+		 * @param patrolLine the line to patrol.
+		 * @param outboundVec the initial direction to travel along the line.
+		 */
+		public PatrolAssignmentHandler(Line2D patrolLine, DoubleVec2D outboundVec) {
+			this.moverHandler = new LinearMoverHandler(patrolLine, outboundVec);
+			this.setMoverHandler(moverHandler);
+			assertValidRep();
 		}
 		
-		private boolean patrolStep(RobotController rc) throws GameActionException {
-			if (this.moveHandler.endOfLine() || this.moveHandler.blocked()) {
-				this.moveHandler.reverse();
-				this.reverseCount++;
+		/**
+		 * See {@link PatrolAssignmentHandler#PatrolAssignmentHandler(Line2D, DoubleVec2D)}.
+		 */
+		public PatrolAssignmentHandler(LinearMoverHandler moverHandler) {
+			this.setMoverHandler(moverHandler);
+			assertValidRep();
+		}
+		
+		/**
+		 * Asserts that the PatrolAssignmentHandler's rep is valid.
+		 */
+		private void assertValidRep() {
+			// note: == is fine; patrolStep handles this case.
+			assert this.reverseCount <= MAX_REVERSE_COUNT : "reverseCount: " + this.reverseCount;
+		}
+		
+		/**
+		 * Set the LinearMoverHandler and reset the reverse() count to zero.
+		 */
+		private void setMoverHandler(LinearMoverHandler moverHandler) {
+			this.moverHandler = moverHandler;
+			this.reverseCount = 0;
+			assertValidRep();
+		}
+		
+		/**
+		 * Reverse the MoverHandler.
+		 */
+		private void reverse() {
+			this.moverHandler.reverse();
+			this.reverseCount++;
+			assertValidRep();
+		}
+		
+		/**
+		 * Attempts a step if the moverHandler doesn't indicate the robot:
+		 *     (1) has reached the end of the line (edge of the world), or
+		 *     (2) cannot move into any candidate MapLocation (all are occupied).
+		 * 
+		 * If either of the two above conditions are met
+		 * 
+		 * @param rc the RobotController for the current round.
+		 * @return true iff a step is attempted (not necessarily completed); else false.
+		 */
+		private boolean patrolStep(RobotController rc) {
+			if (this.moverHandler.endOfLine() || this.moverHandler.blocked()) {
+				if (this.reverseCount < MAX_REVERSE_COUNT) {
+					this.reverse();
+				} else {
+					// randomize the line/direction!
+					this.setMoverHandler(LinearMoverHandler.randomThruMapLocation(rc.getLocation()));
+				}
 			}
-			return this.moveHandler.attemptStep(rc);
+			assertValidRep();
+			return this.moverHandler.attemptStep(rc);
 		}
 		
 		@Override
-		public IAssignmentHandler handle(RobotController rc) throws GameActionException {
-			final int mask = (2 * UtilBattlecode.MAX_WORLD_WIDTH) - 1;
-			Optional<RobotInfo> calloutOpt = PoliticianHandler.this.senseHighestPriorityNonTeammate(rc);
-			if (calloutOpt.isPresent() && rc.canSetFlag(Flag.EMPTY_FLAG)) {
-				RobotInfo robotInfo = calloutOpt.get();
-				MapLocation mapLoc = robotInfo.getLocation(); 
-				EnemySightedFlag flag = new EnemySightedFlag(robotInfo.getType(), mapLoc);
-				rc.setFlag(Flag.encode(flag));
-			}
-			if (!PoliticianHandler.this.attemptEmpowerNearestEnemy(rc)) {
+		public IAssignmentHandler handle(RobotController rc) {
+			List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
+			
+			// call out an enemy to listening enlightenment centers
+			HandlerCommon.setHighestPriorityEnemySightedFlag(rc, sensedRobots);
+			
+			IAssignmentHandler nextHandler;
+			// Attempt to empower any enemies in-range.
+			if (!PoliticianHandler.this.attemptEmpowerNearestNonTeammate(rc, sensedRobots)) {
+				// Empowerment failed! (none are in-range, or cooldown exists).
+				// Just patrol...
 				this.patrolStep(rc);
-				if (this.reverseCount >= MAX_REVERSE_COUNT) {
-					return new UnassignedAssignmentHandler().handle(rc);
-				}
 			}
+			assertValidRep();
 			return this;
 		}
-		
 	}
 
 	class AttackAssignmentHandler implements IAssignmentHandler {
 
-		MapLocation targetMapLoc;
+		// Number of rounds the Politician must wait before posting any new flags
+		// such that all other teammates have time to see a posted TargetMissingFlag.
+		private static final int TARGET_MISSING_COOLDOWN_START = 3;
 		
+		// MapLocation of the assigned target.
+		MapLocation targetMapLoc;
+		// If > 0, the TargetMissingFlag has been posted.
+		int targetMissingCooldown;
+		
+		/**
+		 * Guides the Politician to its target and empowers as soon as possible.
+		 * 
+		 * @param targetMapLoc MapLocation of the assigned target.
+		 */
 		public AttackAssignmentHandler(MapLocation targetMapLoc) {
 			this.targetMapLoc = targetMapLoc;
+			this.targetMissingCooldown = 0;
 		}
 		
 		@Override
-		public IAssignmentHandler handle(RobotController rc) throws GameActionException{
-			if (rc.canSenseLocation(this.targetMapLoc)) {
-				RobotInfo[] sensedRobots = rc.senseNearbyRobots();
-				boolean sensedTarget = false;
-				for (RobotInfo robotInfo : sensedRobots) {
-					if (robotInfo.getLocation().equals(this.targetMapLoc) && robotInfo.getTeam() != rc.getTeam()) {
-						sensedTarget = true;
-						break;
+		public IAssignmentHandler handle(RobotController rc) {
+			List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
+			
+			// Arbitrarily assume the handler will not change.
+			IAssignmentHandler nextHandler = this;
+			// Empower any other nearby bots.
+			if (!PoliticianHandler.this.attemptEmpowerNearestNonTeammate(rc, sensedRobots)) {
+				// No nearby bots to empower!
+				if (this.targetMissingCooldown > 0) {
+					// We've already established that the target is missing from its location
+					// and posted the TargetMissingFlag. Continue the cooldown process so our origin
+					// enlightenment center has time to see the flag.
+					this.targetMissingCooldown--;
+					if (this.targetMissingCooldown == 0) {
+						// Cooldown done! Start patrolling in a random direction.
+						nextHandler = new PatrolAssignmentHandler(LinearMoverHandler.randomThruMapLocation(rc.getLocation()));
+						nextHandler.handle(rc);
+					}
+				} else if (rc.canSenseLocation(this.targetMapLoc)) {
+					// Sensors are in-range of the target location!
+					// Try to sense it...
+					Optional<RobotInfo> targetRobotOpt = sensedRobots.stream()
+							// at the target location?
+							.filter(PredicateFactories.robotAtMapLocation(this.targetMapLoc))
+							// not a teammate? (note that empowered robots can change teams)
+							.filter(PredicateFactories.robotNonTeam(rc.getTeam()))
+							.findAny();
+					if (targetRobotOpt.isPresent()) {
+						// Target found! Move into empower range.
+						PoliticianHandler.this.attemptMoveCloser(rc, this.targetMapLoc);
+					} else {
+						// target not found :(
+						// post the TargetMissingFlag to inform our origin Enlightenment Center
+						TargetMissingFlag flag = new TargetMissingFlag(targetMapLoc);
+						HandlerCommon.setFlag(rc, flag);
+						this.targetMissingCooldown = TARGET_MISSING_COOLDOWN_START;
 					}
 				}
-				
-				if (!sensedTarget) {
-					UtilBattlecode.log("no target sensed; unassigned handler");
-					TargetMissingFlag flag = new TargetMissingFlag(targetMapLoc);
-					rc.setFlag(Flag.encode(flag));
-					Clock.yield();
-					Clock.yield();
-					IAssignmentHandler nextHandler = new UnassignedAssignmentHandler();
-					nextHandler.handle(rc);
-					return nextHandler;
-				}
 			}
-			
-			if (!PoliticianHandler.this.attemptEmpowerNearestEnemy(rc)) {
-				PoliticianHandler.this.attemptMoveCloser(rc, this.targetMapLoc);				
-			}
-			return this;
+			return nextHandler;
 		}
-		
 	}
 	
-	private boolean attemptEmpower(RobotController rc, int radiusSquared) throws GameActionException {
-		assert radiusSquared <= RobotType.POLITICIAN.actionRadiusSquared : "radius squared exceeds action radius";
-		boolean empowerSuccessful;
+	/**
+	 * Attempts to use the Politician's Empower ability.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 * @param radiusSquared the maximum squared radius to empower.
+	 *     Must lie on (0, RobotType.POLITICIAN.actionRadiusSquared].
+	 * @return true iff the empower is successful.
+	 */
+	private boolean attemptEmpower(RobotController rc, int radiusSquared) {
+		assert (radiusSquared > 0) && (radiusSquared <= RobotType.POLITICIAN.actionRadiusSquared) : 
+			"radiusSquared must lie on (0, RobotType.POLITICIAN.actionRadiusSquared]; radiusSquared: " + radiusSquared;
+		// arbitrarily assume empowerment fails.
+		boolean empowerSuccessful = false;
 		if (rc.canEmpower(radiusSquared)) {
-			rc.empower(radiusSquared);
+			try {
+				rc.empower(radiusSquared);				
+			} catch (GameActionException e) {
+				// should never happen; canEmpower is a precondition.
+				throw new UtilBattlecode.IllegalGameActionException(e);
+			}
 			empowerSuccessful = true;
-		} else {
-			empowerSuccessful = false;
 		}
 		UtilBattlecode.log("empower attempt: " + empowerSuccessful);
 		return empowerSuccessful;
 	}
+	
+	/**
+	 * Empowers the nearest non-teammate robot if one lies in-range.
+	 * Does nothing itf no non-teammate robots lie in-range.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 * @param sensedRobots a collection of robots sensed during the current round.
+	 *     Note: filters are applied here while searching for enemies to empower.
+	 *     No caller-side filtering is necessary.
+	 * @return true iff a non-teammate is successfully Empowered.
+	 */
+	private boolean attemptEmpowerNearestNonTeammate(RobotController rc, Collection<RobotInfo> sensedRobots) {
+		// find any in-range non-teammate robot
+		Optional<RobotInfo> nonTeammateRobotOpt = 
+				sensedRobots.stream()
+				.filter(PredicateFactories.robotNonTeam(rc.getTeam()))
+				.filter(PredicateFactories.robotInRange(rc.getLocation(), RobotType.POLITICIAN.actionRadiusSquared))
+				.findAny();
 		
-	private boolean attemptEmpowerNearestEnemy(RobotController rc) throws GameActionException {
-		Optional<RobotInfo> enemyInfoOpt = HandlerCommon.getNearestNonTeamRobot(rc, rc.senseNearbyRobots());
-		if (enemyInfoOpt.isPresent()) {
-			RobotInfo enemyInfo = enemyInfoOpt.get();
+		// arbitrarily assume the empower fails
+		boolean empowerSuccess = false;
+		if (nonTeammateRobotOpt.isPresent()) {
+			// attempt an empower
+			RobotInfo enemyInfo = nonTeammateRobotOpt.get();
 			int enemyDistSquared = rc.getLocation().distanceSquaredTo(enemyInfo.getLocation());
-			if (enemyDistSquared <= rc.getType().actionRadiusSquared) {
-				return attemptEmpower(rc, enemyDistSquared);				
-			}
+			empowerSuccess = attemptEmpower(rc, enemyDistSquared);	
 		}
-		return false;
+		return empowerSuccess;
 	}
 	
-	private Optional<RobotInfo> senseHighestPriorityNonTeammate(RobotController rc) {
-		Function<RobotInfo, Double> costFunc = new Function<RobotInfo, Double>(){
-
-			@Override
-			public Double apply(RobotInfo robotInfo) {
-				switch(robotInfo.getType()) {
-					case POLITICIAN: return -1.0;
-					case MUCKRAKER: return -2.0;
-					case SLANDERER: return -3.0;
-					case ENLIGHTENMENT_CENTER: return -4.0;
-					default: throw new RuntimeException("unrecognized RobotInfo");
-				}
-			}
-		};
+	/**
+	 * Attempts to move the robot toward a target MapLocation.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 * @param targetLoc the MapLocation to attempt to move toward.
+	 * @return true iff a move is attempted and successful; else false.
+	 */
+	private boolean attemptMoveCloser(RobotController rc, MapLocation targetLoc) {
 		
-		Iterator<RobotInfo> sensedNonTeammateIterator = HandlerCommon.getRobotsNotOnTeamStream(rc.getTeam(), rc.senseNearbyRobots()).iterator();
-		if (sensedNonTeammateIterator.hasNext()) {
-			return Optional.of(UtilGeneral.findLeastCostLinear(sensedNonTeammateIterator, costFunc));
-		} else {
-			return Optional.empty();
-		}
-		
-	}
-	
-	@FunctionalInterface
-	private static interface GameActionFunction<T, R> {
-		public R apply(T arg0) throws GameActionException;
-	}
-	
-	// TODO(theimer): move this time-crunch artifact
-	private static <T, R> Function<T, R> wrapGameActionFunctionEmergency(GameActionFunction<T, R> gafunc) {
-		return new Function<T, R>() {
+		Function<MapLocation, Double> distanceCostFunc = new Function<MapLocation, Double>() {
+			static final int PASSABILITY_WEIGHT = 100000;
 			@Override
-			public R apply(T arg0) {
+			public Double apply(MapLocation mapLoc) {
 				try {
-					return gafunc.apply(arg0);					
+					// higher passability, lower distance ----> lower cost
+					return -(rc.sensePassability(mapLoc) * PASSABILITY_WEIGHT) + mapLoc.distanceSquaredTo(targetLoc);					
 				} catch (GameActionException e) {
-					throw new RuntimeException("this should never happen TODO");
+					// should never happen; passabilities are sensed only at adjacent (i.e. senseable) locations.
+					throw new UtilBattlecode.IllegalGameActionException(e);
 				}
 			}
-			
 		};
-	}
-	
-	private boolean attemptMoveCloser(RobotController rc, MapLocation targetLoc) throws GameActionException {
-		Iterator<MapLocation> adjacentIterator = UtilBattlecode.makeAdjacentMapLocIterator(rc.getLocation());
-		int currDistSquared = targetLoc.distanceSquaredTo(rc.getLocation());
-		Function<MapLocation, Double> costFunc = wrapGameActionFunctionEmergency(mapLoc -> -rc.sensePassability(mapLoc)*100000 + mapLoc.distanceSquaredTo(targetLoc));
-		Stream<MapLocation> filteredStream = UtilGeneral.streamifyIterator(adjacentIterator)
-			.filter(mapLoc -> mapLoc.distanceSquaredTo(targetLoc) < currDistSquared)
-			.filter(UtilBattlecode.silenceGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc) && !rc.isLocationOccupied(mapLoc)));
-		Iterator<MapLocation> streamIterator = filteredStream.iterator();
-		if (streamIterator.hasNext()) {
-			MapLocation moveTo = UtilGeneral.findLeastCostLinear(streamIterator, costFunc);
-			Direction dir = rc.getLocation().directionTo(moveTo);
-			if (rc.canMove(dir)) {
-				rc.move(dir);
-				return true;
-			}
+		
+		// only select from MapLocations that are closer to the target than rc.getLocation().
+		List<MapLocation> closerMapLocations = new ArrayList<>();
+		{
+			Stream<MapLocation> closerMapLocStream =
+					UtilBattlecode.makeAllAdjacentMapLocStream(rc.getLocation())
+					.filter(PredicateFactories.mapLocCloser(rc.getLocation(), targetLoc));
+			UtilGeneral.legalCollect(closerMapLocStream, closerMapLocations);
 		}
-		return false;
+		
+		// arbitrarily assume the move fails
+		boolean moveSuccess = false;
+		if (closerMapLocations.size() > 0) {
+			// find the MapLocation of least cost and attempt to move there
+			MapLocation moveToLoc = UtilGeneral.getLeastCostLinear(closerMapLocations, distanceCostFunc);
+			moveSuccess = HandlerCommon.attemptMove(rc, rc.getLocation().directionTo(moveToLoc));
+		}
+		return moveSuccess;
 	}
-	
 	
 	@Override
 	public RobotPlayer.IRobotHandler handle(RobotController rc) throws GameActionException {
