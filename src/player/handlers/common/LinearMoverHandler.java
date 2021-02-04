@@ -64,6 +64,19 @@ public class LinearMoverHandler {
 	}
 	
 	/**
+	 * Returns a LinearMoverHandler that handles linear movement on a
+	 * random line through the argument MapLocation.
+	 * 
+	 * @param mapLocOnLine the MapLocation on the movement line.
+	 */
+	public static LinearMoverHandler randomThruMapLocation(MapLocation mapLocOnLine) {
+		DoubleVec2D outboundVec = DoubleVec2D.makeRandomUnit();
+		DoubleVec2D pointOnLine = UtilBattlecode.mapLocToVec(mapLocOnLine);
+		Line2D patrolLine = new Line2D(outboundVec, pointOnLine);
+		return new LinearMoverHandler(patrolLine, outboundVec);
+	}
+	
+	/**
 	 * Returns a Stream of all locations that the RobotController can move into such that each:
 	 *     (1) is adjacent to the robot's current location, and
 	 *     (2) is on the map, and
