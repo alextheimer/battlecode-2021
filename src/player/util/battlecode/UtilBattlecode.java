@@ -12,6 +12,7 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import player.util.general.UtilGeneral;
+import player.util.math.DoubleVec2D;
 
 /**
  * Contains constants/types/functions related to Battlecode.
@@ -107,6 +108,14 @@ public class UtilBattlecode {
 	public static void log(String logString) {
 		// TODO(theimer): make this more nuanced?
 		LOG_STREAM.println(logString);
+	}
+	
+	/**
+	 * Returns a DoubleVec2D with x/y dimensions identical
+	 * to the x/y coordinates of a MapLocation.
+	 */
+	public static DoubleVec2D mapLocToVec(MapLocation mapLoc) {
+		return new DoubleVec2D(mapLoc.x, mapLoc.y);
 	}
 
 }
