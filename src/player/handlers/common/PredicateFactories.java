@@ -25,6 +25,14 @@ public class PredicateFactories {
 				.isWithinDistanceSquared(adjacentTo, MAX_ADJACENT_DIST_SQUARED);
 	}
 	
+	public static Predicate<RobotInfo> robotAtMapLocation(MapLocation mapLoc) {
+		return robotInfo -> robotInfo.getLocation().equals(mapLoc);
+	}
+	
+	public static Predicate<RobotInfo> robotInRange(MapLocation mapLoc, int radiusSquared) {
+		return robotInfo -> robotInfo.getLocation().distanceSquaredTo(mapLoc) <= radiusSquared;
+	}
+	
 	public static Predicate<RobotInfo> robotSameTeam(Team team) {
 		return robotInfo -> robotInfo.getTeam() == team;
 	}
@@ -54,6 +62,11 @@ public class PredicateFactories {
 	 */
 	public static Predicate<MapLocation> mapLocUnoccupiedSilenced(RobotController rc) {
 		return UtilBattlecode.silenceGameActionPredicate(mapLoc -> !rc.isLocationOccupied(mapLoc));
+	}
+	
+	public static Predicate<MapLocation> mapLocCloser(MapLocation origin, MapLocation target) {
+		int originDistSquared = origin.distanceSquaredTo(target);
+		return mapLoc -> mapLoc.distanceSquaredTo(target) < originDistSquared;
 	}
 	
 	public static Predicate<IFlag> flagAssignment() {
