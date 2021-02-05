@@ -12,6 +12,7 @@ import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
+import battlecode.common.RobotType;
 import player.RobotPlayer;
 import player.handlers.common.HandlerCommon;
 import player.handlers.common.PredicateFactories;
@@ -45,6 +46,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
 
 	@Override
 	public RobotPlayer.IRobotHandler handle(final RobotController rc) {
+		assert rc.getType() == RobotType.SLANDERER : "illegal controller RobotType: " + rc.getType();
 
 		final List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
 

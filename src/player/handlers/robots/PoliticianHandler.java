@@ -359,6 +359,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 
 	@Override
 	public RobotPlayer.IRobotHandler handle(final RobotController rc) {
+		assert rc.getType() == RobotType.POLITICIAN : "illegal controller RobotType: " + rc.getType();
 		this.assignmentHandler = this.assignmentHandler.handle(rc);
 		return this;
 	}

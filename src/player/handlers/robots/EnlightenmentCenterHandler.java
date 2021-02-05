@@ -302,6 +302,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 
 	@Override
 	public RobotPlayer.IRobotHandler handle(final RobotController rc) {
+		assert rc.getType() == RobotType.ENLIGHTENMENT_CENTER : "illegal controller RobotType: " + rc.getType();
 
 		// store this; use below
 		final List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
