@@ -18,7 +18,9 @@ public class AttackAssignmentFlag extends BaseFlag {
 	);
 
 	// number of total bits in an encoded flag (precomputed/stored here for later)
-	private static int NUM_BITS = AttackAssignmentFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
+	// note: the Battlecode backend doesn't like "mapToInt" or "sum".
+	private static int NUM_BITS =
+			AttackAssignmentFlag.fieldFactories.stream().map(factory -> factory.numBits()).reduce(0, (a, b) -> a + b);
 
 	private final MapLocField mapLocField;  // indicates the MapLocation to attack
 

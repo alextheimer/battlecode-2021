@@ -52,6 +52,9 @@ public class UtilGeneral {
 	 */
 	public static <C extends Collection<T>, T> void legalCollect(final Stream<T> stream, final C collection) {
 		final Iterator<T> iterator = stream.iterator();
-		iterator.forEachRemaining(collection::add);
+		// forEachRemaining refuses to work; possible conflict with Battlecode backend?
+		while (iterator.hasNext()) {
+			collection.add(iterator.next());
+		}
 	}
 }

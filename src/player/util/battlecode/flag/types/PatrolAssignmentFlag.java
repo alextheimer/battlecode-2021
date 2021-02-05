@@ -18,8 +18,9 @@ public class PatrolAssignmentFlag extends BaseFlag {
 	);
 
 	// number of total bits in an encoded flag (precomputed/stored here for later)
+	// note: the Battlecode backend doesn't like "mapToInt" or "sum".
 	private static int NUM_BITS =
-			PatrolAssignmentFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
+			PatrolAssignmentFlag.fieldFactories.stream().map(factory -> factory.numBits()).reduce(0, (a, b) -> a + b);
 
 	// Indicates the direction to travel from the receiving robot's initial location.
 	// "Outbound" because a patrolling robot will eventually turn around to travel in the opposite direction.

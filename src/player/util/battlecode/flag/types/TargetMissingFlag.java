@@ -18,8 +18,9 @@ public class TargetMissingFlag extends BaseFlag {
 	);
 
 	// number of total bits in an encoded flag (precomputed/stored here for later)
+	// note: the Battlecode backend doesn't like "mapToInt" or "sum".
 	private static int NUM_BITS =
-			TargetMissingFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
+			TargetMissingFlag.fieldFactories.stream().map(factory -> factory.numBits()).reduce(0, (a, b) -> a + b);
 
 	private final MapLocField mapLocField;  // the MapLocation from which an assigned target is missing
 

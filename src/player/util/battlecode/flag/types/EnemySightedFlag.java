@@ -21,8 +21,9 @@ public class EnemySightedFlag extends BaseFlag {
 	);
 
 	// number of total bits in an encoded flag (precomputed/stored here for later)
+	// note: the Battlecode backend doesn't like "mapToInt" or "sum".
 	private static int NUM_BITS =
-			EnemySightedFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
+			EnemySightedFlag.fieldFactories.stream().map(factory -> factory.numBits()).reduce(0, (a, b) -> a + b);
 
 	// ordinal() acts as an index into ordered field lists.
 	private enum Field { ROBOT_TYPE, MAP_LOC }
