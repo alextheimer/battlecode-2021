@@ -91,8 +91,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 				final MapLocation targetMapLoc = attackAssignmentFlag.getMapLoc(rc.getLocation());
 				handler = new AttackAssignmentHandler(targetMapLoc);
 		} else {
-			// TODO(theimer): change all RuntimeExceptions to something more appropriate.
-			throw new RuntimeException("unrecognized flag type: " + flag.getClass());
+			throw new IllegalArgumentException("unrecognized flag type: " + flag.getClass());
 		}
 		return handler;
 	}

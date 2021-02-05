@@ -178,7 +178,7 @@ public class HandlerCommon {
 					case MUCKRAKER: return -2.0;
 					case SLANDERER: return -3.0;
 					case ENLIGHTENMENT_CENTER: return -4.0;
-					default: throw new RuntimeException("unrecognized RobotInfo: " + robotInfo.getType());
+					default: throw new IllegalArgumentException("unrecognized RobotInfo: " + robotInfo.getType());
 				}
 			}
 		};

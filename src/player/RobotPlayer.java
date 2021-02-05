@@ -26,7 +26,7 @@ public strictfp class RobotPlayer {
 		 * @param rc the robot's RobotController for the current round.
 		 * @return the IRobotHandler to be used during the next round.
 		 */
-		public IRobotHandler handle(RobotController rc);
+		IRobotHandler handle(RobotController rc);
 	}
 
 	/**
@@ -41,7 +41,7 @@ public strictfp class RobotPlayer {
 			case POLITICIAN: return new PoliticianHandler(rc);
 			case MUCKRAKER: return new MuckrakerHandler();
 			case SLANDERER: return new SlandererHandler(rc);
-			default: throw new RuntimeException("TODO");
+			default: throw new IllegalArgumentException("unrecognized enum value: " + rc.getType());
 		}
 	}
 
