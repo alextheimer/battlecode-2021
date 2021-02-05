@@ -11,11 +11,11 @@ import player.util.battlecode.flag.util.FlagWalker;
  * as a sequence of encode-/decode-able fields.
  */
 public abstract class BaseFlag implements Flag.IFlag {
-	
+
 	/* TODO(theimer): there are a number of common methods (decode, numBits, etc)
 	 * that would DRY things out if they were implemented here (at the expense of should-be-static
 	 * variables becoming non-static.*/
-	
+
 	/**
 	 * Field of a BaseFlag-derived class.
 	 */
@@ -29,7 +29,7 @@ public abstract class BaseFlag implements Flag.IFlag {
 		 */
 		public int numBits();
 	}
-	
+
 	/**
 	 * Decodes the bits of an encoded flag field into a FlagField instance.
 	 */
@@ -49,33 +49,33 @@ public abstract class BaseFlag implements Flag.IFlag {
 	 * Returns a List of IFlagFields sufficient to reconstruct the BaseFlag instance.
 	 */
 	protected abstract List<BaseFlag.IFlagField> getOrderedFlagFieldList();
-	
+
 	/**
 	 * Returns the BaseFlag as an encoded sequence of bits.
 	 */
 	@Override
 	public int encode() {
-		FlagWalker flagWalker = new FlagWalker(0);
+		final FlagWalker flagWalker = new FlagWalker(0);
 		// sequentially write the encoded bits of each field into the FlagWalker
-		for (BaseFlag.IFlagField flagField : this.getOrderedFlagFieldList()) {
+		for (final BaseFlag.IFlagField flagField : this.getOrderedFlagFieldList()) {
 			flagWalker.writeBits(flagField.numBits(), flagField.encode());
 		}
 		return flagWalker.getAllBits();
 	}
-	
+
 	/**
 	 * Converts a BaseFlag's encoded bits into a sequence of FlagFields.
-	 * 
+	 *
 	 * @param rawFlag a BaseFlag's encoded bits.
 	 * @param factoryList TODO
 	 */
-	protected static List<BaseFlag.IFlagField> decodeFields(int rawFlag, List<BaseFlag.IFlagFieldFactory> factoryList) {
-		List<BaseFlag.IFlagField> fieldList = new ArrayList<>();
-		FlagWalker flagWalker = new FlagWalker(rawFlag);
+	protected static List<BaseFlag.IFlagField> decodeFields(final int rawFlag, final List<BaseFlag.IFlagFieldFactory> factoryList) {
+		final List<BaseFlag.IFlagField> fieldList = new ArrayList<>();
+		final FlagWalker flagWalker = new FlagWalker(rawFlag);
 		// Decode 'chunks' of bits sequentially from the FlagWalker.
 		// Each i'th chunk is decoded by the i'th factory in factoryList.
-		for (BaseFlag.IFlagFieldFactory factory : factoryList) {
-			int bits = flagWalker.readBits(factory.numBits());
+		for (final BaseFlag.IFlagFieldFactory factory : factoryList) {
+			final int bits = flagWalker.readBits(factory.numBits());
 			fieldList.add(factory.decode(bits));
 		}
 		return fieldList;

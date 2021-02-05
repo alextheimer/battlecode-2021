@@ -12,63 +12,63 @@ import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 
 /**
- * Contains factory functions for common Predicates used to filter 
+ * Contains factory functions for common Predicates used to filter
  * Streams of various Battlecode types.
  */
 public class PredicateFactories {
-	
+
 	// max distance squared between two adjacent MapLocations
 	private final static int MAX_ADJACENT_DIST_SQUARED = 2;
-	
-	public static Predicate<RobotInfo> robotAdjacentTo(MapLocation adjacentTo) {
+
+	public static Predicate<RobotInfo> robotAdjacentTo(final MapLocation adjacentTo) {
 		return robotInfo -> robotInfo.getLocation()
-				.isWithinDistanceSquared(adjacentTo, MAX_ADJACENT_DIST_SQUARED);
+				.isWithinDistanceSquared(adjacentTo, PredicateFactories.MAX_ADJACENT_DIST_SQUARED);
 	}
-	
-	public static Predicate<RobotInfo> robotAtMapLocation(MapLocation mapLoc) {
+
+	public static Predicate<RobotInfo> robotAtMapLocation(final MapLocation mapLoc) {
 		return robotInfo -> robotInfo.getLocation().equals(mapLoc);
 	}
-	
-	public static Predicate<RobotInfo> robotInRange(MapLocation mapLoc, int radiusSquared) {
+
+	public static Predicate<RobotInfo> robotInRange(final MapLocation mapLoc, final int radiusSquared) {
 		return robotInfo -> robotInfo.getLocation().distanceSquaredTo(mapLoc) <= radiusSquared;
 	}
-	
-	public static Predicate<RobotInfo> robotSameTeam(Team team) {
+
+	public static Predicate<RobotInfo> robotSameTeam(final Team team) {
 		return robotInfo -> robotInfo.getTeam() == team;
 	}
-	
-	public static Predicate<RobotInfo> robotNonTeam(Team team) {
+
+	public static Predicate<RobotInfo> robotNonTeam(final Team team) {
 		return robotInfo -> robotInfo.getTeam() != team;
 	}
-	
-	public static Predicate<RobotInfo> robotOpponentTeam(Team team) {
-		Team opponent = team.opponent();
+
+	public static Predicate<RobotInfo> robotOpponentTeam(final Team team) {
+		final Team opponent = team.opponent();
 		return robotInfo -> robotInfo.getTeam() == opponent;
 	}
-	
+
 	/**
 	 * WARNING:
 	 *     This should only ever be used where the argument MapLocations
 	 *     are GUARANTEED to not throw a GameActionException.
 	 */
-	public static Predicate<MapLocation> mapLocOnMapSilenced(RobotController rc) {
+	public static Predicate<MapLocation> mapLocOnMapSilenced(final RobotController rc) {
 		return UtilBattlecode.silenceGameActionPredicate(mapLoc -> rc.onTheMap(mapLoc));
 	}
-	
+
 	/**
 	 * WARNING:
 	 *     This should only ever be used where the argument MapLocations
 	 *     are GUARANTEED to not throw a GameActionException.
 	 */
-	public static Predicate<MapLocation> mapLocUnoccupiedSilenced(RobotController rc) {
+	public static Predicate<MapLocation> mapLocUnoccupiedSilenced(final RobotController rc) {
 		return UtilBattlecode.silenceGameActionPredicate(mapLoc -> !rc.isLocationOccupied(mapLoc));
 	}
-	
-	public static Predicate<MapLocation> mapLocCloser(MapLocation origin, MapLocation target) {
-		int originDistSquared = origin.distanceSquaredTo(target);
+
+	public static Predicate<MapLocation> mapLocCloser(final MapLocation origin, final MapLocation target) {
+		final int originDistSquared = origin.distanceSquaredTo(target);
 		return mapLoc -> mapLoc.distanceSquaredTo(target) < originDistSquared;
 	}
-	
+
 	public static Predicate<IFlag> flagAssignment() {
 		// TODO(theimer): a set of assignment flag types should be maintained in Flag.java.
 		return flag ->( (flag instanceof PatrolAssignmentFlag) || (flag instanceof AttackAssignmentFlag) );

@@ -13,37 +13,37 @@ import java.util.stream.Collectors;
 // TODO(theimer): this file is probably dead
 
 public class BfsGenerator<T> {
-	private Queue<T> openQueue;  // yet to be expanded elements
-	private Set<T> closedSet;  // elements that have been added to openQueue
-	private Function<T, Collection<T>> expandFunc;  // function used to expand elements
-	
+	private final Queue<T> openQueue;  // yet to be expanded elements
+	private final Set<T> closedSet;  // elements that have been added to openQueue
+	private final Function<T, Collection<T>> expandFunc;  // function used to expand elements
+
 	/***
 	 * Generates elements as they would be visited in a BFS search.
-	 * 
+	 *
 	 * @param initialElement the root of the BFS search.
 	 * @param expandFunc the function used to expand elements of the BFS search.
 	 */
-	public BfsGenerator(T initialElement, Function<T, Collection<T>> expandFunc) {
-		openQueue = new ArrayDeque<>(Arrays.asList(initialElement));
-		closedSet = new HashSet<>(Arrays.asList(initialElement));
+	public BfsGenerator(final T initialElement, final Function<T, Collection<T>> expandFunc) {
+		this.openQueue = new ArrayDeque<>(Arrays.asList(initialElement));
+		this.closedSet = new HashSet<>(Arrays.asList(initialElement));
 		this.expandFunc = expandFunc;
 	}
-	
+
 	public boolean hasNext() {
 		return this.openQueue.size() > 0;
 	}
-	
+
 	/**
 	 * Returns the next element (if it exists) of the BfsGenerator.
 	 * Note: throws NoSuchElementException if the BfsGenerator is empty.
 	 */
 	public T next() {
-		T popped = openQueue.remove();
-		Collection<T> expandedCollection = expandFunc.apply(popped);
-		List<T> unclosedList = expandedCollection.stream()
-				.filter(elt -> !closedSet.contains(elt))
+		final T popped = this.openQueue.remove();
+		final Collection<T> expandedCollection = this.expandFunc.apply(popped);
+		final List<T> unclosedList = expandedCollection.stream()
+				.filter(elt -> !this.closedSet.contains(elt))
 				.collect(Collectors.toList());
-		openQueue.addAll(unclosedList);
+		this.openQueue.addAll(unclosedList);
 		return popped;
 	}
 }

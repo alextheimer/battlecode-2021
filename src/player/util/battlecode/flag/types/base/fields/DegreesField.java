@@ -5,22 +5,22 @@ import player.util.battlecode.flag.util.UtilFlag;
 import player.util.math.UtilMath;
 
 public class DegreesField implements BaseFlag.IFlagField {
-	
+
 	// log2ceil(360) = 9
 	public static final int NUM_BITS = 9;
-	
-	private int degrees;
-	
+
+	private final int degrees;
+
 	/**
 	 * Stores a value on [0, 360).
-	 * 
+	 *
 	 * @param degrees must lie on [0, 360).
 	 */
-	public DegreesField(int degrees) {
+	public DegreesField(final int degrees) {
 		assert (degrees >= 0) && (degrees < UtilMath.CIRCLE_DEGREES) : "degrees: " + degrees;
 		this.degrees = degrees;
 	}
-	
+
 	public int getDegrees() {
 		return this.degrees;
 	}
@@ -32,23 +32,23 @@ public class DegreesField implements BaseFlag.IFlagField {
 
 	@Override
 	public int numBits() {
-		return NUM_BITS;
+		return DegreesField.NUM_BITS;
 	}
-	
+
 	public static BaseFlag.IFlagFieldFactory getFactory() {
 		return new BaseFlag.IFlagFieldFactory() {
 
 			@Override
-			public BaseFlag.IFlagField decode(int bits) {
-				assert UtilFlag.validBits(NUM_BITS, bits) : "" + bits;
+			public BaseFlag.IFlagField decode(final int bits) {
+				assert UtilFlag.validBits(DegreesField.NUM_BITS, bits) : "" + bits;
 				return new DegreesField(bits);
 			}
 
 			@Override
 			public int numBits() {
-				return NUM_BITS;
+				return DegreesField.NUM_BITS;
 			}
-			
+
 		};
 	}
 }
