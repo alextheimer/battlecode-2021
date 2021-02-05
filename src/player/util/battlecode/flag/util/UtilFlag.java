@@ -21,7 +21,8 @@ public class UtilFlag {
 	static {
 		// make sure the empty flag is represented correctly
 		assert UtilFlag.getBitsFromOpCode(FlagOpCode.EMPTY) == Flag.EMPTY_FLAG :
-			String.format("these values must be consistent: EMPTY:%d, EMPTY_FLAG:%d", UtilFlag.getBitsFromOpCode(FlagOpCode.EMPTY), Flag.EMPTY_FLAG);
+			String.format("these values must be consistent: EMPTY:%d, EMPTY_FLAG:%d",
+					UtilFlag.getBitsFromOpCode(FlagOpCode.EMPTY), Flag.EMPTY_FLAG);
 	}
 
 	// computed once; used to convert FlagOpCode bits to a FlagOpCode instance

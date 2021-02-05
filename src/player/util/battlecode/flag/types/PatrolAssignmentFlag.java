@@ -18,7 +18,8 @@ public class PatrolAssignmentFlag extends BaseFlag {
 	);
 
 	// number of total bits in an encoded flag (precomputed/stored here for later)
-	private static int NUM_BITS = PatrolAssignmentFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
+	private static int NUM_BITS =
+			PatrolAssignmentFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
 
 	// Indicates the direction to travel from the receiving robot's initial location.
 	// "Outbound" because a patrolling robot will eventually turn around to travel in the opposite direction.
@@ -63,7 +64,8 @@ public class PatrolAssignmentFlag extends BaseFlag {
 			@Override
 			public Flag.IFlag decode(final int bits) {
 				assert UtilFlag.validBits(PatrolAssignmentFlag.NUM_BITS, bits) : "bits: " + bits;
-				final List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(bits, PatrolAssignmentFlag.fieldFactories);
+				final List<BaseFlag.IFlagField> fields =
+						BaseFlag.decodeFields(bits, PatrolAssignmentFlag.fieldFactories);
 				return new PatrolAssignmentFlag(fields);
 			}
 

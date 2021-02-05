@@ -62,7 +62,8 @@ public class AttackAssignmentFlag extends BaseFlag {
 			@Override
 			public Flag.IFlag decode(final int bits) {
 				assert UtilFlag.validBits(AttackAssignmentFlag.NUM_BITS, bits) : "" + bits;
-				final List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(bits, AttackAssignmentFlag.fieldFactories);
+				final List<BaseFlag.IFlagField> fields =
+						BaseFlag.decodeFields(bits, AttackAssignmentFlag.fieldFactories);
 				return new AttackAssignmentFlag(fields);
 			}
 

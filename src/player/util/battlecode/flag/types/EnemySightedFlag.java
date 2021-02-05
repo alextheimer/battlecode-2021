@@ -21,10 +21,11 @@ public class EnemySightedFlag extends BaseFlag {
 	);
 
 	// number of total bits in an encoded flag (precomputed/stored here for later)
-	private static int NUM_BITS = EnemySightedFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
+	private static int NUM_BITS =
+			EnemySightedFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
 
 	// ordinal() acts as an index into ordered field lists.
-	private static enum Field { ROBOT_TYPE, MAP_LOC }
+	private enum Field { ROBOT_TYPE, MAP_LOC }
 
 	private final RobotTypeField robotTypeField;  // the type of robot sighted
 	private final MapLocField mapLocField;  // the location at which it was sighted
@@ -77,7 +78,8 @@ public class EnemySightedFlag extends BaseFlag {
 			@Override
 			public Flag.IFlag decode(final int bits) {
 				assert UtilFlag.validBits(EnemySightedFlag.NUM_BITS, bits) : "" + bits;
-				final List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(bits, EnemySightedFlag.fieldFactories);
+				final List<BaseFlag.IFlagField> fields =
+						BaseFlag.decodeFields(bits, EnemySightedFlag.fieldFactories);
 				return new EnemySightedFlag(fields);
 			}
 

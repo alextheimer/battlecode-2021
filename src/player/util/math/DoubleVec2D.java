@@ -59,7 +59,8 @@ public class DoubleVec2D {
 	}
 
 	public boolean sameValue(final DoubleVec2D other) {
-		return (Math.abs(this.x - other.x) < UtilMath.FLOAT_EPS) && (Math.abs(this.y - other.y) < UtilMath.FLOAT_EPS);
+		return (Math.abs(this.x - other.x) < UtilMath.FLOAT_EPS) &&
+			   (Math.abs(this.y - other.y) < UtilMath.FLOAT_EPS);
 	}
 
 	@Override

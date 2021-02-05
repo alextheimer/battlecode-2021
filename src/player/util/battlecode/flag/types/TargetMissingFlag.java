@@ -18,7 +18,8 @@ public class TargetMissingFlag extends BaseFlag {
 	);
 
 	// number of total bits in an encoded flag (precomputed/stored here for later)
-	private static int NUM_BITS = TargetMissingFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
+	private static int NUM_BITS =
+			TargetMissingFlag.fieldFactories.stream().mapToInt(factory -> factory.numBits()).sum();
 
 	private final MapLocField mapLocField;  // the MapLocation from which an assigned target is missing
 
@@ -62,7 +63,8 @@ public class TargetMissingFlag extends BaseFlag {
 			@Override
 			public Flag.IFlag decode(final int bits) {
 				assert UtilFlag.validBits(TargetMissingFlag.NUM_BITS, bits) : "bits: " + bits;
-				final List<BaseFlag.IFlagField> fields = BaseFlag.decodeFields(bits, TargetMissingFlag.fieldFactories);
+				final List<BaseFlag.IFlagField> fields =
+						BaseFlag.decodeFields(bits, TargetMissingFlag.fieldFactories);
 				return new TargetMissingFlag(fields);
 			}
 

@@ -38,7 +38,7 @@ interface IAssignmentHandler {
 	 *
 	 * @param rc the RobotController for the current round.
 	 */
-	public IAssignmentHandler handle(RobotController rc);
+	IAssignmentHandler handle(RobotController rc);
 }
 
 public class PoliticianHandler implements RobotPlayer.IRobotHandler {
@@ -49,7 +49,8 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 	public PoliticianHandler(final RobotController rc) {
 		final List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
 		// get the assigning robot/flag pair (if one is senseable)
-		final Optional<SimpleImmutableEntry<RobotInfo, IFlag>> flagEntryOpt = HandlerCommon.getAnyAdjacentAssignmentFlag(rc, sensedRobots);
+		final Optional<SimpleImmutableEntry<RobotInfo, IFlag>> flagEntryOpt =
+				HandlerCommon.getAnyAdjacentAssignmentFlag(rc, sensedRobots);
 		if (flagEntryOpt.isPresent()) {
 			this.assignmentHandler = this.makeHandlerFromAssignmentFlag(rc, flagEntryOpt.get().getValue());
 			UtilBattlecode.log("initialized via flag");

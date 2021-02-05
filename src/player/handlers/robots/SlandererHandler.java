@@ -72,7 +72,8 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
         }
 
         // attempt to move as far from moveAwayFrom as possible
-        final Function<MapLocation, Double> distanceCostFunc = mapLoc -> (double)-mapLoc.distanceSquaredTo(moveAwayFrom);  // note: negated!
+        final Function<MapLocation, Double> distanceCostFunc =
+        		mapLoc -> (double)-mapLoc.distanceSquaredTo(moveAwayFrom);  // note: negated!
     	final Optional<Direction> awayDirectionOpt = HandlerCommon.getLeastCostMoveDirection(rc, distanceCostFunc);
     	if (awayDirectionOpt.isPresent()) {
     		HandlerCommon.attemptMove(rc, awayDirectionOpt.get());
