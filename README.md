@@ -1,3 +1,19 @@
+# Foreward
+
+This section is the only piece of text in this document written by myself; everything else was produced by the Battlecode staff.
+
+See https://battlecode.org/ for game details.
+
+All code outside of the `src/` and `test/` directories was produced by the Battlecode staff.
+
+The Battlecode backend interacts directly with `src/player/RobotPlayer.java`; the backend passes a `RobotController` to `RobotPlayer::run`, where handling of the `RobotController` is then delegated to an instance of `IRobotHandler`. Each concrete `IRobotHandler` contains the state/methods necessary for one of the four robot types.
+
+Enlightenment Centers are the "brain" units; they build all others and assign them various tasks (patrol, attack, etc.). The other units carry out these assignments and report "battlefield intel" to any listening units.
+
+Communication is governed by "flags"-- positive integers of <= 24 bits. See `src/player/util/battlecode/flag/Flag.java` for details.
+
+Many thanks to the Battlecode 2021 staff for a solid IAP course!
+
 # Battlecode 2021 Scaffold
 
 This is the Battlecode 2021 scaffold, containing an `examplefuncsplayer`. Read https://2021.battlecode.org/getting-started!
