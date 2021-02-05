@@ -53,7 +53,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
 	}
 	
 	@Override
-	public RobotPlayer.IRobotHandler handle(RobotController rc) throws GameActionException {
+	public RobotPlayer.IRobotHandler handle(RobotController rc) {
 		
 		List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
 		

@@ -16,11 +16,11 @@ import player.util.battlecode.UtilBattlecode;
 
 public strictfp class RobotPlayer {
 	
-	public interface IRobotHandler {
-		public IRobotHandler handle(RobotController rc) throws GameActionException;
-	}
-
 	private static final boolean RESIGN_ON_EXCEPTION = true;
+	
+	public interface IRobotHandler {
+		public IRobotHandler handle(RobotController rc);
+	}
 	
 	private static Map<RobotType, Supplier<RobotPlayer.IRobotHandler>> mapThing = new HashMap<>();
 	static {

@@ -3,7 +3,6 @@ package player.handlers.robots;
 import battlecode.common.*;
 import player.RobotPlayer;
 import player.RobotPlayer.IRobotHandler;
-import player.handlers.common.FlagPoster;
 import player.handlers.common.HandlerCommon;
 import player.handlers.common.LinearMoverHandler;
 import player.handlers.common.PredicateFactories;
@@ -386,7 +385,7 @@ public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 	}
 	
 	@Override
-	public RobotPlayer.IRobotHandler handle(RobotController rc) throws GameActionException {
+	public RobotPlayer.IRobotHandler handle(RobotController rc) {
 		this.assignmentHandler = this.assignmentHandler.handle(rc);
 		return this;
 	}

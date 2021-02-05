@@ -308,7 +308,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
     }
     
 	@Override
-	public RobotPlayer.IRobotHandler handle(RobotController rc) throws GameActionException {
+	public RobotPlayer.IRobotHandler handle(RobotController rc) {
 		
 		// store this; use below
 		List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());

@@ -10,7 +10,7 @@ import player.handlers.common.HandlerCommon;
 public class MuckrakerHandler implements RobotPlayer.IRobotHandler {
 	
 	@Override
-	public RobotPlayer.IRobotHandler handle(RobotController rc) throws GameActionException {
+	public RobotPlayer.IRobotHandler handle(RobotController rc) {
 		// intentionally blank (unit unused)
         return this;
 	}
