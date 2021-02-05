@@ -1,5 +1,6 @@
 package player.handlers.robots;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
+import player.util.general.UtilGeneral;
 import player.util.math.UtilMath;
 
 class Target implements Comparable<Target> {
@@ -256,16 +258,23 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 			}
     	};
 
-    	final Stream<IFlag> flagStream = this.friendlyIdSet.stream().map(flagMapper);
+    	// sense/store flags for all known friendly ID's
+    	final List<IFlag> teammateFlagList = new ArrayList<>();
+    	{
+    		final Stream<IFlag> teammateFlagStream = this.friendlyIdSet.stream().map(flagMapper);
+    		UtilGeneral.legalCollect(teammateFlagStream, teammateFlagList);
+    	}
 
-    	// get/read all non-teammate callout flags
-    	flagStream.filter(flag -> flag instanceof EnemySightedFlag)
-    		.forEach(flag -> this.readEnemySightedFlag(rc, (EnemySightedFlag)flag));
-
-    	// get/read all "target isn't where it's expected" flags
-    	flagStream.filter(flag -> flag instanceof TargetMissingFlag)
-    		.forEach(flag -> this.readTargetMissingFlag(rc, (TargetMissingFlag)flag));
-
+    	// handle each IFlag type we're listening for
+    	for (final IFlag flag : teammateFlagList) {
+    		if (flag instanceof EnemySightedFlag) {
+    			// read non-teammate callout flag
+    			this.readEnemySightedFlag(rc, (EnemySightedFlag)flag);
+    		} else if (flag instanceof TargetMissingFlag) {
+    			// read "target isn't where it's expected" flag
+    			this.readTargetMissingFlag(rc, (TargetMissingFlag)flag);
+    		}
+    	}
     }
 
     /**
