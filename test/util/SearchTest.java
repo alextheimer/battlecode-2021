@@ -96,7 +96,7 @@ public class SearchTest {
 		return new Function<IntVec2D, Set<IntVec2D>>() {
 			@Override
 			public Set<IntVec2D> apply(final IntVec2D coord) {
-				assert intCoordInBounds(coord, xMin, xMax, yMin, yMax);  // TODO(theimer): message
+				assert intCoordInBounds(coord, xMin, xMax, yMin, yMax) : "coord: " + coord;
 				// TODO(theimer): make this faster if speed matters.
 				return Stream.of(
 					new IntVec2D(coord.x, coord.y + 1),
