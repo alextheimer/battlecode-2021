@@ -35,10 +35,9 @@ public class TargetMissingFlag extends BaseFlag {
 	}
 
 	/**
-	 * TODO(theimer): make sure this link works.
 	 * See {@link TargetMissingFlag#TargetMissingFlag(MapLocation)}
 	 *
-	 * @param fieldList the ordered fields of a TargetMissingFlag.
+	 * @param fields the ordered fields of a TargetMissingFlag.
 	 */
 	public TargetMissingFlag(final List<BaseFlag.IFlagField> fields) {
 		this.mapLocField = (MapLocField)fields.get(0);

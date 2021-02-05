@@ -67,7 +67,7 @@ public class MapLocField implements BaseFlag.IFlagField {
 	}
 
 	/**
-	 * See {@link MapLocField#MapLocField(MapLocation)} TODO(theimer): make sure this worked
+	 * See {@link MapLocField#MapLocField(MapLocation)}
 	 *
 	 * @param xSuffixBits must lie on [0, 2**NUM_BITS_PER_DIM)
 	 * @param ySuffixBits must lie on [0, 2**NUM_BITS_PER_DIM)

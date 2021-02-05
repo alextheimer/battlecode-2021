@@ -44,7 +44,6 @@ public class EnemySightedFlag extends BaseFlag {
 	}
 
 	/**
-	 * TODO(theimer): make sure this link works.
 	 * See {@link EnemySightedFlag#EnemySightedFlag(MapLocation)}
 	 *
 	 * @param fieldList the ordered fields of an EnemySightedFlag.

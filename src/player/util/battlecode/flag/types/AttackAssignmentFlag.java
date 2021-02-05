@@ -33,7 +33,6 @@ public class AttackAssignmentFlag extends BaseFlag {
 	}
 
 	/**
-	 * TODO(theimer): make sure this link works.
 	 * See {@link AttackAssignmentFlag#AttackAssignmentFlag(MapLocation)}
 	 *
 	 * @param flagFields the ordered fields of an AttackAssignmentFlag.
