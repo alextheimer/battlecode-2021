@@ -14,65 +14,57 @@ import player.handlers.robots.PoliticianHandler;
 import player.handlers.robots.SlandererHandler;
 import player.util.battlecode.UtilBattlecode;
 
+/**
+ * The Battlecode-required, top-level handler class.
+ */
 public strictfp class RobotPlayer {
 	
+	// Set 'false' for competition code to ignore exceptions and hope for the best...
 	private static final boolean RESIGN_ON_EXCEPTION = true;
-	
+	 
+	/**
+	 * Handles a specific RobotType controller.
+	 */
 	public interface IRobotHandler {
+		/**
+		 * Handles all movements/communications/actions of a specific robot.
+		 * 
+		 * @param rc the robot's RobotController for the current round.
+		 * @return the IRobotHandler to be used during the next round.
+		 */
 		public IRobotHandler handle(RobotController rc);
 	}
 	
-	private static Map<RobotType, Supplier<RobotPlayer.IRobotHandler>> mapThing = new HashMap<>();
-	static {
-		mapThing.put(RobotType.POLITICIAN, () -> new PoliticianHandler());
-		mapThing.put(RobotType.MUCKRAKER, () -> new MuckrakerHandler());
-		mapThing.put(RobotType.SLANDERER, () -> new SlandererHandler());
-		mapThing.put(RobotType.ENLIGHTENMENT_CENTER, () -> new EnlightenmentCenterHandler());
+	/**
+	 * Instantiates a handler for a robot.
+	 * 
+	 * @param rc the robot's current RobotController.
+	 * @return the robot's handler.
+	 */
+	private static IRobotHandler getHandler(RobotController rc) {
+		switch (rc.getType()) {
+			case ENLIGHTENMENT_CENTER: return new EnlightenmentCenterHandler();
+			case POLITICIAN: return new PoliticianHandler(rc);
+			case MUCKRAKER: return new MuckrakerHandler();
+			case SLANDERER: return new SlandererHandler(rc);
+			default: throw new RuntimeException("TODO"); 
+		}
 	}
 	
     /**
-     * run() is the method that is called when a robot is instantiated in the Battlecode world.
-     * If this method returns, the robot dies!
-     **/
+     * Handles a RobotController.
+     * This is the method called directly by the Battlecode backend.
+     */
     public static void run(RobotController rc) {
-    	
-//    	while (rc.getTeam() == Team.A) {
-//    		Clock.yield();
-//    	}
-    	
-    	RobotType currentType = rc.getType();
-    	
-    	RobotPlayer.IRobotHandler typeHandler;
-    	
-//    	try {
-    		typeHandler = mapThing.get(currentType).get();
-//    	} catch (GameActionException e) {
-//    		UtilBattlecode.log(rc.getType() + " GameActionException at instantiation!");
-//    		return;
-//    	}
-    	
-        UtilBattlecode.log("I'm a " + rc.getType() + " and I just got created!");
+    	UtilBattlecode.log("new RobotController: " + rc.getType());
+    	IRobotHandler handler = RobotPlayer.getHandler(rc);
+    	// if the loop exits, the robot dies.
         while (true) {
-        	UtilBattlecode.log("I'm a " + rc.getType() + "! Location " + rc.getLocation());
-            // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
-                // Here, we've separated the controls into a different method for each RobotType.
-                // You may rewrite this into your own control structure if you wish.
-                typeHandler = typeHandler.handle(rc);
-                // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
-                Clock.yield();
-            } catch (GameActionException e) {
-                UtilBattlecode.log(rc.getType() + " GameActionException");
-                e.printStackTrace();
-	        	if (RESIGN_ON_EXCEPTION) {
-	        		rc.resign();	        		
-	        	}
-            } catch (AssertionError e) {
-	        	e.printStackTrace();
-	        	if (RESIGN_ON_EXCEPTION) {
-	        		rc.resign();	        		
-	        	}
+                handler = handler.handle(rc);
+                Clock.yield();  // wait until the next turn.
 	        } catch (Exception e) {
+	        	// Other RobotControllers are unaffected by any exceptions thrown here.
 	        	e.printStackTrace();
 	        	if (RESIGN_ON_EXCEPTION) {
 	        		rc.resign();	        		
