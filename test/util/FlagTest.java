@@ -1,9 +1,10 @@
 package util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import battlecode.common.MapLocation;
@@ -50,7 +51,7 @@ public class FlagTest {
 		final AttackAssignmentFlag flag = new AttackAssignmentFlag(mapLoc);
 		final int flagBits = Flag.encode(flag);
 		final AttackAssignmentFlag decodedFlag = (AttackAssignmentFlag)Flag.decode(flagBits);
-		Assert.assertEquals(mapLoc, decodedFlag.getMapLoc(refMapLoc));
+		assertEquals(mapLoc, decodedFlag.getMapLoc(refMapLoc));
 	}
 
 	/**
@@ -63,7 +64,7 @@ public class FlagTest {
 			final PatrolAssignmentFlag flag = new PatrolAssignmentFlag(degrees);
 			final int flagBits = Flag.encode(flag);
 			final PatrolAssignmentFlag decodedFlag = (PatrolAssignmentFlag)Flag.decode(flagBits);
-			Assert.assertEquals(degrees, decodedFlag.getOutboundDegrees());
+			assertEquals(degrees, decodedFlag.getOutboundDegrees());
 		}
 	}
 
@@ -78,8 +79,8 @@ public class FlagTest {
 			final EnemySightedFlag flag = new EnemySightedFlag(robotType, mapLoc);
 			final int flagBits = Flag.encode(flag);
 			final EnemySightedFlag decodedFlag = (EnemySightedFlag)Flag.decode(flagBits);
-			Assert.assertEquals(robotType,  decodedFlag.getRobotType());
-			Assert.assertEquals(mapLoc, decodedFlag.getMapLoc(refMapLoc));
+			assertEquals(robotType,  decodedFlag.getRobotType());
+			assertEquals(mapLoc, decodedFlag.getMapLoc(refMapLoc));
 		}
 	}
 
@@ -93,6 +94,6 @@ public class FlagTest {
 		final TargetMissingFlag flag = new TargetMissingFlag(mapLoc);
 		final int flagBits = Flag.encode(flag);
 		final TargetMissingFlag decodedFlag = (TargetMissingFlag)Flag.decode(flagBits);
-		Assert.assertEquals(mapLoc, decodedFlag.getMapLoc(refMapLoc));
+		assertEquals(mapLoc, decodedFlag.getMapLoc(refMapLoc));
 	}
 }

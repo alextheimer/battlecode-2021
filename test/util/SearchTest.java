@@ -1,7 +1,8 @@
 package util;
 
-import static org.junit.Assert.*;
-import static player.util.math.UtilMath.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static player.util.math.UtilMath.intCoordInBounds;
 
 import java.util.Arrays;
 import java.util.Collections;

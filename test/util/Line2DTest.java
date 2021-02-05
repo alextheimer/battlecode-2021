@@ -1,9 +1,10 @@
 package util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import player.util.math.DoubleVec2D;
@@ -75,7 +76,7 @@ public class Line2DTest {
 
 		// compare each actual vs expected result
 		for (final TestStruct t : testList) {
-			Assert.assertEquals(
+			assertEquals(
 					"distance mismatch; " + t.coord + ", " + t.line,
 					t.expectedDist,
 					UtilMath.distanceFromLine(t.coord, t.line),
