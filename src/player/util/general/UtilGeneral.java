@@ -1,26 +1,11 @@
 package player.util.general;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import battlecode.common.*;
-
-import java.util.Queue;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 
 /**
  * Contains utility functions/classes.

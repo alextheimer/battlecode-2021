@@ -1,8 +1,6 @@
 package player.util.battlecode.flag.types.base.fields;
 
 import player.util.battlecode.flag.types.base.BaseFlag;
-import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
-import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
 import player.util.battlecode.flag.util.UtilFlag;
 import player.util.math.UtilMath;
 

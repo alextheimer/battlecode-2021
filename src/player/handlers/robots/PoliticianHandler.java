@@ -2,41 +2,26 @@ package player.handlers.robots;
 
 import battlecode.common.*;
 import player.RobotPlayer;
-import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.handlers.common.LinearMoverHandler;
 import player.handlers.common.PredicateFactories;
 import player.util.battlecode.UtilBattlecode;
-import player.util.battlecode.flag.Flag;
 import player.util.battlecode.flag.Flag.IFlag;
 import player.util.battlecode.flag.types.AttackAssignmentFlag;
-import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
-import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 import player.util.general.UtilGeneral;
 import player.util.math.DoubleVec2D;
-import player.util.math.IntVec2D;
 import player.util.math.Line2D;
 import player.util.math.UtilMath;
 
-import static player.handlers.common.HandlerCommon.*;
-
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Set;
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**

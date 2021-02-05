@@ -1,21 +1,14 @@
 package player.handlers.common;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import player.util.battlecode.UtilBattlecode;
@@ -125,6 +118,7 @@ public class LinearMoverHandler {
 		assert candidateCollection.size() > 0 : "collection size must be positive; size: " + candidateCollection.size();
 		MapLocation currentMapLoc = rc.getLocation();
 		Function<MapLocation, Double> progressCostFunc = new Function<MapLocation, Double>() {
+			@Override
 			public Double apply(MapLocation mapLoc) {
 				// TODO(theimer): assert the validity of the MapLocation (near line, on the map)
 				DoubleVec2D diffVec = new DoubleVec2D(mapLoc.x - currentMapLoc.x,

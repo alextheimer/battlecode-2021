@@ -1,9 +1,6 @@
 package player.util.battlecode.flag.util;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import player.util.battlecode.flag.Flag;
@@ -11,8 +8,6 @@ import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
-import player.util.battlecode.flag.types.base.fields.MapLocField;
-import player.util.battlecode.flag.types.base.fields.RobotTypeField;
 import player.util.math.UtilMath;
 
 /**

@@ -1,11 +1,5 @@
 package player.util.math;
 
-import java.util.Arrays;
-
-import player.util.math.UtilMath.*;
-
-import java.lang.Math.*;
-
 /**
  * Stores math-related classes/functions.
  */

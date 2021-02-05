@@ -1,10 +1,7 @@
 package player.util.battlecode;
 
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 

@@ -3,11 +3,8 @@ package player.util.battlecode.flag.types.base.fields;
 import battlecode.common.MapLocation;
 import player.util.battlecode.UtilBattlecode;
 import player.util.battlecode.flag.types.base.BaseFlag;
-import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
-import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
-import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
 public class MapLocField implements BaseFlag.IFlagField {

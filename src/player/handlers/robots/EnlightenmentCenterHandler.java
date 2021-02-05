@@ -2,7 +2,6 @@ package player.handlers.robots;
 
 import battlecode.common.*;
 import player.RobotPlayer;
-import player.RobotPlayer.IRobotHandler;
 import player.handlers.common.HandlerCommon;
 import player.handlers.common.PredicateFactories;
 import player.util.battlecode.UtilBattlecode;
@@ -12,26 +11,15 @@ import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
-import player.util.general.UtilGeneral;
-import player.util.math.IntVec2D;
 import player.util.math.UtilMath;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
-
-import static player.handlers.common.HandlerCommon.*;
-
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;

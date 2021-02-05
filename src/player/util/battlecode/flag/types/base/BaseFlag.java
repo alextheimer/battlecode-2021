@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import player.util.battlecode.flag.Flag;
-import player.util.battlecode.flag.Flag.IFlag;
-import player.util.battlecode.flag.types.base.BaseFlag.IFlagField;
-import player.util.battlecode.flag.types.base.BaseFlag.IFlagFieldFactory;
 import player.util.battlecode.flag.util.FlagWalker;
-import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 
 /**
  * Contains common methods / interfaces used by flags that can be encoded/decoded
@@ -57,6 +53,7 @@ public abstract class BaseFlag implements Flag.IFlag {
 	/**
 	 * Returns the BaseFlag as an encoded sequence of bits.
 	 */
+	@Override
 	public int encode() {
 		FlagWalker flagWalker = new FlagWalker(0);
 		// sequentially write the encoded bits of each field into the FlagWalker

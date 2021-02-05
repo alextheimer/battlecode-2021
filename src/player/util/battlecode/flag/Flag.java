@@ -1,10 +1,7 @@
 package player.util.battlecode.flag;
 
-import player.util.battlecode.flag.Flag.IFlag;
 import player.util.battlecode.flag.util.FlagWalker;
 import player.util.battlecode.flag.util.UtilFlag;
-import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
-import player.util.battlecode.flag.util.UtilFlag.IFlagFactory;
 
 /**
  * Should be imported by the client (along with the `types` package) to encode/decode flags.

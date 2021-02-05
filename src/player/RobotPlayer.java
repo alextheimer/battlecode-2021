@@ -1,13 +1,6 @@
 package player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
-
 import battlecode.common.*;
-import player.handlers.*;
-import player.handlers.common.HandlerCommon.*;
 import player.handlers.robots.EnlightenmentCenterHandler;
 import player.handlers.robots.MuckrakerHandler;
 import player.handlers.robots.PoliticianHandler;

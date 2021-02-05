@@ -2,36 +2,19 @@ package player.handlers.common;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
-
-import com.sun.tools.corba.se.idl.toJavaPortable.Util;
 
 import battlecode.common.*;
 import player.handlers.common.HandlerCommon;
 import player.util.battlecode.UtilBattlecode;
 import player.util.battlecode.flag.Flag;
 import player.util.battlecode.flag.Flag.IFlag;
-import player.util.battlecode.flag.types.AttackAssignmentFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
-import player.util.battlecode.flag.types.PatrolAssignmentFlag;
-import player.util.battlecode.flag.util.UtilFlag.FlagOpCode;
 import player.util.general.UtilGeneral;
-import player.util.math.DoubleVec2D;
-import player.util.math.IntVec2D;
-import player.util.math.UtilMath;
-import player.util.math.UtilMath.*;
 
 /*
  * TODO(theimer):
