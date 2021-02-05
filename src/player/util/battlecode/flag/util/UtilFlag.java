@@ -16,7 +16,7 @@ import player.util.math.UtilMath;
 public class UtilFlag {
 
 	// stored before the encoded bits of an IFlag to indicate to Flag::decode how interpret the IFlag's bits
-	public static enum FlagOpCode { EMPTY, ASSIGN_PATROL, TARGET_MISSING, ENEMY_SIGHTED, ASSIGN_ATTACK }
+	public enum FlagOpCode { EMPTY, ASSIGN_PATROL, TARGET_MISSING, ENEMY_SIGHTED, ASSIGN_ATTACK }
 
 	static {
 		// make sure the empty flag is represented correctly
@@ -30,19 +30,19 @@ public class UtilFlag {
 	// number of bits used to encode each FlagOpCode
 	public static int NUM_OP_CODE_BITS = UtilMath.log2Ceil(UtilFlag.FLAG_OP_CODE_VALUES.length);
 
-	public static interface IFlagFactory {
+	public interface IFlagFactory {
 		/**
 		 * Decodes the bits of an encoded IFlag into an IFlag instance.
 		 *
 		 * @param bits must lie on [0, 2**numBits())
 		 * @return an instance of IFlag as described by the IFlag encoded within the argument bits.
 		 */
-		public Flag.IFlag decode(int bits);
+		Flag.IFlag decode(int bits);
 
 		/**
 		 * Returns the number of bits used to encode the IFlag.
 		 */
-		public int numBits();
+		int numBits();
 	}
 
 	// Maps each IFlag classe to the FlagOpCode Flag::encode/::decode uses to identify it.
@@ -71,7 +71,8 @@ public class UtilFlag {
 	 */
 	public static boolean validBits(final int expectedNumBits, final int bits) {
 		assert expectedNumBits > 0 : "expectedNumBits: " + expectedNumBits;
-		return (bits >= 0) && (UtilMath.log2Ceil(bits) <= expectedNumBits);
+		return (bits == 0) ||
+			   ((bits > 0) && (UtilMath.log2Ceil(bits) <= expectedNumBits));
 	}
 
 	/**
