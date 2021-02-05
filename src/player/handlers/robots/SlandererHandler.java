@@ -37,7 +37,7 @@ public class SlandererHandler implements RobotPlayer.IRobotHandler {
 	 * 
 	 * @param rc the RobotController for the current round.
 	 */
-	public SlandererHandler(RobotController rc) throws GameActionException {
+	public SlandererHandler(RobotController rc) {
 		List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
 		// look for an assignment flag
 		Optional<SimpleImmutableEntry<RobotInfo, IFlag>> assignmentEntry = 

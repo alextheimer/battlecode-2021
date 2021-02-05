@@ -55,71 +55,56 @@ interface IAssignmentHandler {
 public class PoliticianHandler implements RobotPlayer.IRobotHandler {
 	
 	// assignment handler for the Politician's current Enlightenment-Center-given assignment
-	IAssignmentHandler assignmentHandler = new UnassignedAssignmentHandler();
+	IAssignmentHandler assignmentHandler;
+	
+	public PoliticianHandler(RobotController rc) {
+		List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
+		// get the assigning robot/flag pair (if one is senseable)
+		Optional<SimpleImmutableEntry<RobotInfo, IFlag>> flagEntryOpt = HandlerCommon.getAnyAdjacentAssignmentFlag(rc, sensedRobots);
+		if (flagEntryOpt.isPresent()) {
+			this.assignmentHandler = this.makeHandlerFromAssignmentFlag(rc, flagEntryOpt.get().getValue());
+			UtilBattlecode.log("initialized via flag");
+		} else {
+			this.assignmentHandler = this.makeDefaultHandler(rc);
+			UtilBattlecode.log("initialized via self");
+		}
+	}
 	
 	/**
-	 * The 'default' handler for Politicians that have yet to receive an assignment
-	 * from an Enlightenment Center.
+	 * Returns the IAssignmentHandler to use when no assignment flag is detected.
+	 * Used when Slanderers change into Politicians after 300 rounds.
+	 * 
+	 * @param rc the RobotController for the current round.
 	 */
-	private class UnassignedAssignmentHandler implements IAssignmentHandler {
-		
-		/**
-		 * Returns an IAssignmentHandler according to the assignment flag.
-		 * 
-		 * @param rc the RobotController for the current round.
-		 * @param flag must be an assignment flag.
-		 */
-		private IAssignmentHandler makeHandlerFromAssignmentFlag(RobotController rc, IFlag flag) {
-			IAssignmentHandler handler;
-			if (flag instanceof PatrolAssignmentFlag) {
-					PatrolAssignmentFlag patrolAssignmentFlag = (PatrolAssignmentFlag)flag;
-					// build the patrol line and initial direction vector
-					DoubleVec2D outboundVec = UtilMath.degreesToVec(patrolAssignmentFlag.getOutboundDegrees());
-					DoubleVec2D pointOnLine = UtilBattlecode.mapLocToVec(rc.getLocation());
-					Line2D patrolLine = new Line2D(outboundVec, pointOnLine);
-					handler = new PatrolAssignmentHandler(patrolLine, outboundVec);
-			} else if (flag instanceof AttackAssignmentFlag) {
-					AttackAssignmentFlag attackAssignmentFlag = (AttackAssignmentFlag)flag;
-					MapLocation targetMapLoc = attackAssignmentFlag.getMapLoc(rc.getLocation());
-					handler = new AttackAssignmentHandler(targetMapLoc);
-			} else {
-				// TODO(theimer): change all RuntimeExceptions to something more appropriate.
-				throw new RuntimeException("unrecognized flag type: " + flag.getClass());
-			}
-			return handler;
+	private IAssignmentHandler makeDefaultHandler(RobotController rc) {
+		// just pick a random direction to patrol
+		return new PatrolAssignmentHandler(LinearMoverHandler.randomThruMapLocation(rc.getLocation()));
+	}
+	
+	/**
+	 * Returns an IAssignmentHandler according to the assignment flag.
+	 * 
+	 * @param rc the RobotController for the current round.
+	 * @param flag must be an assignment flag.
+	 */
+	private IAssignmentHandler makeHandlerFromAssignmentFlag(RobotController rc, IFlag flag) {
+		IAssignmentHandler handler;
+		if (flag instanceof PatrolAssignmentFlag) {
+				PatrolAssignmentFlag patrolAssignmentFlag = (PatrolAssignmentFlag)flag;
+				// build the patrol line and initial direction vector
+				DoubleVec2D outboundVec = UtilMath.degreesToVec(patrolAssignmentFlag.getOutboundDegrees());
+				DoubleVec2D pointOnLine = UtilBattlecode.mapLocToVec(rc.getLocation());
+				Line2D patrolLine = new Line2D(outboundVec, pointOnLine);
+				handler = new PatrolAssignmentHandler(patrolLine, outboundVec);
+		} else if (flag instanceof AttackAssignmentFlag) {
+				AttackAssignmentFlag attackAssignmentFlag = (AttackAssignmentFlag)flag;
+				MapLocation targetMapLoc = attackAssignmentFlag.getMapLoc(rc.getLocation());
+				handler = new AttackAssignmentHandler(targetMapLoc);
+		} else {
+			// TODO(theimer): change all RuntimeExceptions to something more appropriate.
+			throw new RuntimeException("unrecognized flag type: " + flag.getClass());
 		}
-		
-		/**
-		 * Returns the IAssignmentHandler to use when no assignment flag is detected.
-		 * Used when Slanderers change into Politicians after 300 rounds.
-		 * 
-		 * @param rc the RobotController for the current round.
-		 */
-		private IAssignmentHandler makeDefaultHandler(RobotController rc) {
-			// just pick a random direction to patrol
-			return new PatrolAssignmentHandler(LinearMoverHandler.randomThruMapLocation(rc.getLocation()));
-		}
-		
-		@Override
-		public IAssignmentHandler handle(RobotController rc) {
-			
-			// immediately build an assignment-appropriate handler and call its handle().
-			
-			IAssignmentHandler assignedHandler;
-			List<RobotInfo> sensedRobots = Arrays.asList(rc.senseNearbyRobots());
-			// get the assigning robot/flag pair (if one is senseable)
-			Optional<SimpleImmutableEntry<RobotInfo, IFlag>> flagEntryOpt = HandlerCommon.getAnyAdjacentAssignmentFlag(rc, sensedRobots);
-			if (flagEntryOpt.isPresent()) {
-				assignedHandler = this.makeHandlerFromAssignmentFlag(rc, flagEntryOpt.get().getValue());
-				UtilBattlecode.log("initialized via flag");
-			} else {
-				assignedHandler = this.makeDefaultHandler(rc);
-				UtilBattlecode.log("initialized via self");
-			}
-			assignedHandler.handle(rc);
-			return assignedHandler;
-		}
-		
+		return handler;
 	}
 
 	private class PatrolAssignmentHandler implements IAssignmentHandler {
