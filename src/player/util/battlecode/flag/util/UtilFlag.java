@@ -82,7 +82,7 @@ public class UtilFlag {
 	 *     Must be non-negative and representable by no more than NUM_OP_CODE_BITS bits.
 	 */
 	public static FlagOpCode getOpCodeFromBits(final int bits) {
-		assert (bits >= 0) && (UtilMath.log2Ceil(bits) <= UtilFlag.NUM_OP_CODE_BITS) : "bits: " + bits;
+		assert UtilFlag.validBits(UtilFlag.NUM_OP_CODE_BITS, bits) : "bits: " + bits;
 		return UtilFlag.FLAG_OP_CODE_VALUES[bits];
 	}
 
