@@ -13,8 +13,8 @@ import player.util.battlecode.UtilBattlecode;
  */
 public strictfp class RobotPlayer {
 
-	// Set 'false' for competition code to ignore exceptions and hope for the best...
-	private static final boolean RESIGN_ON_EXCEPTION = true;
+	// Set 'false' for competition code to ignore throwables and hope for the best...
+	private static final boolean RESIGN_ON_THROWABLE = true;
 
 	/**
 	 * Handles a specific RobotType controller.
@@ -57,10 +57,10 @@ public strictfp class RobotPlayer {
             try {
                 handler = handler.handle(rc);
                 Clock.yield();  // wait until the next turn.
-	        } catch (final Exception e) {
-	        	// Other RobotControllers are unaffected by any exceptions thrown here.
+	        } catch (final Throwable e) {
+	        	// Other RobotControllers are unaffected by any throwables thrown here.
 	        	e.printStackTrace();
-	        	if (RobotPlayer.RESIGN_ON_EXCEPTION) {
+	        	if (RobotPlayer.RESIGN_ON_THROWABLE) {
 	        		rc.resign();
 	        	}
 	        }
