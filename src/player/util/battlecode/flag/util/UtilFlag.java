@@ -5,6 +5,7 @@ import java.util.Map;
 
 import player.util.battlecode.flag.Flag;
 import player.util.battlecode.flag.types.AttackAssignmentFlag;
+import player.util.battlecode.flag.types.EmptyFlag;
 import player.util.battlecode.flag.types.EnemySightedFlag;
 import player.util.battlecode.flag.types.PatrolAssignmentFlag;
 import player.util.battlecode.flag.types.TargetMissingFlag;
@@ -58,12 +59,14 @@ public class UtilFlag {
 		UtilFlag.flagToOpCodeMap.put(EnemySightedFlag.class, FlagOpCode.ENEMY_SIGHTED);
 		UtilFlag.flagToOpCodeMap.put(PatrolAssignmentFlag.class, FlagOpCode.ASSIGN_PATROL);
 		UtilFlag.flagToOpCodeMap.put(TargetMissingFlag.class, FlagOpCode.TARGET_MISSING);
+		UtilFlag.flagToOpCodeMap.put(EmptyFlag.class, FlagOpCode.EMPTY);
 
 		// build opCodeToFactoryMap --------------------------------------------------------
 		UtilFlag.opCodeToFactoryMap.put(FlagOpCode.ASSIGN_ATTACK, AttackAssignmentFlag.getFactory());
 		UtilFlag.opCodeToFactoryMap.put(FlagOpCode.ENEMY_SIGHTED, EnemySightedFlag.getFactory());
 		UtilFlag.opCodeToFactoryMap.put(FlagOpCode.ASSIGN_PATROL, PatrolAssignmentFlag.getFactory());
 		UtilFlag.opCodeToFactoryMap.put(FlagOpCode.TARGET_MISSING, TargetMissingFlag.getFactory());
+		UtilFlag.opCodeToFactoryMap.put(FlagOpCode.EMPTY, EmptyFlag.getFactory());
 	}
 
 	/**
