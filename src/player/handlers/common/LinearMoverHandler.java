@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -192,19 +191,15 @@ public class LinearMoverHandler {
 
 			// collect all progressive locations that are unoccupied
 			final List<MapLocation> candidateList = new ArrayList<>();
-			progressiveMapLocIterator.forEachRemaining(new Consumer<MapLocation>() {
-
-				// see below: this won't ever throw a GameActionException because it will only ever
-				// be called on adjacent (i.e. senseable) MapLocations.
-				Predicate<MapLocation> unoccupiedPredicate = PredicateFactories.mapLocOnMapSilenced(rc);
-
-				@Override
-				public void accept(final MapLocation t) {
-					if (this.unoccupiedPredicate.test(t)) {
-						candidateList.add(t);
-					}
+			// note: no GameActionException will be thrown because the MapLocations are adjacent (i.e. senseable).
+			final Predicate<MapLocation> unoccupiedPredicate = PredicateFactories.mapLocUnoccupiedSilenced(rc);
+			// forEachRemaining seems to conflict with the Battlecode backend
+			while (progressiveMapLocIterator.hasNext()) {
+				final MapLocation candidateMapLoc = progressiveMapLocIterator.next();
+				if (unoccupiedPredicate.test(candidateMapLoc)) {
+					candidateList.add(candidateMapLoc);
 				}
-			});
+			}
 
 			if (candidateList.size() > 0) {
 				// unoccupied/progressive locations exist!
