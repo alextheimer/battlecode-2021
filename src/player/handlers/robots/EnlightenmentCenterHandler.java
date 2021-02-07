@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -289,8 +288,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
     	// Oscillate between Slanderers and Politicians
 		if ((this.numUnitsBuilt % 2) == 1) {
 			// assign the slanderer to patrol in a random direction
-			final Random rand = new Random();
-			final int patrolDegrees = rand.nextInt(UtilMath.CIRCLE_DEGREES);
+			final int patrolDegrees = UtilGeneral.RANDOM.nextInt(UtilMath.CIRCLE_DEGREES);
 			buildSuccess = this.attemptBuild(rc, RobotType.SLANDERER, new PatrolAssignmentFlag(patrolDegrees));
 		} else if (this.targetQueue.size() > 0) {
 			// we have a target to attack
@@ -302,8 +300,7 @@ public class EnlightenmentCenterHandler implements RobotPlayer.IRobotHandler {
 			}
 		} else {
 			// no targets to attack; just patrol in a random direction
-			final Random rand = new Random();
-			final int patrolDegrees = rand.nextInt(UtilMath.CIRCLE_DEGREES);
+			final int patrolDegrees = UtilGeneral.RANDOM.nextInt(UtilMath.CIRCLE_DEGREES);
 			buildSuccess = this.attemptBuild(rc, RobotType.POLITICIAN, new PatrolAssignmentFlag(patrolDegrees));
 		}
 		return buildSuccess;

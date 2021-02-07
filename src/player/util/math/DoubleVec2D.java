@@ -1,7 +1,8 @@
 package player.util.math;
 
 import java.util.Objects;
-import java.util.Random;
+
+import player.util.general.UtilGeneral;
 
 public class DoubleVec2D {
 
@@ -17,8 +18,7 @@ public class DoubleVec2D {
 	}
 
 	public static DoubleVec2D makeRandomUnit() {
-		final Random rand = new Random();
-		final double angle = 2 * Math.PI * rand.nextDouble();
+		final double angle = 2 * Math.PI * UtilGeneral.RANDOM.nextDouble();
 		return new DoubleVec2D(Math.cos(angle), Math.sin(angle));
 	}
 

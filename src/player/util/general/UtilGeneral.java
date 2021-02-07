@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -11,6 +12,9 @@ import java.util.stream.Stream;
  * Contains utility functions/classes.
  */
 public class UtilGeneral {
+
+	// Battlecode backend instantiates all Randoms with the same seed!
+	public static final Random RANDOM = new Random();
 
 	/**
 	 * Returns the throwable's stack trace as a String.
